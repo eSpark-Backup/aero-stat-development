@@ -16,16 +16,90 @@
 .header {
     display: flex;
     padding-left: 35px;
+    padding-right: 35px;
     height: 90px;
-    background-color: #16423C;
     box-shadow: 0px 5px 10px 0px #00000040;
     align-items: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1;
+    justify-content: space-between;
+}
+
+.header.light{
+   background-color: #16423C;
+}
+
+.header.dark{
+    background-color: #181818;
+    box-shadow: 0px 5px 10px 0px #00000040;
 }
 
 .header h1 {
     color: #FFFFFF;
     font-size: 20px;
 }
+
+
+.switch-container {
+    display: inline-block;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.switch {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 5px 10px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #b3d4fc;
+    margin-right: 10px;
+}
+
+.sun-icon {
+    font-size: 20px;
+    color: #f1c40f;
+}
+
+.moon-icon {
+    font-size: 20px;
+    color: #f39c12;
+}
+
+.label {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Add light and dark theme styling */
+.switch-container.light .switch {
+    background-color: #e0e0e0;
+}
+
+.switch-container.dark .switch {
+    background-color: #333;
+}
+
+.switch-container.dark .label {
+    color: #fff;
+}
+
+.switch-container.dark .icon {
+    background-color: #2c3e50;
+}
+
 
 /* Header */
 
@@ -36,12 +110,21 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 30px;
+    flex-wrap: wrap;
+    row-gap: 25px;
 }
 
 .home .data h1 {
     font-size: 20px;
-    color: #000000;
     font-weight: 500;
+}
+
+.home .data.light h1 {
+    color: #000000;
+}
+
+.home .data.dark h1 {
+    color: #F8F8F8;
 }
 
 .breaker {
@@ -52,9 +135,12 @@
     display: none;
 }
 
+.highcharts-data-labels .highcharts-series-0 .highcharts-gauge-series .highcharts-color-0 .highcharts-tracker {
+    display: none !important;
+}
+
 .home-main-container {
     min-height: calc(100vh - 90px);
-    background-color: #E9EFEC;
     display: flex;
     padding-top: 60px;
     flex-grow: 1;
@@ -62,19 +148,29 @@
     align-items: center;
 }
 
+.home-main-container.light {
+    background-color: #E9EFEC;
+}
+
+.home-main-container.dark {
+    background-color: rgb(18, 18, 18);
+}
+
+
 .home-main {
-    /* style={{ width: "100%", display: "flex", justifyContent: "space-between" }} */
     width: 100%;
     display: flex;
     justify-content: space-between;
     flex-direction: row;
     row-gap: 30px;
+    padding-top: 30px;
 }
 
 .home {
     width: 95%;
     display: flex;
     flex-direction: column;
+    padding: 50px 0px 20px 0px;
 }
 
 .left {
@@ -95,8 +191,8 @@
 
 .box1 {
     width: 100%;
-    box-shadow: 0px 0px 10px 0px #6F6F6F40;
-    background-color: #FFFFFF;
+    /* box-shadow: 0px 0px 10px 0px #6F6F6F40;
+    background-color: #FFFFFF; */
     min-height: 300px;
     max-height: 300px;
     border-radius: 20px;
@@ -111,6 +207,39 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.box-head.light{
+    color: #000000;
+}
+
+.box-head.dark{
+    color: #F8F8F8;
+}
+
+.graph-info{
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.graph-value{
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.graph-info.light{
+    color: #000000;    
+}
+.graph-info.dark{
+    color: #F8F8F8;    
+}
+
+.graph-value.light{
+    color: #0029FF;
+}
+.graph-value.dark{
+    color: #ECDFCC;
 }
 
 .box-head h1 {
@@ -133,7 +262,7 @@
     flex-direction: column;
 }
 
-input {
+.input-box input {
     height: 40px;
     border: 1px solid #E4E4E4;
     background-color: #FAFAFA;
@@ -179,19 +308,57 @@ input {
     padding-bottom: 20px;
 }
 
+.magnetometer-boxes2 {
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 20px;
+}
+
+.single-column-box {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    /* border: 1px solid red; */
+}
+
+.weather-boxes {
+    width: 46%;
+    display: flex;
+    padding-bottom: 20px;
+    align-items: center;
+}
+
+.box1.light,
+.box2.light,
+.box3.light,
+.box5.light,
+.control-box.light {
+    box-shadow: 0px 0px 10px 0px #6F6F6F40;
+    background-color: #FFFFFF;
+}
+
+.box1.dark,
+.box2.dark,
+.box3.dark,
+.box5.dark,
+.control-box.dark {
+    box-shadow: 0px 0px 10px 0px #6F6F6F40;
+    background-color: #222222;
+}
+
 .box3,
 .box5 {
     width: 100%;
-    box-shadow: 0px 0px 10px 0px #6F6F6F40;
-    background-color: #FFFFFF;
+
     min-height: 300px;
     border-radius: 20px;
 }
 
 .box2 {
     width: 100%;
-    box-shadow: 0px 0px 10px 0px #6F6F6F40;
-    background-color: #FFFFFF;
+    /* box-shadow: 0px 0px 10px 0px #6F6F6F40;
+    background-color: #FFFFFF; */
     min-height: 300px;
     border-radius: 20px;
 }
@@ -206,9 +373,6 @@ input {
 
 .control-box {
     width: 30%;
-    background-color: #FFFFFF;
-    border: 1px solid #E4E4E4;
-    box-shadow: 0px 0px 10px 0px #00000040;
     height: 100%;
     border-radius: 20px;
 }
@@ -237,6 +401,14 @@ input {
     color: #FFFFFF;
 }
 
+.status-box.light{
+    color: #000000;
+}
+
+.status-box.dark{
+    color: #F8F8F8;
+}
+
 .active {
     background-color: #09F012;
 }
@@ -258,6 +430,22 @@ input {
 }
 
 @media screen and (max-width:1200px) {
+    .input-box {
+        flex-direction: column;
+        row-gap: 10px;
+    }
+
+    .input-box input,
+    .input-box button {
+        width: 100%;
+    }
+
+    .box-content {
+        padding-top: 20px;
+    }
+}
+
+@media screen and (max-width:1200px) {
     .home-main {
         flex-direction: column;
     }
@@ -270,14 +458,39 @@ input {
         width: 100%;
     }
 
-    .magnetometer-boxes, .control-box {
+    .magnetometer-boxes,
+    .control-box,
+    .magnetometer-boxes2 {
         width: 100%;
     }
 
-    .box3 .box-body, .box2 .box-body, .box4 {
+    .box3 .box-body,
+    .box2 .box-body,
+    .box4,
+    .single-column-box {
         flex-direction: column;
     }
-    
+
+    .box4 {
+        row-gap: 20px;
+    }
+
+    .single-column-box {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .weather-boxes {
+        flex-direction: column;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .control-box {
+        height: 200px;
+        /* padding: 15px 0px; */
+    }
+
 }
 
 /* Home2 */
