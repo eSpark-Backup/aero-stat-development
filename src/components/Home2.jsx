@@ -46,8 +46,8 @@ const Home2 = () => {
                             </div>
                             <div className="box-body">
                                 <div className="box-content">
-                                    <div>
-                                        <label htmlFor="logFile">Log File</label>
+                                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
+                                        <label htmlFor="logFile" style={{ color: theme === "light" ? "#000000" : "#F8F8F8", fontWeight: "600" }}>Log File</label>
                                         <div className='input-box'>
                                             <input type="text" id="logFile" defaultValue={"Aero/Nw7/Fgs/70082024"} />
                                             <button>Browse</button>
@@ -72,14 +72,14 @@ const Home2 = () => {
                                         highcharts={Highcharts}
                                         options={gaugeOptions}
                                     />
-                                    <p className={`graph-info ${theme}`}>Hull Helium: <span className={`graph-value ${theme}`}>0.12</span></p>
+                                    <p className={`graph-info ${theme}`} style={{ position: "relative", bottom: "30px" }}>Hull Helium: <span className={`graph-value ${theme}`}>0.12</span></p>
                                 </div>
                                 <div className='magnetometer-boxes'>
                                     <HighchartsReact
                                         highcharts={Highcharts}
                                         options={gaugeOptions}
                                     />
-                                    <p className={`graph-info ${theme}`}>Ballonet Air: <span className={`graph-value ${theme}`}>0.295</span></p>
+                                    <p className={`graph-info ${theme}`} style={{ position: "relative", bottom: "30px" }}>Ballonet Air: <span className={`graph-value ${theme}`}>0.295</span></p>
                                 </div>
 
                             </div>
@@ -90,10 +90,12 @@ const Home2 = () => {
                             </div>
                             <div className="box-body">
                                 <div className='single-column-box'>
-                                    <HighchartsReact
-                                        highcharts={Highcharts}
-                                        options={gaugeOptions}
-                                    />
+                                    <div className='graph-box'>
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={gaugeOptions}
+                                        />
+                                    </div>
                                     <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
                                         <p className={`graph-info ${theme}`}>Tension: <span className={`graph-value ${theme}`}>1</span></p>
                                         <p className={`graph-info ${theme}`}>Max Tension: <span className={`graph-value ${theme}`}>1</span></p>
@@ -109,29 +111,35 @@ const Home2 = () => {
                             <div className={`box-head ${theme}`}>
                                 <h1>Magnetometer</h1>
                             </div>
-                            <div className="box-body">
-                                <div className='magnetometer-boxes2'>
-                                    <HighchartsReact
-                                        highcharts={Highcharts}
-                                        options={gaugeOptions}
-                                    />
-                                    <p className={`graph-info ${theme}`}>Ballonet Air: <span className={`graph-value ${theme}`}>0.295</span></p>
-                                </div>
-                                <div className='magnetometer-boxes2'>
-                                    <HighchartsReact
-                                        highcharts={Highcharts}
-                                        options={gaugeOptions}
-                                    />
-                                    <p className={`graph-info ${theme}`}>Pitch: <span className={`graph-value ${theme}`}>0.2</span></p>
-                                </div>
-                                <div className='magnetometer-boxes2'>
-                                    <HighchartsReact
-                                        highcharts={Highcharts}
-                                        options={gaugeOptions}
-                                    />
-                                    <p className={`graph-info ${theme}`}>Roll: <span className={`graph-value ${theme}`}>3.9</span></p>
-                                </div>
 
+                            <div className="box-body3">
+                                <div className='weather-boxes'>
+
+                                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
+                                        <p className={`graph-info ${theme}`}>Heading: <span className={`graph-value ${theme}`}>23.9</span></p>
+                                    </div>
+                                    <div className='graph-box'>
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={gaugeOptions}
+                                        />
+                                    </div>
+
+                                </div>
+                                <div className='weather-boxes'>
+
+                                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
+                                        <p className={`graph-info ${theme}`}>Pitch:<span className={`graph-value ${theme}`}>0.2 Deg</span></p>
+                                        <p className={`graph-info ${theme}`}>Roll:<span className={`graph-value ${theme}`}>3.9 Deg</span></p>
+                                    </div>
+                                    <div className='graph-box'>
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={gaugeOptions}
+                                        />
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                         <div className="box4">
@@ -139,7 +147,7 @@ const Home2 = () => {
                                 <div className={`box-head ${theme}`}>
                                     <h1>Radio Link</h1>
                                 </div>
-                                <div className="box-body">
+                                <div className="box-body2">
                                     <div className="statuses">
                                         <div className={`status-box ${theme}`}>
                                             <p>Coms Status:</p>
@@ -157,14 +165,14 @@ const Home2 = () => {
                                 <div className={`box-head ${theme}`}>
                                     <h1>Fans Control</h1>
                                 </div>
-                                <div className="box-body">
+                                <div className="box-body2">
                                     <div className="statuses">
                                         <div className={`status-box ${theme}`}>
-                                            <p>Fan 1:</p>
+                                            <p style={{ width: "40%" }}>Fan 1:</p>
                                             <div className='status active'>On</div>
                                         </div>
                                         <div className={`status-box ${theme}`}>
-                                            <p>Fan 2:</p>
+                                            <p style={{ width: "40%" }}>Fan 2:</p>
                                             <div className='status active'>On</div>
                                         </div>
                                     </div>
@@ -174,14 +182,14 @@ const Home2 = () => {
                                 <div className={`box-head ${theme}`}>
                                     <h1>Lights Control</h1>
                                 </div>
-                                <div className="box-body">
+                                <div className="box-body2">
                                     <div className="statuses">
                                         <div className={`status-box ${theme}`}>
-                                            <p>Strobe Control:</p>
+                                            <p style={{ width: "65%" }}>Strobe Control:</p>
                                             <div className='status inactive'>On</div>
                                         </div>
                                         <div className={`status-box ${theme}`}>
-                                            <p>Position Control:</p>
+                                            <p style={{ width: "65%" }}>Position Control:</p>
                                             <div className='status inactive'>On</div>
                                         </div>
                                     </div>
@@ -192,17 +200,19 @@ const Home2 = () => {
                             <div className={`box-head ${theme}`}>
                                 <h1>Weather Station</h1>
                             </div>
-                            <div className="box-body">
+                            <div className="box-body3">
                                 <div className='weather-boxes'>
 
                                     <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
                                         <p style={{ fontSize: "16px", fontWeight: "600", textAlign: "center", color: "#FF0000" }}>Aerostat Heading</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", textAlign: "center", color: "#0075FF" }}>Wind Angle</p>
                                     </div>
-                                    <HighchartsReact
-                                        highcharts={Highcharts}
-                                        options={gaugeOptions}
-                                    />
+                                    <div className='graph-box'>
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={gaugeOptions}
+                                        />
+                                    </div>
 
                                 </div>
                                 <div className='weather-boxes'>
@@ -211,10 +221,12 @@ const Home2 = () => {
                                         <p className={`graph-info ${theme}`}>Air Temp (c):<span className={`graph-value ${theme}`}>15</span></p>
                                         <p className={`graph-info ${theme}`}>Bare Pres (intig):<span className={`graph-value ${theme}`}>292</span></p>
                                     </div>
-                                    <HighchartsReact
-                                        highcharts={Highcharts}
-                                        options={gaugeOptions}
-                                    />
+                                    <div className='graph-box'>
+                                        <HighchartsReact
+                                            highcharts={Highcharts}
+                                            options={gaugeOptions}
+                                        />
+                                    </div>
 
                                 </div>
                             </div>
