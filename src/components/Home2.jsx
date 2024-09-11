@@ -1,14 +1,33 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Highcharts from 'highcharts'
 import HighchartsReact from 'highcharts-react-official'
 import HighchartsMore from 'highcharts/highcharts-more'
 import HighchartsGauge from 'highcharts/modules/solid-gauge'
 import { getGaugeOptions } from '../constant'
 import { ThemeContext } from '../ThemeHandler'
+import Modal from './Modal'
 
 HighchartsMore(Highcharts)
 HighchartsGauge(Highcharts)
 const Home2 = () => {
+    const [form, setForm] = useState({
+        ip: "192.168.0.102",
+        weather: "4002",
+        hmr: "4003",
+        ballonet: "4004",
+        helium: "4005",
+        adam: "4006",
+        ebox: "4007",
+    })
+    const [openModal, setOpenModal] = useState(false);
+    const handleClose = () => {
+        setOpenModal(false)
+    }
+    const handleSubmit = () => {
+        console.log(form, "success")
+        setOpenModal(false)
+    }
+
     const { theme } = React.useContext(ThemeContext);
     const gaugeOptions = getGaugeOptions(theme);
     return (
@@ -118,6 +137,24 @@ const Home2 = () => {
                         <div className="box4">
                             <div className={`control-box ${theme}`}>
                                 <div className={`box-head ${theme}`}>
+                                    <h1>Radio Link</h1>
+                                </div>
+                                <div className="box-body">
+                                    <div className="statuses">
+                                        <div className={`status-box ${theme}`}>
+                                            <p>Coms Status:</p>
+                                            <div className='load active'></div>
+                                            <p>Connected</p>
+                                        </div>
+                                        <div className='loader'></div>
+                                        <div style={{ display: "flex", justifyContent: "center" }} className='btn-group'>
+                                            <button style={{ cursor: "pointer" }} onClick={() => setOpenModal(true)}>Config</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={`control-box ${theme}`}>
+                                <div className={`box-head ${theme}`}>
                                     <h1>Fans Control</h1>
                                 </div>
                                 <div className="box-body">
@@ -130,22 +167,6 @@ const Home2 = () => {
                                             <p>Fan 2:</p>
                                             <div className='status active'>On</div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className={`control-box ${theme}`}>
-                                <div className={`box-head ${theme}`}>
-                                    <h1>Radio Link</h1>
-                                </div>
-                                <div className="box-body">
-                                    <div className="statuses">
-                                        <div className={`status-box ${theme}`}>
-                                            <p>Coms Status:</p>
-                                            <div className='load active'></div>
-                                            <p>Connected</p>
-                                        </div>
-                                        <div className='loader'></div>
-
                                     </div>
                                 </div>
                             </div>
@@ -201,6 +222,14 @@ const Home2 = () => {
                     </div>
                 </div>
             </div>
+            <Modal
+                theme={theme}
+                open={openModal}
+                handleClose={handleClose}
+                handleSubmit={handleSubmit}
+                form={form}
+                setForm={setForm}
+            />
         </div>
     )
 }

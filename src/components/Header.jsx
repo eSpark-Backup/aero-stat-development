@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { ThemeContext } from '../ThemeHandler';
+import sun from "../assets/sun.png";
+import moon from "../assets/moon.png";
 
 const Header = () => {
     const { theme, toggleTheme } = React.useContext(ThemeContext);
@@ -10,9 +12,9 @@ const Header = () => {
                 <div className="switch">
                     <div className="icon">
                         {theme === "light" ? (
-                            <span className="sun-icon">☀️</span>
+                            <img src={sun} alt="sun" />
                         ) : (
-                            <span className="moon-icon">🌙</span>
+                            <img src={moon} alt="sun" />
                         )}
                     </div>
                     <span className="label">{theme === "light" ? "Light" : "Dark"}</span>
