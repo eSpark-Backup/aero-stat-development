@@ -98,7 +98,7 @@ const Home2 = () => {
                                             options={gaugeOptions}
                                         />
                                     </div>
-                                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
+                                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }} className='text-box'>
                                         <p className={`graph-info ${theme}`}>Tension: <span className={`graph-value ${theme}`}>1</span></p>
                                         <p className={`graph-info ${theme}`}>Max Tension: <span className={`graph-value ${theme}`}>1</span></p>
                                     </div>
@@ -115,7 +115,7 @@ const Home2 = () => {
                             </div>
 
                             <div className="box-body3">
-                                <div className='weather-boxes'>
+                                <div className='weather-boxes' style={{ rowGap: "20px" }}>
 
                                     <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
                                         <p className={`graph-info ${theme}`}>Heading: <span className={`graph-value ${theme}`}>23.9</span></p>
@@ -123,7 +123,7 @@ const Home2 = () => {
                                     <Compass variant="single" heading={40} />
 
                                 </div>
-                                <div className='weather-boxes'>
+                                <div className='weather-boxes' style={{ rowGap: "20px" }}>
 
                                     <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
                                         <p className={`graph-info ${theme}`}>Pitch:<span className={`graph-value ${theme}`}>0.2 Deg</span></p>
@@ -193,7 +193,7 @@ const Home2 = () => {
                                 <h1>Weather Station</h1>
                             </div>
                             <div className="box-body3">
-                                <div className='weather-boxes'>
+                                <div className='weather-boxes' style={{ rowGap: "20px" }}>
 
                                     <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
                                         <p style={{ fontSize: "16px", fontWeight: "600", textAlign: "center", color: "#FF0000" }}>Aerostat Heading</p>
@@ -204,7 +204,7 @@ const Home2 = () => {
                                 </div>
                                 <div className='weather-boxes'>
 
-                                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
+                                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }} className='text-box'>
                                         <p className={`graph-info ${theme}`}>Air Temp (c):<span className={`graph-value ${theme}`}>15</span></p>
                                         <p className={`graph-info ${theme}`}>Bare Pres (intig):<span className={`graph-value ${theme}`}>292</span></p>
                                     </div>
