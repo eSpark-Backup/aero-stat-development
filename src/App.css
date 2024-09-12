@@ -243,6 +243,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 10px;
 }
 
 .box-body2 {
@@ -373,8 +374,7 @@
 .control-box {
   width: 30%;
   height: 100%;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  border-radius: 20px;
 }
 
 .statuses {
