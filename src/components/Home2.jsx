@@ -6,6 +6,7 @@ import HighchartsGauge from 'highcharts/modules/solid-gauge'
 import { getGaugeOptions } from '../constant'
 import { ThemeContext } from '../ThemeHandler'
 import Modal from './Modal'
+import Compass from './compass'
 
 HighchartsMore(Highcharts)
 HighchartsGauge(Highcharts)
@@ -118,12 +119,7 @@ const Home2 = () => {
                                     <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
                                         <p className={`graph-info ${theme}`}>Heading: <span className={`graph-value ${theme}`}>23.9</span></p>
                                     </div>
-                                    <div className='graph-box'>
-                                        <HighchartsReact
-                                            highcharts={Highcharts}
-                                            options={gaugeOptions}
-                                        />
-                                    </div>
+                                    <Compass variant="single" heading={40} />
 
                                 </div>
                                 <div className='weather-boxes'>
@@ -207,12 +203,7 @@ const Home2 = () => {
                                         <p style={{ fontSize: "16px", fontWeight: "600", textAlign: "center", color: "#FF0000" }}>Aerostat Heading</p>
                                         <p style={{ fontSize: "16px", fontWeight: "600", textAlign: "center", color: "#0075FF" }}>Wind Angle</p>
                                     </div>
-                                    <div className='graph-box'>
-                                        <HighchartsReact
-                                            highcharts={Highcharts}
-                                            options={gaugeOptions}
-                                        />
-                                    </div>
+                                    <Compass variant="double" heading={45} angle={315} />
 
                                 </div>
                                 <div className='weather-boxes'>
