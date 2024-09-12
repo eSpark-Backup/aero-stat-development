@@ -7,6 +7,7 @@ import { getGaugeOptions } from '../constant'
 import { ThemeContext } from '../ThemeHandler'
 import Modal from './Modal'
 import Compass from './compass'
+import RollMeter from './RollMeter'
 
 HighchartsMore(Highcharts)
 HighchartsGauge(Highcharts)
@@ -128,12 +129,7 @@ const Home2 = () => {
                                         <p className={`graph-info ${theme}`}>Pitch:<span className={`graph-value ${theme}`}>0.2 Deg</span></p>
                                         <p className={`graph-info ${theme}`}>Roll:<span className={`graph-value ${theme}`}>3.9 Deg</span></p>
                                     </div>
-                                    <div className='graph-box'>
-                                        <HighchartsReact
-                                            highcharts={Highcharts}
-                                            options={gaugeOptions}
-                                        />
-                                    </div>
+                                    <RollMeter pitch={0} roll={0} />
 
                                 </div>
                             </div>
