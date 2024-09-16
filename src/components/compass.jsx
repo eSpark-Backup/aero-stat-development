@@ -30,8 +30,8 @@ const Compass = ({ variant, heading, angle }) => {
       }}
     >
       <svg
-        width="250"
-        height="250"
+        width="240"
+        height="240"
         viewBox="0 0 200 200"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -68,10 +68,10 @@ const Compass = ({ variant, heading, angle }) => {
 
         {["N", "S", "E", "W"].map((dir, i) => {
           const positions = {
-            N: { x: 100, y: 10, width: "25", height: "20" },
-            S: { x: 100, y: 195, width: "25", height: "20" },
-            E: { x: 190, y: 100, width: "20", height: "25" },
-            W: { x: 10, y: 100, width: "20", height: "25" },
+            N: { x: 104, y: 10, width: "25", height: "20" },
+            S: { x: 104, y: 199, width: "25", height: "20" },
+            E: { x: 191, y: 100, width: "20", height: "25" },
+            W: { x: 8, y: 100, width: "20", height: "25" },
           };
 
           return (
@@ -137,7 +137,7 @@ const Compass = ({ variant, heading, angle }) => {
               strokeWidth="1"
               transform={`rotate(${90 + heading / 2} 100 100)`}
             />
-            <circle cx="100" cy="100" r="8" fill="#16423C" />
+            <circle cx="100" cy="100" r="7.99" fill="#16423C" />
           </svg>
         ) : (
           <>

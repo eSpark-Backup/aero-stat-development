@@ -96,7 +96,7 @@
 .data {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   flex-wrap: wrap;
   row-gap: 25px;
 }
@@ -149,7 +149,7 @@
   justify-content: space-between;
   flex-direction: row;
   row-gap: 30px;
-  padding-top: 30px;
+  padding-top: 40px;
 }
 
 .home {
@@ -250,14 +250,14 @@
   padding: 36px 0px;
 }
 
-.box-body3{
+.box-body3 {
   justify-content: space-around;
 }
 
 .box-content {
   width: 80%;
   display: flex;
-  row-gap: 30px;
+  row-gap: 23px;
   flex-direction: column;
 }
 
@@ -272,12 +272,12 @@
 
 .input-box {
   display: flex;
-  column-gap: 5px;
+  column-gap: 10px;
 }
 
 .input-box button {
   /* width: 20%; */
-  height: 40px;
+  height: 41px;
   width: 110px;
   border-radius: 50px;
   background-color: #16423c;
@@ -288,12 +288,12 @@
 
 .btn-group {
   display: flex;
-  column-gap: 30px;
+  column-gap: 35px;
 }
 
 .btn-group button {
   width: 110px;
-  height: 40px;
+  height: 41px;
   border-radius: 50px;
   background-color: #6a9c89;
   box-shadow: 0px 4px 4px 0px #00000040;
@@ -333,7 +333,7 @@
   display: flex;
   /* padding-bottom: 20px; */
   align-items: center;
-  column-gap: 20px;
+  column-gap: 26px;
   justify-content: space-around;
 }
 
@@ -367,7 +367,7 @@
   max-height: 445px;
 }
 
-.box3 .box-body{
+.box3 .box-body {
   justify-content: space-around;
 }
 
@@ -460,6 +460,34 @@ button {
   flex-direction: column;
 }
 
+.custom-desc {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  color: #FF0000;
+}
+
+.custom-desc2 {
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  color: #0075FF;
+}
+
+
+@media screen and (min-width:1201px) and (max-width:1600px) {
+
+  .weather-boxes {
+    column-gap: 0px;
+  }
+
+  .graph-value,
+  .graph-info,
+  .custom-desc2 {
+    font-size: 12px;
+  }
+}
+
 @media screen and (max-width: 1200px) {
   .input-box {
     flex-direction: column;
@@ -502,7 +530,7 @@ button {
     flex-direction: column;
   }
 
-  .box3 .box-body{
+  .box3 .box-body {
     padding-top: 15px;
   }
 
@@ -521,6 +549,7 @@ button {
     overflow: hidden;
     /* padding-bottom: 10px; */
     padding-top: 20px;
+    row-gap: 50px;
   }
 
   .weather-boxes {

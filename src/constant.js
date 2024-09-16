@@ -8,8 +8,8 @@ export const getGaugeOptions = (theme) => {
             plotBackgroundImage: null,
             plotShadow: false,
             backgroundColor: "transparent",
-            height: 250,
-            width: 250
+            height: 240,
+            width: 240
         },
         plotOptions: {
             gauge: {

@@ -130,26 +130,28 @@ const Home2 = () => {
                     highcharts={Highcharts}
                     options={gaugeOptions}
                   />
-                  <p
-                    className={`graph-info ${theme}`}
-                    style={{ position: "relative", bottom: "30px" }}
-                  >
-                    Hull Helium:{" "}
+                  <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                    <p
+                      className={`graph-info ${theme}`}
+                    >
+                      Hull Helium:
+                    </p>
                     <span className={`graph-value ${theme}`}>0.12</span>
-                  </p>
+                  </div>
                 </div>
                 <div className="magnetometer-boxes">
                   <HighchartsReact
                     highcharts={Highcharts}
                     options={gaugeOptions}
                   />
-                  <p
-                    className={`graph-info ${theme}`}
-                    style={{ position: "relative", bottom: "30px" }}
-                  >
-                    Ballonet Air:{" "}
+                  <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                    <p
+                      className={`graph-info ${theme}`}
+                    >
+                      Ballonet Air:{" "}
+                    </p>
                     <span className={`graph-value ${theme}`}>0.295</span>
-                  </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -173,13 +175,18 @@ const Home2 = () => {
                     }}
                     className="text-box"
                   >
-                    <p className={`graph-info ${theme}`}>
-                      Tension: <span className={`graph-value ${theme}`}>1</span>
-                    </p>
-                    <p className={`graph-info ${theme}`}>
-                      Max Tension:{" "}
+                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                      <p className={`graph-info ${theme}`}>
+                        Tension:
+                      </p>
                       <span className={`graph-value ${theme}`}>1</span>
-                    </p>
+                    </div>
+                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                      <p className={`graph-info ${theme}`}>
+                        Max Tension:
+                      </p>
+                      <span className={`graph-value ${theme}`}>1</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -193,18 +200,20 @@ const Home2 = () => {
 
               <div className="box-body3">
                 <div className="weather-boxes" style={{ rowGap: "20px" }}>
-                  <div
+                  {/* <div
                     style={{
                       display: "flex",
                       flexDirection: "column",
                       rowGap: "10px",
                     }}
-                  >
+                  > */}
+                  <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
                     <p className={`graph-info ${theme}`}>
-                      Heading:{" "}
-                      <span className={`graph-value ${theme}`}>23.9</span>
+                      Heading:
                     </p>
+                    <span className={`graph-value ${theme}`}>23.9</span>
                   </div>
+                  {/* </div> */}
                   <Compass variant="single" heading={40} />
                 </div>
                 <div className="weather-boxes" style={{ rowGap: "20px" }}>
@@ -215,14 +224,18 @@ const Home2 = () => {
                       rowGap: "10px",
                     }}
                   >
-                    <p className={`graph-info ${theme}`}>
-                      Pitch:
+                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                      <p className={`graph-info ${theme}`}>
+                        Pitch:
+                      </p>
                       <span className={`graph-value ${theme}`}>0.2 Deg</span>
-                    </p>
-                    <p className={`graph-info ${theme}`}>
-                      Roll:
+                    </div>
+                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                      <p className={`graph-info ${theme}`}>
+                        Roll:
+                      </p>
                       <span className={`graph-value ${theme}`}>3.9 Deg</span>
-                    </p>
+                    </div>
                   </div>
                   <RollMeter pitch={0} roll={0} />
                 </div>
@@ -324,22 +337,24 @@ const Home2 = () => {
                     }}
                   >
                     <p
-                      style={{
-                        fontSize: "16px",
-                        fontWeight: "600",
-                        textAlign: "center",
-                        color: "#FF0000",
-                      }}
+                      // style={{
+                      //   fontSize: "16px",
+                      //   fontWeight: "600",
+                      //   textAlign: "center",
+                      //   color: "#FF0000",
+                      // }}
+                      className="custom-desc"
                     >
                       Aerostat Heading
                     </p>
                     <p
-                      style={{
-                        fontSize: "16px",
-                        fontWeight: "600",
-                        textAlign: "center",
-                        color: "#0075FF",
-                      }}
+                      // style={{
+                      //   fontSize: "16px",
+                      //   fontWeight: "600",
+                      //   textAlign: "center",
+                      //   color: "#0075FF",
+                      // }}
+                      className="custom-desc2"
                     >
                       Wind Angle
                     </p>
@@ -355,14 +370,18 @@ const Home2 = () => {
                     }}
                     className="text-box"
                   >
-                    <p className={`graph-info ${theme}`}>
-                      Air Temp (c):
-                      <span className={`graph-value ${theme}`}>15</span>
-                    </p>
-                    <p className={`graph-info ${theme}`}>
-                      Bare Pres (intig):
+                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                      <p className={`graph-info ${theme}`}>
+                        Air Temp (c):
+                        <span className={`graph-value ${theme}`}>15</span>
+                      </p>
+                    </div>
+                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                      <p className={`graph-info ${theme}`}>
+                        Bare Pres (intig):
+                      </p>
                       <span className={`graph-value ${theme}`}>292</span>
-                    </p>
+                    </div>
                   </div>
                   <div className="graph-box">
                     <HighchartsReact
