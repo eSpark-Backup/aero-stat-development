@@ -414,10 +414,15 @@
   height: 40px;
   border-radius: 50px;
   display: flex;
+  cursor: pointer;
   justify-content: center;
   align-items: center;
   font-size: 16px;
   color: #ffffff;
+}
+
+button {
+  cursor: pointer;
 }
 
 .status-box.light {
