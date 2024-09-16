@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
@@ -8,20 +8,63 @@ import { ThemeContext } from "../ThemeHandler";
 import Modal from "./Modal";
 import Compass from "./compass";
 import RollMeter from "./RollMeter";
+import {fetchDataUtil, weatherstationData, digitalCompassData, ballonetSensorData, heliumSensorData, adamsData, eBoxData } from "../utils";
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
 const Home2 = () => {
   const [form, setForm] = useState({
-    ip: "",
-    weather: "",
-    hmr: "",
-    ballonet: "",
-    helium: "",
-    adam: "",
-    ebox: "",
+    ip: "192.168.0.102",
+    weather: "4002",
+    hmr: "4003",
+    ballonet: "4004",
+    helium: "4005",
+    adam: "4006",
+    ebox: "4007",
   });
   const [openModal, setOpenModal] = useState(false);
+  const [responses, setResponses] = useState({});
+
+  const fetchData = async () => {
+    try {
+      const results = await fetchDataUtil(form);
+      const encoder = new TextEncoder();
+
+      const str = '$HCHDT,128.0,T*22\r\n$WIMDA,29.2878,I,0.9918,B,18.8,C,,,,,,,,,,,,,,*36\r\n$WIMWV,158.4,R,1.9,N,A*23\r\n';
+      results[0] = encoder.encode(str).buffer;
+      
+      const compassStr = '$PTNTHPR,240.1,N,0.8,N,2.2,N*3B\r\n';
+      results[1] = encoder.encode(compassStr).buffer;
+      
+      const ballonetStr = '?01CP=0.0712\r\n';
+      results[2] = encoder.encode(ballonetStr).buffer;
+      
+      const heliumStr = '?01CP=-0.3984\r\n';
+      results[3] = encoder.encode(heliumStr).buffer;
+
+      const parsedResponses = {
+        weather: weatherstationData(results[0]),
+        digitalCompass: digitalCompassData(results[1]),
+        ballonet: ballonetSensorData(results[2]),
+        helium: heliumSensorData(results[3]),
+        adams: adamsData(results[4]),
+        ebox: eBoxData(results[5]),
+      };
+
+      setResponses(parsedResponses);
+    } catch (error) {
+      console.error("Error in fetchData:", error);
+    }
+  };
+  
+  useEffect(() => {
+    // console.log(responses,"HELOOOOOOOOOOOOOOOO*********");
+    if (form.ip) {
+      const interval = setInterval(fetchData, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [form]);
+
   const handleClose = () => {
     setOpenModal(false);
   };
