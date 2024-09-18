@@ -8,7 +8,7 @@ import { ThemeContext } from "../ThemeHandler";
 import Modal from "./Modal";
 import Compass from "./compass";
 import RollMeter from "./RollMeter";
-import {fetchDataUtil, weatherstationData, digitalCompassData, ballonetSensorData, heliumSensorData, adamsData, eBoxData } from "../utils";
+import { fetchDataUtil, weatherstationData, digitalCompassData, ballonetSensorData, heliumSensorData, adamsData, eBoxData } from "../utils";
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -32,13 +32,13 @@ const Home2 = () => {
 
       const str = '$HCHDT,128.0,T*22\r\n$WIMDA,29.2878,I,0.9918,B,18.8,C,,,,,,,,,,,,,,*36\r\n$WIMWV,158.4,R,1.9,N,A*23\r\n';
       results[0] = encoder.encode(str).buffer;
-      
+
       const compassStr = '$PTNTHPR,240.1,N,0.8,N,2.2,N*3B\r\n';
       results[1] = encoder.encode(compassStr).buffer;
-      
+
       const ballonetStr = '?01CP=0.0712\r\n';
       results[2] = encoder.encode(ballonetStr).buffer;
-      
+
       const heliumStr = '?01CP=-0.3984\r\n';
       results[3] = encoder.encode(heliumStr).buffer;
 
@@ -56,7 +56,7 @@ const Home2 = () => {
       console.error("Error in fetchData:", error);
     }
   };
-  
+
   useEffect(() => {
     // console.log(responses,"HELOOOOOOOOOOOOOOOO*********");
     if (form.ip) {
@@ -67,11 +67,59 @@ const Home2 = () => {
 
   const handleClose = () => {
     setOpenModal(false);
+    setErrorValues([]);
+    setForm({
+      ip: "",
+      weather: "",
+      hmr: "",
+      ballonet: "",
+      helium: "",
+      adam: "",
+      ebox: "",
+    })
   };
+
+  const [errorValues, setErrorValues] = useState([]);
+
   const handleSubmit = () => {
+    const errors = [];
+
+    // Regular expression to validate IPv4 addresses
+    const ipRegex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
+
+    Object.keys(form).forEach(key => {
+      // Check for empty values
+      if (form[key].trim() === "") {
+        errors.push(key);
+      }
+    });
+
+    // Validate IP address format if it exists in the form
+    if (form.ip && !ipRegex.test(form.ip.trim())) {
+      errors.push('ip');
+    }
+
+    setErrorValues(errors);
+    if (errors.length > 0) {
+      // alert(`Please fill in the following fields: ${errors.join(", ")}`);
+      return;
+    }
+
     console.log(form, "success");
     setOpenModal(false);
+    setErrorValues([]);
+    setForm({
+      ip: "",
+      weather: "",
+      hmr: "",
+      ballonet: "",
+      helium: "",
+      adam: "",
+      ebox: "",
+    })
   };
+
+
 
   const { theme } = React.useContext(ThemeContext);
   const gaugeOptions = getGaugeOptions(theme);
@@ -445,6 +493,8 @@ const Home2 = () => {
         handleSubmit={handleSubmit}
         form={form}
         setForm={setForm}
+        errorValues={errorValues}
+        setErrorValues={setErrorValues}
       />
     </div>
   );
