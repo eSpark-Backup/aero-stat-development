@@ -1,5 +1,5 @@
-// Define your gaugeOptions as a function that takes 'theme' as a parameter
-export const getGaugeOptions = (theme) => {
+// Define your gaugeOptions as a function that takes 'theme', 'min', 'max', and 'seriesData' as parameters
+export const getGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) => {
     return {
         chart: {
             type: 'gauge',
@@ -14,7 +14,7 @@ export const getGaugeOptions = (theme) => {
         plotOptions: {
             gauge: {
                 dataLabels: {
-                    enabled: false // This hides the central data label
+                    enabled: false
                 }
             }
         },
@@ -31,9 +31,9 @@ export const getGaugeOptions = (theme) => {
             }]
         },
         yAxis: {
-            min: 0,
-            max: 610,
-            tickInterval: 50,
+            min: min,
+            max: max,
+            tickInterval: (max - min) / 10,
             tickWidth: 2,
             tickPosition: 'inside',
             tickLength: 6,
@@ -43,35 +43,34 @@ export const getGaugeOptions = (theme) => {
             labels: {
                 rotation: 'auto',
                 style: {
-                    // Set color based on theme
+                    
                     color: theme === 'light' ? '#101010' : '#AAAD9C'
                 }
             },
             title: {
                 text: ''
             },
-            lineWidth: 1,
             lineColor: theme === 'light' ? '#101010' : '#AAAD9C',
             plotBands: [{
-                from: 0,
-                to: 170,
+                from: min,
+                to: min + (max - min) * 0.28,
                 color: '#FAFF01',
                 thickness: -25,
             }, {
-                from: 170,
-                to: 460,
+                from: min + (max - min) * 0.28,
+                to: min + (max - min) * 0.75,
                 color: '#09F012',
                 thickness: -25,
             }, {
-                from: 460,
-                to: 610,
+                from: min + (max - min) * 0.75,
+                to: max, // Third plot band
                 color: '#FF4C4C',
                 thickness: -25,
             }]
         },
         series: [{
             name: '',
-            data: [450],
+            data: seriesData,
             tooltip: {
                 valueSuffix: ' km/h',
             },
@@ -87,8 +86,6 @@ export const getGaugeOptions = (theme) => {
                 radius: 3,
                 baseWidth: 8,
             },
-        },
-
-        ]
+        }]
     }
 }

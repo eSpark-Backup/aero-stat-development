@@ -24,6 +24,11 @@ const Home2 = () => {
   });
   const [openModal, setOpenModal] = useState(false);
   const [responses, setResponses] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [fan1, setFan1] = useState(false);
+  const [fan2, setFan2] = useState(false);
+  const [strobe, setStrobe] = useState(false);
+  const [position, setPosition] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -49,7 +54,7 @@ const Home2 = () => {
       // console.log("Parsed Weather Data:", digitalCompassdata);
       // console.log("Parsed Ballonet Data:", ballonetSensordata);
       // console.log("Parsed Helium Pressure:", heliumSensordata);
-      
+
       const parsedResponses = {
         weather: weatherdata,
         digitalCompass: digitalCompassdata,
@@ -58,11 +63,12 @@ const Home2 = () => {
         adams: adamsdata,
         ebox: eBoxdata,
       };
-      
-      console.log("Parsed Responses after each second:", parsedResponses);
+
       setResponses(parsedResponses);
+      setIsLoading(false)
     } catch (error) {
       console.error("Error in fetchData:", error);
+      setIsLoading(false)
     }
   };
 
@@ -73,17 +79,21 @@ const Home2 = () => {
     }
   }, [form]);
 
+  useEffect(() => {
+    fetchData()
+  }, [fan1, fan2, position, strobe])
+
   const handleClose = () => {
     setOpenModal(false);
     setErrorValues([]);
     setForm({
-      ip: "",
-      weather: "",
-      hmr: "",
-      ballonet: "",
-      helium: "",
-      adam: "",
-      ebox: "",
+      ip: "192.168.0.102",
+      weather: "4002",
+      hmr: "4003",
+      ballonet: "4004",
+      helium: "4005",
+      adam: "4006",
+      ebox: "4007",
     })
   };
 
@@ -133,26 +143,19 @@ const Home2 = () => {
   const gaugeOptions = getGaugeOptions(theme);
 
   const [logFile, setLogFile] = useState("");
-  const [fan1, setFan1] = useState(true);
-  const [fan2, setFan2] = useState(true);
-  const [strobe, setStrobe] = useState(false);
-  const [position, setPosition] = useState(false);
+
 
   const handleFan1 = () => {
-    ////Fan1 functionality
-    setFan1(!fan1);
+    setFan1(prev => !prev);
   };
   const handleFan2 = () => {
-    ////Fan2 functionality
-    setFan2(!fan2);
+    setFan2(prev => !prev);
   };
   const handleStrobe = () => {
-    ////Strobe functionality
-    setStrobe(!strobe);
+    setStrobe(prev => !prev);
   };
   const handlePosition = () => {
-    ////Position functionality
-    setPosition(!position);
+    setPosition(prev => !prev);
   };
   const handleBrowse = () => {
     console.log(logFile, "logFile")
@@ -168,343 +171,352 @@ const Home2 = () => {
     ////stop functionality
   };
 
-  return (
-    <div className={`home-main-container ${theme}`}>
-      <div className="home">
-        <div className={`data ${theme}`}>
-          <h1>Fri, 30 August 2024, 07:49:01</h1>
-          <h1>Live Data</h1>
-        </div>
-        <div className="breaker"></div>
-        <div className="home-main">
-          <div className="left">
-            <div className={`box1 ${theme}`}>
-              <div className={`box-head ${theme}`}>
-                <h1>Data Logging</h1>
-              </div>
-              <div className="box-body">
-                <div className="box-content">
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: "10px",
-                    }}
-                  >
-                    <label
-                      htmlFor="logFile"
-                      style={{
-                        color: theme === "light" ? "#000000" : "#F8F8F8",
-                        fontWeight: "600",
-                      }}
-                    >
-                      Log File
-                    </label>
-                    <div className="input-box">
-                      <input
-                        type="text"
-                        id="logFile"
-                        placeholder={"Aero/Nw7/Fgs/70082024"}
-                        value={logFile}
-                        onChange={(e) => setLogFile(e.target.value)}
-                      />
-                      <button onClick={handleBrowse}>Browse</button>
-                    </div>
-                  </div>
-                  <div className="btn-group">
-                    <button onClick={handlePlay}>Play</button>
-                    <button onClick={handleFrwd}>FWD</button>
-                    <button onClick={handleStop}>Stop</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={`box3 ${theme}`}>
-              <div className={`box-head ${theme}`}>
-                <h1>Pressures (inWG)</h1>
-              </div>
-              <div className="box-body">
-                <div className="magnetometer-boxes">
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={gaugeOptions}
-                  />
-                  <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
-                    <p
-                      className={`graph-info ${theme}`}
-                    >
-                      Hull Helium:
-                    </p>
-                    <span className={`graph-value ${theme}`}>0.12</span>
-                  </div>
-                </div>
-                <div className="magnetometer-boxes">
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={gaugeOptions}
-                  />
-                  <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
-                    <p
-                      className={`graph-info ${theme}`}
-                    >
-                      Ballonet Air:{" "}
-                    </p>
-                    <span className={`graph-value ${theme}`}>0.295</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className={`box5 ${theme}`}>
-              <div className={`box-head ${theme}`}>
-                <h1>Confluence Point Tension</h1>
-              </div>
-              <div className="box-body">
-                <div className="single-column-box">
-                  <div className="graph-box">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={gaugeOptions}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: "10px",
-                    }}
-                    className="text-box"
-                  >
-                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
-                      <p className={`graph-info ${theme}`}>
-                        Tension:
-                      </p>
-                      <span className={`graph-value ${theme}`}>1</span>
-                    </div>
-                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
-                      <p className={`graph-info ${theme}`}>
-                        Max Tension:
-                      </p>
-                      <span className={`graph-value ${theme}`}>1</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="right">
-            <div className={`box2 ${theme}`}>
-              <div className={`box-head ${theme}`}>
-                <h1>Magnetometer</h1>
-              </div>
+  useEffect(() => {
+    console.log("Parsed Responses after each second:", responses);
+  }, [responses])
 
-              <div className="box-body3">
-                <div className="weather-boxes" style={{ rowGap: "20px" }}>
-                  {/* <div
+  return (
+    <>
+      {isLoading ?
+        <div style={{ width: "100%", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <h1>Loading....</h1>
+        </div>
+        : <div className={`home-main-container ${theme}`}>
+          <div className="home">
+            <div className={`data ${theme}`}>
+              <h1>Fri, 30 August 2024, 07:49:01</h1>
+              <h1>Live Data</h1>
+            </div>
+            <div className="breaker"></div>
+            <div className="home-main">
+              <div className="left">
+                <div className={`box1 ${theme}`}>
+                  <div className={`box-head ${theme}`}>
+                    <h1>Data Logging</h1>
+                  </div>
+                  <div className="box-body">
+                    <div className="box-content">
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          rowGap: "10px",
+                        }}
+                      >
+                        <label
+                          htmlFor="logFile"
+                          style={{
+                            color: theme === "light" ? "#000000" : "#F8F8F8",
+                            fontWeight: "600",
+                          }}
+                        >
+                          Log File
+                        </label>
+                        <div className="input-box">
+                          <input
+                            type="text"
+                            id="logFile"
+                            placeholder={"Aero/Nw7/Fgs/70082024"}
+                            value={logFile}
+                            onChange={(e) => setLogFile(e.target.value)}
+                          />
+                          <button onClick={handleBrowse}>Browse</button>
+                        </div>
+                      </div>
+                      <div className="btn-group">
+                        <button onClick={handlePlay}>Play</button>
+                        <button onClick={handleFrwd}>FWD</button>
+                        <button onClick={handleStop}>Stop</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={`box3 ${theme}`}>
+                  <div className={`box-head ${theme}`}>
+                    <h1>Pressures (inWG)</h1>
+                  </div>
+                  <div className="box-body">
+                    <div className="magnetometer-boxes">
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={getGaugeOptions(theme, -1, 6, [responses?.helium?.HelPressure || 0])}
+                      />
+                      <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                        <p
+                          className={`graph-info ${theme}`}
+                        >
+                          Hull Helium:
+                        </p>
+                        <span className={`graph-value ${theme}`}>{responses?.helium?.HelPressure}</span>
+                      </div>
+                    </div>
+                    <div className="magnetometer-boxes">
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={getGaugeOptions(theme, 0, 6, [responses?.ballonet?.BalPressure || 0])}
+                      />
+                      <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                        <p
+                          className={`graph-info ${theme}`}
+                        >
+                          Ballonet Air:
+                        </p>
+                        <span className={`graph-value ${theme}`}>{responses?.ballonet?.BalPressure}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className={`box5 ${theme}`}>
+                  <div className={`box-head ${theme}`}>
+                    <h1>Confluence Point Tension</h1>
+                  </div>
+                  <div className="box-body">
+                    <div className="single-column-box">
+                      <div className="graph-box">
+                        <HighchartsReact
+                          highcharts={Highcharts}
+                          options={getGaugeOptions(theme, 0, 750, [responses?.ballonet?.BalPressure || 0])}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          rowGap: "10px",
+                        }}
+                        className="text-box"
+                      >
+                        <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                          <p className={`graph-info ${theme}`}>
+                            Tension:
+                          </p>
+                          <span className={`graph-value ${theme}`}>{responses?.adams?.Tension}</span>
+                        </div>
+                        <div style={{ display: "flex", columnGap: "6px", alignItems: "center", position: "relative", bottom: "30px" }}>
+                          <p className={`graph-info ${theme}`}>
+                            Max Tension:
+                          </p>
+                          <span className={`graph-value ${theme}`}>{responses?.adams?.MaxTension}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="right">
+                <div className={`box2 ${theme}`}>
+                  <div className={`box-head ${theme}`}>
+                    <h1>Magnetometer</h1>
+                  </div>
+
+                  <div className="box-body3">
+                    <div className="weather-boxes" style={{ rowGap: "20px" }}>
+                      {/* <div
                     style={{
                       display: "flex",
                       flexDirection: "column",
                       rowGap: "10px",
                     }}
                   > */}
-                  <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
-                    <p className={`graph-info ${theme}`}>
-                      Heading:
-                    </p>
-                    <span className={`graph-value ${theme}`}>23.9</span>
-                  </div>
-                  {/* </div> */}
-                  <Compass variant="single" heading={40} />
-                </div>
-                <div className="weather-boxes" style={{ rowGap: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: "10px",
-                    }}
-                  >
-                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
-                      <p className={`graph-info ${theme}`}>
-                        Pitch:
-                      </p>
-                      <span className={`graph-value ${theme}`}>0.2 Deg</span>
-                    </div>
-                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
-                      <p className={`graph-info ${theme}`}>
-                        Roll:
-                      </p>
-                      <span className={`graph-value ${theme}`}>3.9 Deg</span>
-                    </div>
-                  </div>
-                  <RollMeter pitch={0} roll={0} />
-                </div>
-              </div>
-            </div>
-            <div className="box4">
-              <div className={`control-box ${theme}`}>
-                <div className={`box-head ${theme}`}>
-                  <h1>Radio Link</h1>
-                </div>
-                <div className="box-body2">
-                  <div className="statuses">
-                    <div className={`status-box ${theme}`}>
-                      <p>Coms Status:</p>
-                      <div className="load active"></div>
-                      <p>Connected</p>
-                    </div>
-                    <div className="loader"></div>
-                    <div
-                      style={{ display: "flex", justifyContent: "center" }}
-                      className="btn-group"
-                    >
-                      <button
-                        style={{ cursor: "pointer" }}
-                        onClick={() => setOpenModal(true)}
-                      >
-                        Config
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={`control-box ${theme}`}>
-                <div className={`box-head ${theme}`}>
-                  <h1>Fans Control</h1>
-                </div>
-                <div className="box-body2">
-                  <div className="statuses">
-                    <div className={`status-box ${theme}`}>
-                      <p style={{ width: "40%" }}>Fan 1:</p>
-                      <div
-                        onClick={handleFan1}
-                        className={`status ${fan1 ? "active" : "inactive"}`}
-                      >
-                        {fan1 ? "On" : "Off"}
+                      <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                        <p className={`graph-info ${theme}`}>
+                          Heading:
+                        </p>
+                        <span className={`graph-value ${theme}`}>{responses?.weather?.heading}</span>
                       </div>
+                      <Compass variant="single" heading={responses?.weather?.heading} />
                     </div>
-                    <div className={`status-box ${theme}`}>
-                      <p style={{ width: "40%" }}>Fan 2:</p>
+                    <div className="weather-boxes" style={{ rowGap: "20px" }}>
                       <div
-                        onClick={handleFan2}
-                        className={`status ${fan2 ? "active" : "inactive"}`}
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          rowGap: "10px",
+                        }}
                       >
-                        {fan2 ? "On" : "Off"}
+                        <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                          <p className={`graph-info ${theme}`}>
+                            Pitch:
+                          </p>
+                          <span className={`graph-value ${theme}`}>{responses?.digitalCompass?.Pitch} Deg</span>
+                        </div>
+                        <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                          <p className={`graph-info ${theme}`}>
+                            Roll:
+                          </p>
+                          <span className={`graph-value ${theme}`}>{responses?.digitalCompass?.Roll} Deg</span>
+                        </div>
+                      </div>
+                      <RollMeter pitch={responses?.digitalCompass?.Pitch} roll={responses?.digitalCompass?.Roll} />
+                    </div>
+                  </div>
+                </div>
+                <div className="box4">
+                  <div className={`control-box ${theme}`}>
+                    <div className={`box-head ${theme}`}>
+                      <h1>Radio Link</h1>
+                    </div>
+                    <div className="box-body2">
+                      <div className="statuses">
+                        <div className={`status-box ${theme}`}>
+                          <p>Coms Status:</p>
+                          <div className="load active"></div>
+                          <p>Connected</p>
+                        </div>
+                        <div className="loader"></div>
+                        <div
+                          style={{ display: "flex", justifyContent: "center" }}
+                          className="btn-group"
+                        >
+                          <button
+                            style={{ cursor: "pointer" }}
+                            onClick={() => setOpenModal(true)}
+                          >
+                            Config
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div className={`control-box ${theme}`}>
-                <div className={`box-head ${theme}`}>
-                  <h1>Lights Control</h1>
-                </div>
-                <div className="box-body2">
-                  <div className="statuses">
-                    <div className={`status-box ${theme}`}>
-                      <p style={{ width: "65%" }}>Strobe Control:</p>
-                      <div
-                        onClick={handleStrobe}
-                        className={`status ${strobe ? "active" : "inactive"}`}
-                      >
-                        {strobe ? "On" : "Off"}
+                  <div className={`control-box ${theme}`}>
+                    <div className={`box-head ${theme}`}>
+                      <h1>Fans Control</h1>
+                    </div>
+                    <div className="box-body2">
+                      <div className="statuses">
+                        <div className={`status-box ${theme}`}>
+                          <p style={{ width: "40%" }}>Fan 1:</p>
+                          <div
+                            onClick={handleFan1}
+                            className={`status ${fan1 ? "active" : "inactive"}`}
+                          >
+                            {fan1 ? "On" : "Off"}
+                          </div>
+                        </div>
+                        <div className={`status-box ${theme}`}>
+                          <p style={{ width: "40%" }}>Fan 2:</p>
+                          <div
+                            onClick={handleFan2}
+                            className={`status ${fan2 ? "active" : "inactive"}`}
+                          >
+                            {fan2 ? "On" : "Off"}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className={`status-box ${theme}`}>
-                      <p style={{ width: "65%" }}>Position Control:</p>
-                      <div
-                        onClick={handlePosition}
-                        className={`status ${position ? "active" : "inactive"}`}
-                      >
-                        {position ? "On" : "Off"}
+                  </div>
+                  <div className={`control-box ${theme}`}>
+                    <div className={`box-head ${theme}`}>
+                      <h1>Lights Control</h1>
+                    </div>
+                    <div className="box-body2">
+                      <div className="statuses">
+                        <div className={`status-box ${theme}`}>
+                          <p style={{ width: "65%" }}>Strobe Control:</p>
+                          <div
+                            onClick={handleStrobe}
+                            className={`status ${strobe ? "active" : "inactive"}`}
+                          >
+                            {strobe ? "On" : "Off"}
+                          </div>
+                        </div>
+                        <div className={`status-box ${theme}`}>
+                          <p style={{ width: "65%" }}>Position Control:</p>
+                          <div
+                            onClick={handlePosition}
+                            className={`status ${position ? "active" : "inactive"}`}
+                          >
+                            {position ? "On" : "Off"}
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className={`box2 ${theme}`}>
-              <div className={`box-head ${theme}`}>
-                <h1>Weather Station</h1>
-              </div>
-              <div className="box-body3">
-                <div className="weather-boxes" style={{ rowGap: "20px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: "10px",
-                    }}
-                  >
-                    <p
-                      // style={{
-                      //   fontSize: "16px",
-                      //   fontWeight: "600",
-                      //   textAlign: "center",
-                      //   color: "#FF0000",
-                      // }}
-                      className="custom-desc"
-                    >
-                      Aerostat Heading
-                    </p>
-                    <p
-                      // style={{
-                      //   fontSize: "16px",
-                      //   fontWeight: "600",
-                      //   textAlign: "center",
-                      //   color: "#0075FF",
-                      // }}
-                      className="custom-desc2"
-                    >
-                      Wind Angle
-                    </p>
+                <div className={`box2 ${theme}`}>
+                  <div className={`box-head ${theme}`}>
+                    <h1>Weather Station</h1>
                   </div>
-                  <Compass variant="double" heading={45} angle={315} />
-                </div>
-                <div className="weather-boxes">
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      rowGap: "10px",
-                    }}
-                    className="text-box"
-                  >
-                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
-                      <p className={`graph-info ${theme}`}>
-                        Air Temp (c):
-                        <span className={`graph-value ${theme}`}>15</span>
-                      </p>
+                  <div className="box-body3">
+                    <div className="weather-boxes" style={{ rowGap: "20px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          rowGap: "10px",
+                        }}
+                      >
+                        <p
+                          // style={{
+                          //   fontSize: "16px",
+                          //   fontWeight: "600",
+                          //   textAlign: "center",
+                          //   color: "#FF0000",
+                          // }}
+                          className="custom-desc"
+                        >
+                          Aerostat Heading
+                        </p>
+                        <p
+                          // style={{
+                          //   fontSize: "16px",
+                          //   fontWeight: "600",
+                          //   textAlign: "center",
+                          //   color: "#0075FF",
+                          // }}
+                          className="custom-desc2"
+                        >
+                          Wind Angle
+                        </p>
+                      </div>
+                      <Compass variant="double" heading={responses?.weather?.heading} angle={responses?.weather?.windAngle} />
                     </div>
-                    <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
-                      <p className={`graph-info ${theme}`}>
-                        Bare Pres (intig):
-                      </p>
-                      <span className={`graph-value ${theme}`}>292</span>
+                    <div className="weather-boxes">
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          rowGap: "10px",
+                        }}
+                        className="text-box"
+                      >
+                        <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                          <p className={`graph-info ${theme}`}>
+                            Air Temp (c):
+                            <span className={`graph-value ${theme}`}>{responses?.weather?.airTemp}</span>
+                          </p>
+                        </div>
+                        <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
+                          <p className={`graph-info ${theme}`}>
+                            Bare Pres (intig):
+                          </p>
+                          <span className={`graph-value ${theme}`}>{responses?.weather?.baroPres}</span>
+                        </div>
+                      </div>
+                      <div className="graph-box">
+                        <HighchartsReact
+                          highcharts={Highcharts}
+                          options={getGaugeOptions(theme, 0, 70, [responses?.weather?.windSpeed || 0])}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="graph-box">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={gaugeOptions}
-                    />
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <Modal
-        theme={theme}
-        open={openModal}
-        handleClose={handleClose}
-        handleSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
-        errorValues={errorValues}
-        setErrorValues={setErrorValues}
-      />
-    </div>
+          <Modal
+            theme={theme}
+            open={openModal}
+            handleClose={handleClose}
+            handleSubmit={handleSubmit}
+            form={form}
+            setForm={setForm}
+            errorValues={errorValues}
+            setErrorValues={setErrorValues}
+          />
+        </div>}
+    </>
   );
 };
 
