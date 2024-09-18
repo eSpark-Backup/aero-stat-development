@@ -30,27 +30,36 @@ const Home2 = () => {
       const results = await fetchDataUtil(form);
       const encoder = new TextEncoder();
 
-      const str = '$HCHDT,128.0,T*22\r\n$WIMDA,29.2878,I,0.9918,B,18.8,C,,,,,,,,,,,,,,*36\r\n$WIMWV,158.4,R,1.9,N,A*23\r\n';
-      results[0] = encoder.encode(str).buffer;
+      results[0] = '$HCHDT,128.0,T*22\r\n$WIMDA,29.2878,I,0.9918,B,18.8,C,,,,,,,,,,,,,,*36\r\n$WIMWV,158.4,R,1.9,N,A*23\r\n';
+      results[1] = '$PTNTHPR,240.1,N,0.8,N,2.2,N*3B\r\n';
+      results[2] = '?01CP=0.0712\r\n';
+      results[3] = '?01CP=-0.3984\r\n';
 
-      const compassStr = '$PTNTHPR,240.1,N,0.8,N,2.2,N*3B\r\n';
-      results[1] = encoder.encode(compassStr).buffer;
+      results.forEach((result, index) => {
+        results[index] = encoder.encode(result).buffer;
+      });
 
-      const ballonetStr = '?01CP=0.0712\r\n';
-      results[2] = encoder.encode(ballonetStr).buffer;
-
-      const heliumStr = '?01CP=-0.3984\r\n';
-      results[3] = encoder.encode(heliumStr).buffer;
-
+      const weatherdata = weatherstationData(results[0]);
+      const digitalCompassdata = digitalCompassData(results[1]);
+      const ballonetSensordata = ballonetSensorData(results[2]);
+      const heliumSensordata = heliumSensorData(results[3]);
+      const adamsdata = adamsData(results[4]);
+      const eBoxdata = eBoxData(results[5]);
+      // console.log("Parsed Weather Data:", weatherdata);
+      // console.log("Parsed Weather Data:", digitalCompassdata);
+      // console.log("Parsed Ballonet Data:", ballonetSensordata);
+      // console.log("Parsed Helium Pressure:", heliumSensordata);
+      
       const parsedResponses = {
-        weather: weatherstationData(results[0]),
-        digitalCompass: digitalCompassData(results[1]),
-        ballonet: ballonetSensorData(results[2]),
-        helium: heliumSensorData(results[3]),
-        adams: adamsData(results[4]),
-        ebox: eBoxData(results[5]),
+        weather: weatherdata,
+        digitalCompass: digitalCompassdata,
+        ballonet: ballonetSensordata,
+        helium: heliumSensordata,
+        adams: adamsdata,
+        ebox: eBoxdata,
       };
-
+      
+      console.log("Parsed Responses after each second:", parsedResponses);
       setResponses(parsedResponses);
     } catch (error) {
       console.error("Error in fetchData:", error);
@@ -58,7 +67,6 @@ const Home2 = () => {
   };
 
   useEffect(() => {
-    // console.log(responses,"HELOOOOOOOOOOOOOOOO*********");
     if (form.ip) {
       const interval = setInterval(fetchData, 1000);
       return () => clearInterval(interval);

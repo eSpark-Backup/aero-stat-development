@@ -39,40 +39,47 @@ export const fetchDataUtil = async (form) => {
       })
     );
     
-    const results = await Promise.all(promises);
-    return results;
-  };
+  const results = await Promise.all(promises);
+  return results;
+};
   
-  // weather Station Port:4002
-  export const weatherstationData = (buffer) => {
-    let m_WXBytesRead = buffer.byteLength;
-    let m_WXBuffer = new Uint8Array(buffer);
-    let m_msgStr = "";
+// weather Station Port:4002
+export const weatherstationData = (buffer) => {
+  let m_WXBytesRead = buffer.byteLength;
+  let m_WXBuffer = new Uint8Array(buffer);
+  let m_msgStr = "";
+  let parsedData = {
+    heading: null,
+    airTemp: null,
+    baroPres: null,
+    windAngle: null,
+    windSpeed: null,
+  };
+
+  if (m_WXBytesRead > 0) {
+    let crOffset = 0;
+    let msgEndOffset = 0;
+    let foundEnd = false;
     
-    if (m_WXBytesRead > 0) {
-      let crOffset = 0;
-      let msgEndOffset = 0;
-      let foundEnd = false;
+    for (let i = m_WXBytesRead - 1; i >= 0; i--) {
+      if (m_WXBuffer[i] === 0x0D) { // 0x0D is '\r'
+        crOffset = i;
+        foundEnd = true;
+        break;
+      }
+    }
+    msgEndOffset = crOffset + 2;
+    
+    if (foundEnd && m_WXBytesRead >= msgEndOffset) {
+      let foundStart = false;
+      let msgStartOffset = 0;
       
-      for (let i = m_WXBytesRead - 1; i >= 0; i--) {
-        if (m_WXBuffer[i] === 0x0D) { // 0x0D is '\r'
-          crOffset = i;
-          foundEnd = true;
+      while (msgStartOffset < (crOffset - 1)) {
+        if (m_WXBuffer[msgStartOffset] === 0x24) { // 0x24 is '$'
+          foundStart = true;
           break;
         }
-      }
-      msgEndOffset = crOffset + 2;
-      
-      if (foundEnd && m_WXBytesRead >= msgEndOffset) {
-        let foundStart = false;
-        let msgStartOffset = 0;
-        
-        while (msgStartOffset < (crOffset - 1)) {
-          if (m_WXBuffer[msgStartOffset] === 0x24) { // 0x24 is '$'
-            foundStart = true;
-            break;
-          }
-          msgStartOffset++;
+        msgStartOffset++;
       }
       
       if (!foundStart) {
@@ -93,6 +100,7 @@ export const fetchDataUtil = async (form) => {
             if (h.length > 0) {
               let headingV = parseFloat(h);
               if (!isNaN(headingV)) {
+                parsedData.heading = headingV;
                 m_msgStr += `Aerostat Heading: ${h}\t`;
               }
             }
@@ -103,8 +111,10 @@ export const fetchDataUtil = async (form) => {
             let airTemp = parseFloat(airTempStr);
             
             if (!isNaN(baroPres) && !isNaN(airTemp)) {
-              baroPres = Math.floor(baroPres * 10.0 + 0.5) / 10.0;
-              m_msgStr += `Air Temp: ${airTempStr}\tBaro Pres: ${baroPresStr}\t`;
+              // baroPres = Math.floor(baroPres * 10.0 + 0.5) / 10.0;
+              parsedData.baroPres = Math.floor(baroPres * 10.0 + 0.5) / 10.0;
+              parsedData.airTemp = airTemp;
+              m_msgStr += `Air Temp: ${airTemp}\tBaro Pres: ${baroPres}\t`;
             }
           } else if (msgHeader === "$WIMWV") {
             let windDirectionStr = msgData[1];
@@ -113,7 +123,9 @@ export const fetchDataUtil = async (form) => {
             let windSpeed = parseFloat(windSpeedStr);
             
             if (!isNaN(windDirection) && !isNaN(windSpeed)) {
-              m_msgStr += `Wind Angle: ${windDirectionStr}\tWind Speed: ${windSpeedStr}\t`;
+              parsedData.windAngle = windDirection;
+              parsedData.windSpeed = windSpeed;
+              m_msgStr += `Wind Angle: ${windDirection}\tWind Speed: ${windSpeed}\t`;
             }
           }
         }
@@ -127,6 +139,7 @@ export const fetchDataUtil = async (form) => {
       }
     }
   }
+  return parsedData;
 };
 
 // Digital Compass Port:4003
@@ -134,7 +147,12 @@ export const digitalCompassData = (buffer) => {
   let m_MagBytesRead = buffer.byteLength;
   let m_magBuffer = new Uint8Array(buffer);
   let m_msgStr = "";
-  
+  let parsedData = {
+    Magheading: null,
+    Pitch: null,
+    Roll: null,
+  };
+
   if (m_MagBytesRead > 0) {
     let crOffset = 0;
     let msgEndOffset = 0;
@@ -180,6 +198,9 @@ export const digitalCompassData = (buffer) => {
           let rollV = parseFloat(r);
 
           if (!isNaN(headingV) && !isNaN(pitchV) && !isNaN(rollV)) {
+            parsedData.Magheading = headingV;
+            parsedData.Pitch = pitchV;
+            parsedData.Roll = rollV;
             m_msgStr = `MagHeading: ${h}\tPitch: ${p}\tRoll: ${r}`;
             console.log("Log Messages:", m_msgStr);
             // Update GUI
@@ -193,6 +214,7 @@ export const digitalCompassData = (buffer) => {
       }
     }
   }
+  return parsedData;
 };
 
 // Ballonet Sensor Port:4004
@@ -200,7 +222,9 @@ export const ballonetSensorData = (buffer) => {
   let m_BalPreBytesRead = buffer.byteLength;
   let m_BalPreBuffer = new Uint8Array(buffer);
   let m_msgStr = "";
-  // console.log(m_BalPreBuffer,"HELLO******");
+  let parsedData = {
+    BalPressure: null,
+  };
 
   if (m_BalPreBytesRead > 0) {
     let crOffset = 0;
@@ -248,6 +272,7 @@ export const ballonetSensorData = (buffer) => {
 
             if (!isNaN(pressureValue)) {
               pressureValue = Math.floor(pressureValue * 1000.0 + 0.5) / 1000.0;
+              parsedData.BalPressure = pressureValue;
               m_msgStr = `Ballonet Pressure: ${pressure}`;
               // Log received message
               console.log("Log Messages:", m_msgStr);
@@ -263,6 +288,7 @@ export const ballonetSensorData = (buffer) => {
       }
     }
   }
+  return parsedData;
 };
 
 // Helium Sensor Port:4005
@@ -270,6 +296,9 @@ export const heliumSensorData = (buffer) => {
   let m_HelPreBytesRead = buffer.byteLength;
   let m_HelPreBuffer = new Uint8Array(buffer);
   let m_msgStr = "";
+  let parsedData = {
+    HelPressure: null,
+  };
 
   if (m_HelPreBytesRead > 0) {
     let crOffset = 0;
@@ -317,6 +346,7 @@ export const heliumSensorData = (buffer) => {
 
             if (!isNaN(pressureValue)) {
               pressureValue = Math.floor(pressureValue * 1000.0 + 0.5) / 1000.0;
+              parsedData.HelPressure = pressureValue;
               m_msgStr = `Helium Pressure: ${pressure}`;
               // Log received message
               console.log("Log Messages:", m_msgStr);
@@ -332,6 +362,7 @@ export const heliumSensorData = (buffer) => {
       }
     }
   }
+  return parsedData;
 };
 
 // ADAMS Port:4006
@@ -340,6 +371,10 @@ export const adamsData = (buffer) => {
   let m_ADAMBuffer = new Uint8Array(buffer);
   let m_dMaxTension = 0;
   let m_msgStr = "";
+  let parsedData = {
+    Tension: null,
+    MaxTension: null,
+  };
 
   if (m_ADAMBytesRead > 0) {
     let crOffset = 0;
@@ -385,7 +420,8 @@ export const adamsData = (buffer) => {
           if (tensionValue > m_dMaxTension) {
             m_dMaxTension = tensionValue;
           }
-
+          parsedData.Tension = tensionValue;
+          parsedData.MaxTension = m_dMaxTension;
           m_msgStr = `Tension: ${tensionValue}\tMax Tension: ${m_dMaxTension}`;
           console.log("Log Messages:", m_msgStr);
           // Update GUI
@@ -398,6 +434,7 @@ export const adamsData = (buffer) => {
       }
     }
   }
+  return parsedData;
 };
 
 // EBox Port:4008
@@ -405,6 +442,13 @@ export const eBoxData = (buffer) => {
   let m_PDUBytesRead = buffer.byteLength;
   let m_PDUBuffer = new Uint8Array(buffer);
   let m_msgStr = "";
+  let parsedData = {
+    InternalTemp: null,
+    fan1: null,
+    fan2: null,
+    strobe: null,
+    position: null,
+  };
 
   if (m_PDUBytesRead > 0) {
     let crOffset = 0;
@@ -457,14 +501,12 @@ export const eBoxData = (buffer) => {
           console.log("position", positionStatus);
 
           if (!isNaN(tempV)) {
-            // Update GUI
-            // This is where you would call the GUI update function
-            // e.g., updateGUI(tempV, fan1Status, fan2Status, strobeStatus, positionStatus.charAt(0));
-
-            // Log received message
+            parsedData.InternalTemp = tempV;
+            parsedData.fan1 = fan1Status;
+            parsedData.fan2 = fan2Status;
+            parsedData.strobe = strobeStatus;
+            parsedData.position = positionStatus;
             m_msgStr = `Internal temperature: ${temp}\tBlower1 Status: ${fan1Status}\tBlower2 Status: ${fan2Status}\tStrobe Light Status: ${strobeStatus}\tPosition Light Status: ${positionStatus}`;
-            // This is where you would call the log messages function
-            // e.g., logMessages(m_msgStr);
           }
         }
         m_PDUBytesRead -= msgEndOffset;
@@ -472,4 +514,5 @@ export const eBoxData = (buffer) => {
       }
     }
   }
+  return parsedData;
 };
