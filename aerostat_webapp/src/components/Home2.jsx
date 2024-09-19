@@ -40,7 +40,7 @@ const Home2 = () => {
       const heliumSensordata = heliumSensorData(results.port_4005);
       const adamsdata = adamsData(results.port_4006);
       const eBoxdata = eBoxData(results.port_4007);
-    
+
       const parsedResponses = {
         weather: weatherdata,
         digitalCompass: digitalCompassdata,
@@ -138,23 +138,43 @@ const Home2 = () => {
 
   const [logFile, setLogFile] = useState("");
 
+
+  const HanldeStatusSubmit = async (data) => {
+    try {
+      const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+      })
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Data successfully posted:");
+      }
+    } catch (error) {
+      console.log("Error in posting:", error);
+    }
+  }
+
   const handleFan1 = () => {
     setFan1(prevFan1 => {
       const newFan1 = !prevFan1;
 
       const newData = {
-        ...(newFan1 && fan2 ? { FANS_ON_ON: "@01DO00\r" } : {}),
-        ...(newFan1 && !fan2 ? { FANS_ON_OFF: "@01DO02\r" } : {}),
-        ...(!newFan1 && fan2 ? { FANS_OFF_ON: "@01DO01\r" } : {}),
-        ...(!newFan1 && !fan2 ? { FANS_OFF_OFF: "@01DO03\r" } : {}),
+        ...(newFan1 && fan2 ? { Fans: "@01DO00\r" } : {}),
+        ...(newFan1 && !fan2 ? { Fans: "@01DO02\r" } : {}),
+        ...(!newFan1 && fan2 ? { Fans: "@01DO01\r" } : {}),
+        ...(!newFan1 && !fan2 ? { Fans: "@01DO03\r" } : {}),
 
-        ...(strobe && position ? { LIGHTS_ON_ON: "@01DO10\r" } : {}),
-        ...(strobe && !position ? { LIGHTS_ON_OFF: "@01DO12\r" } : {}),
-        ...(!strobe && position ? { LIGHTS_OFF_ON: "@01DO11\r" } : {}),
-        ...(!strobe && !position ? { LIGHTS_OFF_OFF: "@01DO13\r" } : {}),
+        ...(strobe && position ? { Lights: "@01DO10\r" } : {}),
+        ...(strobe && !position ? { Lights: "@01DO12\r" } : {}),
+        ...(!strobe && position ? { Lights: "@01DO11\r" } : {}),
+        ...(!strobe && !position ? { Lights: "@01DO13\r" } : {}),
       };
 
       setData(newData);
+      HanldeStatusSubmit(newData);
 
 
       return newFan1;
@@ -166,18 +186,19 @@ const Home2 = () => {
       const newFan2 = !prevFan2;
 
       const newData = {
-        ...(fan1 && newFan2 ? { FANS_ON_ON: "@01DO00\r" } : {}),
-        ...(fan1 && !newFan2 ? { FANS_ON_OFF: "@01DO02\r" } : {}),
-        ...(!fan1 && newFan2 ? { FANS_OFF_ON: "@01DO01\r" } : {}),
-        ...(!fan1 && !newFan2 ? { FANS_OFF_OFF: "@01DO03\r" } : {}),
+        ...(fan1 && newFan2 ? { Fans: "@01DO00\r" } : {}),
+        ...(fan1 && !newFan2 ? { Fans: "@01DO02\r" } : {}),
+        ...(!fan1 && newFan2 ? { Fans: "@01DO01\r" } : {}),
+        ...(!fan1 && !newFan2 ? { Fans: "@01DO03\r" } : {}),
 
-        ...(strobe && position ? { LIGHTS_ON_ON: "@01DO10\r" } : {}),
-        ...(strobe && !position ? { LIGHTS_ON_OFF: "@01DO12\r" } : {}),
-        ...(!strobe && position ? { LIGHTS_OFF_ON: "@01DO11\r" } : {}),
-        ...(!strobe && !position ? { LIGHTS_OFF_OFF: "@01DO13\r" } : {}),
+        ...(strobe && position ? { Lights: "@01DO10\r" } : {}),
+        ...(strobe && !position ? { Lights: "@01DO12\r" } : {}),
+        ...(!strobe && position ? { Lights: "@01DO11\r" } : {}),
+        ...(!strobe && !position ? { Lights: "@01DO13\r" } : {}),
       };
 
       setData(newData);
+      HanldeStatusSubmit(newData)
 
 
       return newFan2;
@@ -188,18 +209,19 @@ const Home2 = () => {
       const newStrobe = !prevStrobe;
 
       const newData = {
-        ...(fan1 && fan2 ? { FANS_ON_ON: "@01DO00\r" } : {}),
-        ...(fan1 && !fan2 ? { FANS_ON_OFF: "@01DO02\r" } : {}),
-        ...(!fan1 && fan2 ? { FANS_OFF_ON: "@01DO01\r" } : {}),
-        ...(!fan1 && !fan2 ? { FANS_OFF_OFF: "@01DO03\r" } : {}),
+        ...(fan1 && fan2 ? { Fans: "@01DO00\r" } : {}),
+        ...(fan1 && !fan2 ? { Fans: "@01DO02\r" } : {}),
+        ...(!fan1 && fan2 ? { Fans: "@01DO01\r" } : {}),
+        ...(!fan1 && !fan2 ? { Fans: "@01DO03\r" } : {}),
 
-        ...(newStrobe && position ? { LIGHTS_ON_ON: "@01DO10\r" } : {}),
-        ...(newStrobe && !position ? { LIGHTS_ON_OFF: "@01DO12\r" } : {}),
-        ...(!newStrobe && position ? { LIGHTS_OFF_ON: "@01DO11\r" } : {}),
-        ...(!newStrobe && !position ? { LIGHTS_OFF_OFF: "@01DO13\r" } : {}),
+        ...(newStrobe && position ? { Lights: "@01DO10\r" } : {}),
+        ...(newStrobe && !position ? { Lights: "@01DO12\r" } : {}),
+        ...(!newStrobe && position ? { Lights: "@01DO11\r" } : {}),
+        ...(!newStrobe && !position ? { Lights: "@01DO13\r" } : {}),
       };
 
       setData(newData);
+      HanldeStatusSubmit(newData)
 
 
       return newStrobe;
@@ -210,18 +232,19 @@ const Home2 = () => {
       const newPosition = !prevPosition;
 
       const newData = {
-        ...(fan1 && fan2 ? { FANS_ON_ON: "@01DO00\r" } : {}),
-        ...(fan1 && !fan2 ? { FANS_ON_OFF: "@01DO02\r" } : {}),
-        ...(!fan1 && fan2 ? { FANS_OFF_ON: "@01DO01\r" } : {}),
-        ...(!fan1 && !fan2 ? { FANS_OFF_OFF: "@01DO03\r" } : {}),
+        ...(fan1 && fan2 ? { Fans: "@01DO00\r" } : {}),
+        ...(fan1 && !fan2 ? { Fans: "@01DO02\r" } : {}),
+        ...(!fan1 && fan2 ? { Fans: "@01DO01\r" } : {}),
+        ...(!fan1 && !fan2 ? { Fans: "@01DO03\r" } : {}),
 
-        ...(strobe && newPosition ? { LIGHTS_ON_ON: "@01DO10\r" } : {}),
-        ...(strobe && !newPosition ? { LIGHTS_ON_OFF: "@01DO12\r" } : {}),
-        ...(!strobe && newPosition ? { LIGHTS_OFF_ON: "@01DO11\r" } : {}),
-        ...(!strobe && !newPosition ? { LIGHTS_OFF_OFF: "@01DO13\r" } : {}),
+        ...(strobe && newPosition ? { Lights: "@01DO10\r" } : {}),
+        ...(strobe && !newPosition ? { Lights: "@01DO12\r" } : {}),
+        ...(!strobe && newPosition ? { Lights: "@01DO11\r" } : {}),
+        ...(!strobe && !newPosition ? { Lights: "@01DO13\r" } : {}),
       };
 
       setData(newData);
+      HanldeStatusSubmit(newData)
 
 
       return newPosition;
