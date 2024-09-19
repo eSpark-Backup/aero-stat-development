@@ -15,7 +15,6 @@ export function calculateSkyLandPercentage(pitch) {
 // Fetching Data
 export const fetchDataUtil = async (form) => {
   const baseUrl = form.ip;
-
   const ports = {
     weather: form.weather,
     hmr: form.hmr,
@@ -24,6 +23,7 @@ export const fetchDataUtil = async (form) => {
     adam: form.adam,
     ebox: form.ebox,
   };
+
 
   const urls = Object.keys(ports).map((key) =>
     `http://${baseUrl}:${ports[key]}`
@@ -34,15 +34,15 @@ export const fetchDataUtil = async (form) => {
     fetch(url)
       .then((response) => response.arrayBuffer())
       .catch((error) => {
-        console.error("Error fetching:", error);
+        // console.error("Error fetching:", error);
         return null;
       })
-    );
-    
+  );
+
   const results = await Promise.all(promises);
   return results;
 };
-  
+
 // weather Station Port:4002
 export const weatherstationData = (buffer) => {
   let m_WXBytesRead = buffer.byteLength;
@@ -60,7 +60,7 @@ export const weatherstationData = (buffer) => {
     let crOffset = 0;
     let msgEndOffset = 0;
     let foundEnd = false;
-    
+
     for (let i = m_WXBytesRead - 1; i >= 0; i--) {
       if (m_WXBuffer[i] === 0x0D) { // 0x0D is '\r'
         crOffset = i;
@@ -69,11 +69,11 @@ export const weatherstationData = (buffer) => {
       }
     }
     msgEndOffset = crOffset + 2;
-    
+
     if (foundEnd && m_WXBytesRead >= msgEndOffset) {
       let foundStart = false;
       let msgStartOffset = 0;
-      
+
       while (msgStartOffset < (crOffset - 1)) {
         if (m_WXBuffer[msgStartOffset] === 0x24) { // 0x24 is '$'
           foundStart = true;
@@ -81,7 +81,7 @@ export const weatherstationData = (buffer) => {
         }
         msgStartOffset++;
       }
-      
+
       if (!foundStart) {
         m_WXBytesRead -= msgEndOffset;
         m_WXBuffer = m_WXBuffer.slice(msgEndOffset);
@@ -109,7 +109,7 @@ export const weatherstationData = (buffer) => {
             let airTempStr = msgData[5];
             let baroPres = parseFloat(baroPresStr);
             let airTemp = parseFloat(airTempStr);
-            
+
             if (!isNaN(baroPres) && !isNaN(airTemp)) {
               // baroPres = Math.floor(baroPres * 10.0 + 0.5) / 10.0;
               parsedData.baroPres = Math.floor(baroPres * 10.0 + 0.5) / 10.0;
@@ -121,7 +121,7 @@ export const weatherstationData = (buffer) => {
             let windSpeedStr = msgData[3];
             let windDirection = parseFloat(windDirectionStr);
             let windSpeed = parseFloat(windSpeedStr);
-            
+
             if (!isNaN(windDirection) && !isNaN(windSpeed)) {
               parsedData.windAngle = windDirection;
               parsedData.windSpeed = windSpeed;
@@ -129,9 +129,9 @@ export const weatherstationData = (buffer) => {
             }
           }
         }
-        
+
         if (m_msgStr.length > 0) {
-          console.log("Log Messages:", m_msgStr);
+          // console.log("Log Messages:", m_msgStr);
         }
 
         m_WXBytesRead -= msgEndOffset;
@@ -157,7 +157,7 @@ export const digitalCompassData = (buffer) => {
     let crOffset = 0;
     let msgEndOffset = 0;
     let foundEnd = false;
-    
+
     for (let i = m_MagBytesRead - 1; i >= 0; i--) {
       if (m_magBuffer[i] === 0x0D) { // 0x0D is '\r'
         crOffset = i;
@@ -202,7 +202,7 @@ export const digitalCompassData = (buffer) => {
             parsedData.Pitch = pitchV;
             parsedData.Roll = rollV;
             m_msgStr = `MagHeading: ${h}\tPitch: ${p}\tRoll: ${r}`;
-            console.log("Log Messages:", m_msgStr);
+            // console.log("Log Messages:", m_msgStr);
             // Update GUI
             // m_pGUI.updateMagnetometerValues(headingV, pitchV, rollV); // Replace with actual GUI update method
             // m_pDataLog.LogMsgs(m_msgStr); // Replace with actual logging method
@@ -275,7 +275,7 @@ export const ballonetSensorData = (buffer) => {
               parsedData.BalPressure = pressureValue;
               m_msgStr = `Ballonet Pressure: ${pressure}`;
               // Log received message
-              console.log("Log Messages:", m_msgStr);
+              // console.log("Log Messages:", m_msgStr);
               // Update GUI
               // m_pGUI.updateBallonetPres(pressureValue); // Replace with actual GUI update method
               // m_pDataLog.LogMsgs(m_msgStr); // Replace with actual logging method
@@ -338,7 +338,7 @@ export const heliumSensorData = (buffer) => {
 
         if (dataList.length > 1) {
           let header = dataList[0].trim();
-          
+
           // if (header === "#01CP") {
           if (header === "?01CP") {
             let pressure = dataList[1].trim();
@@ -349,7 +349,7 @@ export const heliumSensorData = (buffer) => {
               parsedData.HelPressure = pressureValue;
               m_msgStr = `Helium Pressure: ${pressure}`;
               // Log received message
-              console.log("Log Messages:", m_msgStr);
+              // console.log("Log Messages:", m_msgStr);
               // Update GUI
               // m_pGUI.updateHeliumPres(pressureValue); // Replace with actual GUI update method
               // m_pDataLog.LogMsgs(m_msgStr); // Replace with actual logging method
@@ -423,12 +423,12 @@ export const adamsData = (buffer) => {
           parsedData.Tension = tensionValue;
           parsedData.MaxTension = m_dMaxTension;
           m_msgStr = `Tension: ${tensionValue}\tMax Tension: ${m_dMaxTension}`;
-          console.log("Log Messages:", m_msgStr);
+          // console.log("Log Messages:", m_msgStr);
           // Update GUI
           // m_pGUI.updateTension(tensionValue, m_dMaxTension); // Replace with actual GUI update method
           // m_pDataLog.LogMsgs(m_msgStr); // Replace with actual logging method
         }
-        
+
         m_ADAMBytesRead -= msgEndOffset;
         m_ADAMBuffer = m_ADAMBuffer.slice(msgEndOffset);
       }
@@ -494,11 +494,11 @@ export const eBoxData = (buffer) => {
           let strobeStatus = dataList[4].trim();
           let positionStatus = dataList[5].trim();
 
-          console.log("Internal temperature:", temp, "__", !isNaN(tempV), "__", tempV);
-          console.log("fan1", fan1Status);
-          console.log("fan2", fan2Status);
-          console.log("strobe", strobeStatus);
-          console.log("position", positionStatus);
+          // console.log("Internal temperature:", temp, "__", !isNaN(tempV), "__", tempV);
+          // console.log("fan1", fan1Status);
+          // console.log("fan2", fan2Status);
+          // console.log("strobe", strobeStatus);
+          // console.log("position", positionStatus);
 
           if (!isNaN(tempV)) {
             parsedData.InternalTemp = tempV;

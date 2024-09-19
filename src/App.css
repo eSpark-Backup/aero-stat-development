@@ -457,6 +457,9 @@ button {
 .inactive {
   background-color: #ff4c4c;
 }
+.inactive2 {
+  border: 1px solid #E4E4E4;
+}
 
 .load {
   width: 16px;
@@ -464,10 +467,16 @@ button {
   border-radius: 50%;
 }
 
-.loader {
+.loader-complete {
   height: 28px;
   width: 80%;
   background-color: #11c018;
+  border-radius: 50px;
+}
+.loader-incomplete {
+  height: 28px;
+  width: 80%;
+  border: 1px solid #E4E4E4;
   border-radius: 50px;
 }
 
