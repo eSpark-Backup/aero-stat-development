@@ -74,10 +74,16 @@ def send_device_commands():
         return jsonify({"error": "No valid commands provided"}), 400
 
     # Send Fans command to the target port and get the response
-    fans_response = connect_and_send_to_port(fans_command) if fans_command else "No Fans command provided"
-    
+    if fans_command:
+        fans_response = connect_and_send_to_port(fans_command)
+    else:
+        fans_response = "No Fans command provided"
+
     # Send Lights command to the target port and get the response
-    lights_response = connect_and_send_to_port(lights_command) if lights_command else "No Lights command provided"
+    if lights_command:
+        lights_response = connect_and_send_to_port(lights_command)
+    else:
+        lights_response = "No Lights command provided"
 
     return jsonify({
         "FansResponse": fans_response,
