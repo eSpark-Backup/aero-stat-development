@@ -95,7 +95,7 @@ const Home2 = () => {
 
   const [errorValues, setErrorValues] = useState([]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const errors = [];
 
     // Regular expression to validate IPv4 addresses
@@ -119,18 +119,44 @@ const Home2 = () => {
       return;
     }
 
-    console.log(form, "success");
-    setOpenModal(false);
-    setErrorValues([]);
-    setForm({
-      ip: "",
-      weather: "",
-      hmr: "",
-      ballonet: "",
-      helium: "",
-      adam: "",
-      ebox: "",
-    })
+    try {
+      const response = await fetch("https://jsonplaceholder.typicodes.com/posts", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify(form),
+      })
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Form successfully posted:");
+        setOpenModal(false);
+        setErrorValues([]);
+        setForm({
+          ip: "",
+          weather: "",
+          hmr: "",
+          ballonet: "",
+          helium: "",
+          adam: "",
+          ebox: "",
+        })
+      }
+    } catch (error) {
+      console.log("Error in form posting:", error);
+      setOpenModal(false);
+      setErrorValues([]);
+      setForm({
+        ip: "",
+        weather: "",
+        hmr: "",
+        ballonet: "",
+        helium: "",
+        adam: "",
+        ebox: "",
+      })
+    }
+
   };
 
   const { theme } = React.useContext(ThemeContext);
