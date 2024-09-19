@@ -120,7 +120,7 @@ const Home2 = () => {
     }
 
     try {
-      const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      const response = await fetch("http://localhost:5000/update-config", {
         method: "POST",
         headers: {
           "Content-type": "application/json"
@@ -167,7 +167,7 @@ const Home2 = () => {
 
   const HanldeStatusSubmit = async (data) => {
     try {
-      const response = await fetch("https://jsonplaceholder.typicode.com/posts", {
+      const response = await fetch("http://localhost:5000/send-device-commands", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -176,7 +176,7 @@ const Home2 = () => {
       })
       if (response.ok) {
         const result = await response.json();
-        console.log("Data successfully posted:");
+        console.log("Data successfully posted:",result);
       }
     } catch (error) {
       console.log("Error in posting:", error);
