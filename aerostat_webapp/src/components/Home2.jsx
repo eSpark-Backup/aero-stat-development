@@ -343,17 +343,20 @@ const Home2 = () => {
   };
   const handleFrwd = () => {
     ////Forward functionality
-    setFetchingSpeed(fetchingSpeed * 0.5);
+    if(fetchingSpeed > 125){
+      setFetchingSpeed(fetchingSpeed * 0.5);
+    }
   };
   const handleStop = () => {
     ////stop functionality
     setStartFetchingFromFile(false);
     setFwdBtn(false);
-    setPlayBtn(false);
+    setPlayBtn(true);
     setHeaderText("LIVE DATA");
     setFileContent("");
     setLogFile("");
     setStopBtn(false)
+    setFetchingSpeed(1000)
   };
 
 
@@ -406,7 +409,8 @@ const Home2 = () => {
                           id="logFile"
                           placeholder={"Aero/Nw7/Fgs/70082024"}
                           value={logFile}
-                          onChange={(e) => setLogFile(e.target.value)}
+                          disabled
+                          // onChange={(e) => setLogFile(e.target.value)}
                         />
                         {/* <button onClick={handleBrowse}>Browse</button>  */}
                         <input
