@@ -9,6 +9,7 @@ import Modal from "./Modal";
 import Compass from "./compass";
 import RollMeter from "./RollMeter";
 import { fetchDataUtil, weatherstationData, digitalCompassData, ballonetSensorData, heliumSensorData, adamsData, eBoxData } from "../utils";
+import { processData, processDataArray } from "../Js_parsing";
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -29,7 +30,17 @@ const Home2 = () => {
   const [fan2, setFan2] = useState(null);
   const [strobe, setStrobe] = useState(null);
   const [position, setPosition] = useState(false);
+  const [playBtn, setPlayBtn] = useState(false);
+  const [fwdBtn, setFwdBtn] = useState(false);
+  const [stopBtn, setStopBtn] = useState(false);
   const [data, setData] = useState({});
+  const [fileContent, setFileContent] = useState('');
+  const [startFetchingFromFile, setStartFetchingFromFile] = useState(false);
+  const [fileData, setfileData] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentResult, setCurrentResult] = useState(null);
+  const [fetchingSpeed, setFetchingSpeed] = useState(1000);
+  const [headerText, setHeaderText] = useState("Live Data");
 
   const fetchData = async () => {
     try {
@@ -59,12 +70,12 @@ const Home2 = () => {
   };
 
   useEffect(() => {
-    // if (1) {
-    fetchData();
-    const interval = setInterval(fetchData, 3500);
-    return () => clearInterval(interval);
-    // }
-  }, []);
+    if (!startFetchingFromFile) {
+      fetchData();
+      const interval = setInterval(fetchData, 3500);
+      return () => clearInterval(interval);
+    }
+  }, [startFetchingFromFile]);
 
   useEffect(() => {
     if (responses?.ebox) {
@@ -176,7 +187,7 @@ const Home2 = () => {
       })
       if (response.ok) {
         const result = await response.json();
-        console.log("Data successfully posted:",result);
+        console.log("Data successfully posted:", result);
       }
     } catch (error) {
       console.log("Error in posting:", error);
@@ -276,23 +287,85 @@ const Home2 = () => {
       return newPosition;
     });
   };
-  const handleBrowse = () => {
-    console.log(logFile, "logFile")
-    ////browse functionality
+  const handleBrowse = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setLogFile(file.name);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFileContent(e.target.result);
+      };
+      reader.readAsText(file);
+    }
   };
+
+  useEffect(() => {
+    if (fileContent) {
+      setPlayBtn(true);
+      let res = processData(fileContent)
+      setfileData(res);
+
+    }
+  }, [fileContent])
+
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (startFetchingFromFile && currentIndex < fileData.length) {
+        const result = processDataArray([fileData[currentIndex]], currentResult);
+        console.log(result);
+        setCurrentResult(result);
+        setResponses(result);
+
+        setCurrentIndex(prevIndex => prevIndex + 1);
+      } else {
+        clearInterval(intervalId);
+      }
+    }, fetchingSpeed);
+
+    return () => clearInterval(intervalId);
+
+
+    // if (fileData && currentIndex < fileData.length) {
+    //   const result = processDataArray([fileData[currentIndex]], currentResult);
+    //   console.log(result);
+    // }
+
+
+  }, [fileData, currentIndex, currentResult, startFetchingFromFile, fetchingSpeed]);
+
   const handlePlay = () => {
+    setStartFetchingFromFile(true);
+    setFwdBtn(true);
+    setStopBtn(true);
+    setHeaderText("PLAYING BACK RECORDED DATA")
     ////play functionality
   };
   const handleFrwd = () => {
     ////Forward functionality
+    setFetchingSpeed(fetchingSpeed * 0.5);
   };
   const handleStop = () => {
     ////stop functionality
+    setStartFetchingFromFile(false);
+    setFwdBtn(false);
+    setPlayBtn(false);
+    setHeaderText("LIVE DATA");
+    setFileContent("");
+    setLogFile("");
+    setStopBtn(false)
   };
 
+
   useEffect(() => {
-    console.log("Parsed Responses after each second:", responses);
-  }, [responses])
+    if (fetchingSpeed == 125) {
+      setFwdBtn(false);
+    }
+  }, [fetchingSpeed])
+
+  // useEffect(() => {
+  //   console.log("Parsed Responses after each second:", responses);
+  // }, [responses])
 
   return (
     <>
@@ -300,7 +373,7 @@ const Home2 = () => {
         <div className="home">
           <div className={`data ${theme}`}>
             <h1>Fri, 30 August 2024, 07:49:01</h1>
-            <h1>Live Data</h1>
+            <h1>{headerText}</h1>
           </div>
           <div className="breaker"></div>
           <div className="home-main">
@@ -335,13 +408,22 @@ const Home2 = () => {
                           value={logFile}
                           onChange={(e) => setLogFile(e.target.value)}
                         />
-                        <button onClick={handleBrowse}>Browse</button>
+                        {/* <button onClick={handleBrowse}>Browse</button>  */}
+                        <input
+                          type="file"
+                          id="fileInput"
+                          onChange={handleBrowse}
+                          style={{ display: 'none' }}
+                        />
+                        <label htmlFor="fileInput" className={startFetchingFromFile ? "custom-file-input disabled" : "custom-file-input"}>
+                          Browse
+                        </label>
                       </div>
                     </div>
                     <div className="btn-group">
-                      <button onClick={handlePlay}>Play</button>
-                      <button onClick={handleFrwd}>FWD</button>
-                      <button onClick={handleStop}>Stop</button>
+                      <button disabled={playBtn ? false : true} onClick={handlePlay}>Play</button>
+                      <button disabled={fwdBtn ? false : true} onClick={handleFrwd}>FWD</button>
+                      <button disabled={stopBtn ? false : true} onClick={handleStop}>Stop</button>
                     </div>
                   </div>
                 </div>

@@ -24,6 +24,26 @@ input[type=number] {
 }
 
 
+.custom-file-input {
+  display: inline-block;
+  padding: 10px 20px;
+  /* The dark green color */
+  font-size: 16px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #16423c;
+  box-shadow: 0px 4px 4px 0px #00000040;
+  color: white;
+  border: 1px solid #16423c;
+}
+
+button:disabled, .disabled {
+  cursor: not-allowed;
+}
+
+
 /* Header */
 .header {
   display: flex;
@@ -283,24 +303,14 @@ input[type=number] {
   padding-left: 20px;
 }
 
-.input-err, .input-err:focus{
+.input-err,
+.input-err:focus {
   border: 1px solid #ff0000 !important;
 }
 
 .input-box {
   display: flex;
   column-gap: 10px;
-}
-
-.input-box button {
-  /* width: 20%; */
-  height: 41px;
-  width: 110px;
-  border-radius: 50px;
-  background-color: #16423c;
-  box-shadow: 0px 4px 4px 0px #00000040;
-  color: white;
-  border: 1px solid #16423c;
 }
 
 .btn-group {
@@ -457,6 +467,7 @@ button {
 .inactive {
   background-color: #ff4c4c;
 }
+
 .inactive2 {
   border: 1px solid #E4E4E4;
 }
@@ -473,6 +484,7 @@ button {
   background-color: #11c018;
   border-radius: 50px;
 }
+
 .loader-incomplete {
   height: 28px;
   width: 80%;
