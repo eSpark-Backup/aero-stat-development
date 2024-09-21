@@ -21,8 +21,31 @@ export function processData(input) {
 }
 
 
+export function formatDateTime(dateString = new Date().toISOString()) {
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const monthsOfYear = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+
+    const dateObj = new Date(dateString);
+
+    const dayOfWeek = daysOfWeek[dateObj.getDay()];
+    const day = dateObj.getDate();
+    const month = monthsOfYear[dateObj.getMonth()];
+    const year = dateObj.getFullYear();
+
+    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+    const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+
+    return `${dayOfWeek}, ${day} ${month} ${year}, ${hours}:${minutes}:${seconds}`;
+}
+
+
 export function processDataArray(dataArray, currentResult = null) {
-    // If currentResult is provided, use it as the base; otherwise, initialize with default values
+
     let result = currentResult || {
         weather: {
             heading: 0,
@@ -32,7 +55,7 @@ export function processDataArray(dataArray, currentResult = null) {
         digitalCompass: {
             MagHeading: 0,
             Pitch: 0,
-            Roll: 0,
+            Roll: 0
         },
         ballonet: {
             BalPressure: 0
@@ -44,29 +67,51 @@ export function processDataArray(dataArray, currentResult = null) {
             Tension: 0,
             MaxTension: 0
         },
-        ebox: {}
+        ebox: {},
+        time: ""
     };
 
     dataArray?.forEach(line => {
-        // Remove the date and time prefix using regex
+        const dateTimeMatch = line.match(/^\d{8}\s\d{2}:\d{2}:\d{2}/);
+
+        if (dateTimeMatch) {
+            const dateString = dateTimeMatch[0];
+            const datePart = dateString.slice(0, 8);
+            const timePart = dateString.slice(9);
+
+            const formattedDate = `${datePart.slice(4, 8)}-${datePart.slice(2, 4)}-${datePart.slice(0, 2)}`;
+
+
+            const dateTimeString = `${formattedDate} ${timePart}`;
+
+
+            result.time = formatDateTime(dateTimeString);
+        }
+
+
         const cleanedLine = line.replace(/^\d{8}\s\d{2}:\d{2}:\d{2}\s*/, '');
 
-        // Use regex to match key-value pairs in the format "key: value"
+
         const keyValuePairs = cleanedLine.match(/(\w+(?:\s+\w+)*):\s*(-?\d+(\.\d+)?)/g);
 
         if (keyValuePairs) {
             keyValuePairs.forEach(pair => {
-                // Split the key and value based on ":"
+
                 const [key, value] = pair.split(':').map(item => item.trim());
-                // Convert the value to a number
+
                 const numericValue = parseFloat(value);
 
-                // Update only the keys found in the current line
-                if (key === 'MagHeading' || key === 'Pitch' || key === 'Roll') {
+
+                if (key === 'Pitch' || key === 'Roll') {
                     result.digitalCompass[key] = numericValue;
-                } else if (key === 'Ballonet Pressure') {
+                }
+                else if (key === 'MagHeading') {
+                    result.digitalCompass['Magheading'] = numericValue;
+                }
+                else if (key === 'Ballonet Pressure') {
                     result.ballonet['BalPressure'] = numericValue;
-                } else if (key === 'Helium Pressure') {
+                }
+                else if (key === 'Helium Pressure') {
                     result.helium['HelPressure'] = numericValue;
                 } else if (key === 'Aerostat Heading') {
                     result.weather['heading'] = numericValue;
@@ -76,8 +121,15 @@ export function processDataArray(dataArray, currentResult = null) {
                     result.weather['windAngle'] = numericValue;
                 } else if (key === 'Tension') {
                     result.adams['Tension'] = numericValue;
-                } else if (key === 'Max Tension') {
+                }
+                else if (key === 'Max Tension') {
                     result.adams['MaxTension'] = numericValue;
+                }
+                else if (key === 'Air Temp') {
+                    result.weather['airTemp'] = numericValue;
+                }
+                else if (key === 'Baro Pres') {
+                    result.weather['baroPres'] = numericValue;
                 }
             });
         }
@@ -85,10 +137,4 @@ export function processDataArray(dataArray, currentResult = null) {
 
     return result;
 }
-
-
-
-
-
-
 

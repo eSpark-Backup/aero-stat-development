@@ -9,7 +9,7 @@ import Modal from "./Modal";
 import Compass from "./compass";
 import RollMeter from "./RollMeter";
 import { fetchDataUtil, weatherstationData, digitalCompassData, ballonetSensorData, heliumSensorData, adamsData, eBoxData } from "../utils";
-import { processData, processDataArray } from "../Js_parsing";
+import { formatDateTime, processData, processDataArray } from "../Js_parsing";
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -59,6 +59,7 @@ const Home2 = () => {
         helium: heliumSensordata,
         adams: adamsdata,
         ebox: eBoxdata,
+        time: formatDateTime()
       };
 
       setResponses(parsedResponses);
@@ -72,7 +73,7 @@ const Home2 = () => {
   useEffect(() => {
     if (!startFetchingFromFile) {
       fetchData();
-      const interval = setInterval(fetchData, 3500);
+      const interval = setInterval(fetchData, 1000);
       return () => clearInterval(interval);
     }
   }, [startFetchingFromFile]);
@@ -84,11 +85,9 @@ const Home2 = () => {
       setStrobe(responses?.ebox?.strobe === "ON");
       setPosition(responses?.ebox?.position == "1");
     }
+
   }, [responses]);
 
-  useEffect(() => {
-    console.log(data)
-  }, [data])
 
   const handleClose = () => {
     setOpenModal(false);
@@ -109,24 +108,22 @@ const Home2 = () => {
   const handleSubmit = async () => {
     const errors = [];
 
-    // Regular expression to validate IPv4 addresses
+
     const ipRegex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
 
     Object.keys(form).forEach(key => {
-      // Check for empty values
       if (form[key].trim() === "") {
         errors.push(key);
       }
     });
 
-    // Validate IP address format if it exists in the form
+
     if (form.ip && !ipRegex.test(form.ip.trim())) {
       errors.push('ip');
     }
 
     setErrorValues(errors);
     if (errors.length > 0) {
-      // alert(`Please fill in the following fields: ${errors.join(", ")}`);
       return;
     }
 
@@ -318,18 +315,24 @@ const Home2 = () => {
         setResponses(result);
 
         setCurrentIndex(prevIndex => prevIndex + 1);
-      } else {
+      }
+      else if (currentIndex >= fileData.length) {
+        setStartFetchingFromFile(false);
+        setFwdBtn(false);
+        setPlayBtn(false);
+        setHeaderText("LIVE DATA");
+        setFileContent("");
+        setLogFile("");
+        setStopBtn(false)
+        setFetchingSpeed(1000);
+        clearInterval(intervalId);
+      }
+      else {
         clearInterval(intervalId);
       }
     }, fetchingSpeed);
 
     return () => clearInterval(intervalId);
-
-
-    // if (fileData && currentIndex < fileData.length) {
-    //   const result = processDataArray([fileData[currentIndex]], currentResult);
-    //   console.log(result);
-    // }
 
 
   }, [fileData, currentIndex, currentResult, startFetchingFromFile, fetchingSpeed]);
@@ -343,7 +346,7 @@ const Home2 = () => {
   };
   const handleFrwd = () => {
     ////Forward functionality
-    if(fetchingSpeed > 125){
+    if (fetchingSpeed > 125) {
       setFetchingSpeed(fetchingSpeed * 0.5);
     }
   };
@@ -351,12 +354,13 @@ const Home2 = () => {
     ////stop functionality
     setStartFetchingFromFile(false);
     setFwdBtn(false);
-    setPlayBtn(true);
+    setPlayBtn(false);
     setHeaderText("LIVE DATA");
     setFileContent("");
     setLogFile("");
     setStopBtn(false)
-    setFetchingSpeed(1000)
+    setFetchingSpeed(1000);
+
   };
 
 
@@ -366,16 +370,13 @@ const Home2 = () => {
     }
   }, [fetchingSpeed])
 
-  // useEffect(() => {
-  //   console.log("Parsed Responses after each second:", responses);
-  // }, [responses])
 
   return (
     <>
       <div className={`home-main-container ${theme}`}>
         <div className="home">
           <div className={`data ${theme}`}>
-            <h1>Fri, 30 August 2024, 07:49:01</h1>
+            <h1>{responses?.time ? responses?.time : formatDateTime()}</h1>
             <h1>{headerText}</h1>
           </div>
           <div className="breaker"></div>
@@ -410,7 +411,7 @@ const Home2 = () => {
                           placeholder={"Aero/Nw7/Fgs/70082024"}
                           value={logFile}
                           disabled
-                          // onChange={(e) => setLogFile(e.target.value)}
+                        // onChange={(e) => setLogFile(e.target.value)}
                         />
                         {/* <button onClick={handleBrowse}>Browse</button>  */}
                         <input
@@ -689,7 +690,7 @@ const Home2 = () => {
                       </div>
                       <div style={{ display: "flex", columnGap: "6px", alignItems: "center" }}>
                         <p className={`graph-info ${theme}`}>
-                          Bare Pres (intig):
+                          Baro Pres (intig):
                         </p>
                         <span className={`graph-value ${theme}`}>{responses?.weather?.baroPres}</span>
                       </div>
