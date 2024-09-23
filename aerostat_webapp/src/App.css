@@ -485,6 +485,13 @@ button {
   border-radius: 50px;
 }
 
+.loader-disconnect {
+  height: 28px;
+  width: 80%;
+  background-color: #f72004;
+  border-radius: 50px;
+}
+
 .loader-incomplete {
   height: 28px;
   width: 80%;

@@ -66,7 +66,7 @@ const Home2 = () => {
       setIsLoading(false)
     } catch (error) {
       console.error("Error in fetchData:", error);
-      setIsLoading(false)
+      setIsLoading(null)
     }
   };
 
@@ -149,6 +149,14 @@ const Home2 = () => {
           adam: "",
           ebox: "",
         })
+        setStartFetchingFromFile(false);
+        setFwdBtn(false);
+        setPlayBtn(false);
+        setHeaderText("LIVE DATA");
+        setFileContent("");
+        setLogFile("");
+        setStopBtn(false)
+        setFetchingSpeed(1000);
       }
     } catch (error) {
       console.log("Error in form posting:", error);
@@ -562,10 +570,10 @@ const Home2 = () => {
                     <div className="statuses">
                       <div className={`status-box ${theme}`}>
                         <p>Coms Status:</p>
-                        <div className={`load ${isLoading ? "inactive2 " : "active"}`}></div>
-                        <p>{isLoading ? "Loading..." : "Connected"}</p>
+                        <div className={`load ${startFetchingFromFile ? "active" : isLoading === true ? "inactive2" : isLoading === false ? "active" : "inactive"}`}></div>
+                        <p>{startFetchingFromFile ? "Connected" : isLoading ? "Loading..." : isLoading === false ? "Connected" : "Disconnected"}</p>
                       </div>
-                      <div className={`${isLoading ? "loader-incomplete" : "loader-complete"}`}></div>
+                      <div className={`${startFetchingFromFile ? "loader-complete" : isLoading ? "loader-incomplete" : isLoading === false ? "loader-complete" : "loader-disconnect"}`}></div>
                       <div
                         style={{ display: "flex", justifyContent: "center" }}
                         className="btn-group"
