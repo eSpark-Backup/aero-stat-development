@@ -13,7 +13,7 @@ body {
     border-radius: 50%;
     background: #F3F8FF;
     box-shadow: -20px -20px 100px 0px #FFFFFF, 30px 10px 20px 0px #1A73E81A inset;
-    padding: 5px;
+    /* padding: 5px; */
 }
 
 .center-main-circle {

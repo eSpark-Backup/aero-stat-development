@@ -23,7 +23,7 @@ const getDirection = (degree) => {
 
 const NewCompass = () => {
     const degrees = [...Array(12)].map((_, i) => `${i * 30}°`);
-    const needleRotation = 260;
+    const needleRotation = 60;
     const direction = getDirection(needleRotation);
 
     return (
@@ -32,7 +32,7 @@ const NewCompass = () => {
                 <div className="center-main-circle">
                     <div className="center-circle">
                         <span className="degree">
-                            {needleRotation}° 
+                            {needleRotation}°
                         </span>
                         <span className="direction">
                             {direction}
@@ -48,13 +48,13 @@ const NewCompass = () => {
 
                 <div className="line-container">
                     {/* Render lines */}
-                    {[...Array(12)].map((_, i) => (
+                    {[...Array(24)].map((_, i) => (
                         <div
                             key={i}
                             className="line"
                             style={{
-                                height: i % 2 === 0 ? '10.05px' : '4.69px',
-                                transform: `rotate(${i * 30}deg) translateY(-130px)`
+                                height: i % 2 === 0 ? '10.05px' : '4px',
+                                transform: `rotate(${i * 15}deg) translateY(-130px)`
                             }}
                         ></div>
                     ))}
