@@ -24,6 +24,7 @@ const getDirection = (degree) => {
 const NewCompass = () => {
     const degrees = [...Array(12)].map((_, i) => `${i * 30}°`);
     const needleRotation = 260;
+    const needleRotation2 = 100;
     const direction = getDirection(needleRotation);
 
     return (
@@ -44,6 +45,12 @@ const NewCompass = () => {
                             transform: `rotate(${needleRotation}deg) translate(-50%, -50%)`,
                         }}
                     ></div>
+                    {needleRotation2 && <div
+                        className="needle2"
+                        style={{
+                            transform: `rotate(${needleRotation2}deg) translate(-50%, -50%)`,
+                        }}
+                    ></div>}
                 </div>
 
                 <div className="line-container">

@@ -99,36 +99,32 @@ body {
     color: #333333;
 }
 
-.needle {
+.needle,
+.needle2 {
     z-index: -1;
     position: absolute;
     top: 50%;
-    /* Position at the center */
     left: 50%;
-    /* Center horizontally */
     width: 0;
-    /* No width */
     height: 0;
-    /* No height */
     transform-origin: bottom center;
-    /* Needle will rotate from the bottom center */
     transform: rotate(260deg) translateX(-50%);
-    /* Rotate based on your degree */
 }
 
-.needle::after {
+.needle::after,
+.needle2::after {
     content: '';
     position: absolute;
     top: -92px;
     left: -20px;
-    /* Adjusted to account for the wider needle */
     width: 0px;
     height: 0;
     border-left: 20px solid transparent;
-    /* Increased width */
     border-right: 20px solid transparent;
-    /* Increased width */
     border-bottom: 104px solid red;
-    /* Length of the red part remains */
     transform-origin: bottom;
+}
+
+.needle2::after{
+    border-bottom: 104px solid #0029FF;
 }
