@@ -23,7 +23,7 @@ const getDirection = (degree) => {
 
 const NewCompass = () => {
     const degrees = [...Array(12)].map((_, i) => `${i * 30}°`);
-    const needleRotation = 60;
+    const needleRotation = 260;
     const direction = getDirection(needleRotation);
 
     return (
