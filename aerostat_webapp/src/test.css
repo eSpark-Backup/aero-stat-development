@@ -1,0 +1,119 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #EFF2F7;
+}
+
+.compass {
+    position: relative;
+    width: 290px;
+    height: 290px;
+    border-radius: 50%;
+    background: #F3F8FF;
+    box-shadow: -20px -20px 100px 0px #FFFFFF, 30px 10px 20px 0px #1A73E81A inset;
+    padding: 5px;
+}
+
+.center-main-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 190px;
+    height: 190px;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    border: 1px solid #ECF4FF;
+}
+
+.center-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #F3F9FF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 6px solid #E6EFFD;
+    box-shadow: -30px -30px 40px 0px #FCFDFF inset;
+    box-shadow: 2px 1px 10px 0px #00000040;
+}
+
+.degree {
+    font-size: 30px;
+    font-weight: 500;
+    color: #47515C;
+    text-align: center;
+}
+
+.direction {
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.line-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: rotate(0deg);
+    padding: 3px;
+}
+
+.line {
+    position: absolute;
+    width: 2px;
+    background-color: #999;
+    transform-origin: 50% 100%;
+}
+
+
+.degree-label {
+    color: #333333;
+}
+
+.needle {
+    z-index: -1;
+    position: absolute;
+    top: 50%;
+    /* Position at the center */
+    left: 50%;
+    /* Center horizontally */
+    width: 0;
+    /* No width */
+    height: 0;
+    /* No height */
+    transform-origin: bottom center;
+    /* Needle will rotate from the bottom center */
+    transform: rotate(260deg) translateX(-50%);
+    /* Rotate based on your degree */
+}
+
+.needle::after {
+    content: '';
+    position: absolute;
+    top: -92px;
+    left: -20px;
+    /* Adjusted to account for the wider needle */
+    width: 0px;
+    height: 0;
+    border-left: 20px solid transparent;
+    /* Increased width */
+    border-right: 20px solid transparent;
+    /* Increased width */
+    border-bottom: 104px solid red;
+    /* Length of the red part remains */
+    transform-origin: bottom;
+}
