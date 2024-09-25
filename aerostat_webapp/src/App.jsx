@@ -1,21 +1,17 @@
 import './App.css'
-import Header from './components/Header'
-import Home2 from './components/Home2'
-import NewCompass from './components/NewCompass'
-import NewRollMeter from './components/NewRollMeter'
-import RollMeter from './components/RollMeter'
-import ThemeHandler from './ThemeHandler'
-
+import React from 'react'
+import Header from './components/New-Components/Header'
+import NewCompass from './components/New-Components/NewCompass'
+import Home from './components/New-Components/Home'
 function App() {
+
 
   return (
     <>
-      {/* <ThemeHandler>
+      <div style={{ display: "flex", flexDirection: "column", rowGap: "0px" }}>
         <Header />
-        <Home2 />
-      </ThemeHandler> */}
-      {/* <NewCompass /> */}
-      <NewRollMeter />
+        <Home />
+      </div>
     </>
   )
 }
