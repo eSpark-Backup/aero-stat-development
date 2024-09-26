@@ -1,7 +1,7 @@
 .compass {
     position: relative;
-    width: 240px; /* Adjusted size */
-    height: 240px; /* Adjusted size */
+    width: 204px; /* Adjusted size */
+    height: 204px; /* Adjusted size */
     border-radius: 50%;
     background: #F3F8FF;
     box-shadow: 6px 6px 10px 0px #C3C5CC80;
@@ -12,8 +12,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 140px; /* Adjusted size */
-    height: 140px; /* Adjusted size */
+    width: 130px; /* Adjusted size */
+    height: 130px; /* Adjusted size */
     border-radius: 50%;
     background-color: #FFFFFF;
     border: 1px solid #ECF4FF;
@@ -24,8 +24,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90px; /* Adjusted size */
-    height: 90px; /* Adjusted size */
+    width: 94px; /* Adjusted size */
+    height: 94px; /* Adjusted size */
     border-radius: 50%;
     background: #F3F9FF;
     display: flex;

@@ -1,10 +1,10 @@
 import React from 'react';
 import "../../styles/test2.css";
 import { calculateSkyLandPercentage } from '../../utils';
-import lines from "../assets/lines2.svg";
-import meter from "../assets/meter2.png";
-import meter2 from "../assets/meter3.png";
-import stand from "../assets/stand.png";
+import lines from "../../assets/lines2.svg";
+import meter from "../../assets/meter2.png";
+import meter2 from "../../assets/meter3.png";
+import stand from "../../assets/stand.png";
 
 
 const NewRollMeter = () => {
