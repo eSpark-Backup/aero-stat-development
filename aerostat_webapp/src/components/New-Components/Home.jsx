@@ -43,7 +43,7 @@ const Home = () => {
                     <div className='wind-speed-card'>
                         <HighchartsReact
                             highcharts={Highcharts}
-                            options={windGaugeOptions("light", 0, 70, [0])}
+                            options={windGaugeOptions("light", 0, 70, [2])}
                         />
                         <ChartsData position={"between"} description1={"Air Temp (C):"} value1={15} description2={"Bare Press (inHg):"} value2={292} graphValue={0.295} graphName={"Wind Speed"} />
                     </div>
@@ -120,14 +120,14 @@ const Home = () => {
                                 <div>
                                     <HighchartsReact
                                         highcharts={Highcharts}
-                                        options={pressureGaugeOptions("light", 0, 6, [2.3])}
+                                        options={pressureGaugeOptions("light", 0, 6, [4])}
                                     />
                                     <ChartsData position={"around"} graphValue={0.295} graphName={"Hull Helium"} />
                                 </div>
                                 <div>
                                     <HighchartsReact
                                         highcharts={Highcharts}
-                                        options={pressureGaugeOptions("light", 0, 6, [2.3])}
+                                        options={pressureGaugeOptions("light", 0, 6, [0.295])}
                                     />
                                     <ChartsData position={"around"} graphValue={0.295} graphName={"Ballonet Air"} />
                                 </div>
@@ -141,7 +141,7 @@ const Home = () => {
                                 <div className='confluence-graph'>
                                     <HighchartsReact
                                         highcharts={Highcharts}
-                                        options={confluenceGaugeOptions("light", 0, 700, [1])}
+                                        options={confluenceGaugeOptions("light", 0, 700, [100])}
                                     />
                                     <ChartsData position={"center"} graphName={"Current Tension"} graphValue={1} />
                                 </div>

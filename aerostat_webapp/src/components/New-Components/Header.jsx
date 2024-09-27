@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import logo from "../../assets/logo.svg"
+import logo from "../../assets/logo (2).svg"
 import logowhite from "../../assets/logo-white.svg"
 import { ThemeContext } from '../../ThemeHandler';
 

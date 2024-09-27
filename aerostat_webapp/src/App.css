@@ -42,6 +42,22 @@ input[type=number] {
     display: none !important;
 }
 
+.watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 85%;
+    background-image: url('./assets/watermark.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+}
+
 
 
 
@@ -55,7 +71,7 @@ input[type=number] {
 }
 
 .logo {
-    width: 180px;
+    width: 380px;
     height: 90px;
 
     border-radius: 20px;
@@ -78,8 +94,8 @@ input[type=number] {
 }
 
 .logo img {
-    width: 132px;
-    height: 95px;
+    width: 232px;
+    height: 82px;
     position: relative;
     top: 4px;
 }
@@ -407,7 +423,7 @@ input[type=number] {
     height: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 8px;
+    padding: 16px 8px;
 }
 
 .pitch-box-content {
@@ -518,11 +534,11 @@ input[type=number] {
     font-weight: 600;
 }
 
-.log-detail-light>p{
+.log-detail-light>p {
     color: #4C4C4C;
 }
 
-.log-detail-dark>p{
+.log-detail-dark>p {
     color: #FFFFFF;
 }
 
@@ -1007,10 +1023,11 @@ input[type=number] {
 
 }
 
-.breaker-light >p {
+.breaker-light>p {
     color: #D9D9D9;
 }
-.breaker-dark >p {
+
+.breaker-dark>p {
     color: #D9D9D9;
 }
 
@@ -1132,7 +1149,15 @@ input[type=number] {
         flex-direction: column;
         row-gap: 10px;
         padding: 23px 5px;
+    }
 
+    .logo {
+        width: 98%;
+        margin: auto auto;
+    }
+
+    .logo img {
+        width: 90%;
     }
 
     .header-details {
@@ -1205,7 +1230,7 @@ input[type=number] {
         padding: 5px 12px;
     }
 
-    .controls-box>h2{
+    .controls-box>h2 {
         text-align: center;
     }
 
@@ -1214,6 +1239,14 @@ input[type=number] {
 @media screen and (min-width:769px) and (max-width:1200px) {
     .header {
         padding: 23px 10px;
+    }
+
+    .logo {
+        width: 220px;
+    }
+
+    .logo img {
+        width: 90%;
     }
 
     .header-details>div,
@@ -1292,7 +1325,7 @@ input[type=number] {
     }
 
     .wind-speed-card {
-        padding-top: 30px;
+        padding-top: 0px;
     }
 }
 
@@ -1319,7 +1352,7 @@ input[type=number] {
     }
 
     .magnetometer-box {
-        padding: 15px 30px 33px 30px;
+        padding: 24px 30px 33px 30px;
     }
 
     .charts-data-box3 {
@@ -1331,7 +1364,7 @@ input[type=number] {
     }
 
     .pitch-box-content {
-        column-gap: 5px;
+        column-gap: 13px;
     }
 
     .heading-box2 .chart-chip {
@@ -1358,6 +1391,10 @@ input[type=number] {
 
     .wind-speed-card {
         padding-bottom: 12px;
+    }
+
+    .heading-box-content{
+        padding: 2px 8px;
     }
 }
 

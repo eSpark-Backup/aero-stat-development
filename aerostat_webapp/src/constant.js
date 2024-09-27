@@ -55,19 +55,19 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45]) =>
             plotBands: [
                 {
                     from: 0,
-                    to: 24,
+                    to: needleValue < 24 ? needleValue : 24,
                     color: needleValue >= 0 ? '#5fd400' : "transparent",
                     thickness: '20%'
                 },
                 {
                     from: 24,
-                    to: 39,
+                    to: needleValue < 39 ? needleValue : 39,
                     color: needleValue >= 24 ? "#eef02c" : "transparent",
                     thickness: '20%'
                 },
                 {
                     from: 39,
-                    to: 70,
+                    to: needleValue < 70 ? needleValue : 70,
                     color: needleValue >= 39 ? "#e0403b" : "transparent",
                     thickness: '20%'
                 }
@@ -154,27 +154,27 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
             plotBands: [{
                 from: 0,
                 to: 0.5,
-                color: needleValue >= 0 ? '#d94343' : "transparent",
+                color: '#d94343',
                 thickness: "20%",
             }, {
                 from: 0.5,
                 to: 1.5,
-                color: needleValue >= 0.5 ? "#eef02c" : "transparent",
+                color: "#eef02c",
                 thickness: "20%",
             }, {
                 from: 1.5,
                 to: 2.7,
-                color: needleValue >= 1.5 ? "#5fd400" : "transparent",
+                color: "#5fd400",
                 thickness: "20%",
             }, {
                 from: 2.7,
                 to: 4.4,
-                color: needleValue >= 2.7 ? "#eef22c" : "transparent",
+                color: "#eef22c",
                 thickness: "20%",
             }, {
                 from: 4.4,
                 to: 6,
-                color: needleValue >= 4.4 ? "#f6331f" : "transparent",
+                color: "#f6331f",
                 thickness: "20%",
             }]
         },
@@ -259,24 +259,24 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [
             plotBands: [
                 {
                     from: 0,
-                    to: 49,
+                    to: needleValue < 49 ? needleValue : 49,
                     color: needleValue >= 0 ? '#eeed2c' : "transparent",
                     thickness: "20%",
                 }, {
                     from: 49,
-                    to: 350,
+                    to: needleValue < 350 ? needleValue : 350,
                     color: needleValue >= 49 ? "#5fd400" : "transparent",
                     thickness: "20%",
                 }
                 , {
                     from: 350,
-                    to: 500,
+                    to: needleValue < 500 ? needleValue : 500,
                     color: needleValue >= 350 ? "#eeef2c" : "transparent",
                     thickness: "20%",
                 }
                 , {
                     from: 500,
-                    to: 700,
+                    to: needleValue < 700 ? needleValue : 700,
                     color: needleValue >= 500 ? "#f64a20" : "transparent",
                     thickness: "20%",
                 }
