@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import MainCard from '../../common/MainCard'
 import ChildCard from '../../common/ChildCard'
 import StatusChip from '../../common/StatusChip'
@@ -6,21 +6,23 @@ import NewCompass from './NewCompass'
 import play from "../../assets/play.svg"
 import forward from "../../assets/forward.svg"
 import stop from "../../assets/stop.svg"
-
-import Highcharts from "highcharts";
-import HighchartsReact from "highcharts-react-official";
-import HighchartsMore from "highcharts/highcharts-more";
-import HighchartsGauge from "highcharts/modules/solid-gauge";
-import { getGaugeOptions } from '../../constant'
 import ChartsData from '../../common/ChartsData'
 import OptionBox from '../../common/OptionBox'
 import ChartChip from '../../common/ChartChip'
 import NewRollMeter from './NewRollMeter'
 
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
+import HighchartsMore from "highcharts/highcharts-more";
+import HighchartsGauge from "highcharts/modules/solid-gauge";
+import { confluenceGaugeOptions, pressureGaugeOptions, windGaugeOptions } from '../../constant'
+import { ThemeContext } from '../../ThemeHandler'
+
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
 
 const Home = () => {
+    const { theme, toggleTheme } = useContext(ThemeContext);
     return (
         <div className="main">
             <div className="box1">
@@ -28,7 +30,7 @@ const Home = () => {
                     <div className='weather-station-card'>
                         <ChildCard>
                             <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", rowGap: "40px", paddingTop: "10px" }}>
-                                <NewCompass />
+                                <NewCompass needle1={260} needle2={110} />
                                 <div className='weather-station-chips'>
                                     <StatusChip color={"blue"} description={"Wind Angle"} />
                                     <StatusChip color={"red"} description={"Aerostats Heading"} />
@@ -41,28 +43,28 @@ const Home = () => {
                     <div className='wind-speed-card'>
                         <HighchartsReact
                             highcharts={Highcharts}
-                            options={getGaugeOptions("light", -1, 6, [2.3])}
+                            options={windGaugeOptions("light", 0, 70, [0])}
                         />
-                        <ChartsData position={"between"} />
+                        <ChartsData position={"between"} description1={"Air Temp (C):"} value1={15} description2={"Bare Press (inHg):"} value2={292} graphValue={0.295} graphName={"Wind Speed"} />
                     </div>
                 </MainCard>
                 <MainCard title={"Controls"}>
-                    <div className="controls-box">
+                    <div className={`controls-box ${theme === "light" ? "controls-box-light" : "controls-box-dark"}`}>
                         <h2>Fan Control</h2>
-                        <div className='fan-box'>
+                        <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                             <p>Fan 1 <span>(Left direction)</span></p>
                             <OptionBox option1={"Continuous"} option2={"Pressured"} selectedOption={"Continuous"} />
                         </div>
-                        <div className='fan-box'>
+                        <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                             <p>Fan 2 <span>(Right direction)</span></p>
                             <OptionBox option1={"Continuous"} option2={"Pressured"} selectedOption={"Pressured"} />
                         </div>
                         <h2>Lights Control</h2>
-                        <div className='fan-box'>
+                        <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                             <p>Strobe Control</p>
                             <OptionBox option1={"Continuous"} option2={"Off"} selectedOption={"Continuous"} />
                         </div>
-                        <div className='fan-box'>
+                        <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                             <p>Position Control</p>
                             <OptionBox option1={"Continuous"} option2={"Off"} selectedOption={"off"} />
                         </div>
@@ -70,11 +72,22 @@ const Home = () => {
                 </MainCard>
             </div>
             <div className="box2">
-                <div className="preferences">
+                <div className={`preferences ${theme === "light" ? "preferences-light" : "preferences-dark"}`}>
                     <p>Preference</p>
-                    <div className="choice">
-                        <div className="theme"></div>
-                        <p className='theme-text'>Light</p>
+                    <div className={`choice ${theme === "light" ? "choice-light" : "choice-dark"}`}>
+                        {
+                            theme === "light"
+                                ?
+                                <>
+                                    <div className="theme-light"></div>
+                                    <p className='theme-text-light'>Light</p>
+                                </>
+                                :
+                                <>
+                                    <p className='theme-text-dark'>Dark</p>
+                                    <div className="theme-dark"></div>
+                                </>
+                        }
                     </div>
                 </div>
                 <MainCard title={"Magnetometer"}>
@@ -83,7 +96,7 @@ const Home = () => {
                             <ChildCard>
                                 <div className="heading-box-content">
                                     <ChartChip name={"Heading"} value={23.9} />
-                                    <NewCompass />
+                                    <NewCompass needle1={260} />
                                 </div>
                             </ChildCard>
                         </div>
@@ -107,16 +120,16 @@ const Home = () => {
                                 <div>
                                     <HighchartsReact
                                         highcharts={Highcharts}
-                                        options={getGaugeOptions("light", -1, 6, [2.3])}
+                                        options={pressureGaugeOptions("light", 0, 6, [2.3])}
                                     />
-                                    <ChartsData position={"around"} />
+                                    <ChartsData position={"around"} graphValue={0.295} graphName={"Hull Helium"} />
                                 </div>
                                 <div>
                                     <HighchartsReact
                                         highcharts={Highcharts}
-                                        options={getGaugeOptions("light", -1, 6, [2.3])}
+                                        options={pressureGaugeOptions("light", 0, 6, [2.3])}
                                     />
-                                    <ChartsData position={"around"} />
+                                    <ChartsData position={"around"} graphValue={0.295} graphName={"Ballonet Air"} />
                                 </div>
                             </div>
                         </MainCard>
@@ -128,9 +141,9 @@ const Home = () => {
                                 <div className='confluence-graph'>
                                     <HighchartsReact
                                         highcharts={Highcharts}
-                                        options={getGaugeOptions("light", -1, 6, [2.3])}
+                                        options={confluenceGaugeOptions("light", 0, 700, [1])}
                                     />
-                                    <ChartsData position={"center"} />
+                                    <ChartsData position={"center"} graphName={"Current Tension"} graphValue={1} />
                                 </div>
                             </div>
                         </MainCard>
@@ -141,15 +154,15 @@ const Home = () => {
                         <MainCard title={"Radio Link"}>
                             <div className='radio-box-content'>
                                 <div className='config-box'>
-                                    <div className='log-detail'>
+                                    <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
                                         <p>RF Link:</p>
                                         <StatusChip color={"green"} description={"Connected"} />
                                     </div>
                                     <div className="loading-bar">
                                         <div className="progress"></div>
                                     </div>
-                                    <div className='log-detail'>
-                                        <p>RF Link:</p>
+                                    <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
+                                        <p>Tether Link:</p>
                                         <StatusChip color={"green"} description={"Connected"} />
                                     </div>
                                     <div className="loading-bar">

@@ -27,7 +27,7 @@ const NewRollMeter = () => {
                 <div style={{ height: `${land}%` }} className="land"></div>
                 <div className="red-arrow"></div>
                 <div className="blue-box">
-                    <div className="meter-lines"><img src={meter} /></div>
+                    <div className="meter-lines"><img src={meter2} /></div>
                 </div>
                 <div className="meter-lines2"><img src={meter2} /></div>
             </div>

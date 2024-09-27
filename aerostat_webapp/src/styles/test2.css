@@ -55,7 +55,7 @@
 
 .red-arrow {
     position: absolute;
-    top: 30px;
+    top: 20px;
     /* Adjusted to fit container */
     left: 50%;
     z-index: 7;
@@ -107,15 +107,13 @@
 
 .meter-lines2 {
     position: absolute;
-    top: 120px;
-    /* Adjusted */
+    top: 39px;
     z-index: 4;
-    left: 45px;
-    /* Adjusted */
+    left: 0px;
 }
 
 .meter-lines2 img {
-    width: 45%;
+    width: 60%;
     /* Reduced to match the new container size */
 }
 

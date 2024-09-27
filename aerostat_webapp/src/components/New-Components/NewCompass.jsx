@@ -21,23 +21,30 @@ const getDirection = (degree) => {
     return "Unknown";
 };
 
-const NewCompass = () => {
+const NewCompass = ({ needle1, needle2 }) => {
     const degrees = [...Array(12)].map((_, i) => `${i * 30}°`);
-    const needleRotation = 270;
-    const needleRotation2 = 100;
-    const direction = getDirection(needleRotation);
+    const needleRotation = needle1;
+    const needleRotation2 = needle2;
+    const direction1 = getDirection(needleRotation);
 
     return (
         <div>
             <div className="compass">
                 <div className="center-main-circle">
                     <div className="center-circle">
-                        <span className="degree">
-                            {needleRotation}°
+                        <span className="degree" style={{ color: needle2 ? "#F30102" : "#47515C" }}>
+                            <p>{needleRotation}°</p>
                         </span>
-                        <span className="direction">
-                            {direction}
-                        </span>
+                        {
+                            !needle2 && <span className="direction">
+                                <p>{direction1}</p>
+                            </span>
+                        }
+                        {
+                            needle2 && <span className="degree2" style={{ color: "#4260FF" }}>
+                                <p>{needleRotation2}°</p>
+                            </span>
+                        }
                     </div>
                     <div
                         className="needle"
@@ -45,7 +52,7 @@ const NewCompass = () => {
                             transform: `rotate(${needleRotation}deg) translate(-50%, -50%)`,
                         }}
                     ></div>
-                    {needleRotation2 && <div
+                    {needle2 && <div
                         className="needle2"
                         style={{
                             transform: `rotate(${needleRotation2}deg) translate(-50%, -50%)`,
@@ -76,8 +83,8 @@ const NewCompass = () => {
                                 transform: `rotate(${i * 30}deg) translateY(-74px)`,
                                 textAlign: 'center',
                                 width: '30px',
-                                fontSize: degree === "0°" || degree === "90°" || degree === "180°" || degree === "270°" ? "14px" : "16px",
-                                fontWeight: degree === "0°" || degree === "90°" || degree === "180°" || degree === "270°" ? "500" : "400",
+                                fontSize: degree === "0°" || degree === "90°" || degree === "180°" || degree === "270°" ? "12px" : "10px",
+                                fontWeight: degree === "0°" || degree === "90°" || degree === "180°" || degree === "270°" ? "700" : "400",
                             }}
                         >
                             {degree}
@@ -87,12 +94,12 @@ const NewCompass = () => {
                         <p style={{ transform: 'rotate(-8.5deg) translateX(8px)', fontSize: "24px", fontWeight: "500", color: "#F60000" }}>N</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(90deg) translateY(-128px)' }}>
-                        <p style={{ fontSize: "24px", fontWeight: "500", }}>E</p>
+                        <p style={{ fontSize: "24px", fontWeight: "500", color: "#47515C" }}>E</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(180deg) translateY(-118px)' }}>
-                        <p style={{ transform: "translateX(3px)", fontSize: "24px", fontWeight: "500" }}>S</p>
+                        <p style={{ transform: "translateX(3px)", fontSize: "24px", fontWeight: "500", color: "#47515C" }}>S</p>
                     </div>
-                    <div className="direction-label" style={{ transform: 'rotate(270deg) translateY(-138px) translateX(-2px)', fontSize: "24px", fontWeight: "500" }}>
+                    <div className="direction-label" style={{ transform: 'rotate(270deg) translateY(-138px) translateX(-2px)', fontSize: "24px", fontWeight: "500", color: "#47515C" }}>
                         <p>W</p>
                     </div>
                 </div>

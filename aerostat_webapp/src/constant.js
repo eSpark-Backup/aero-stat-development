@@ -1,4 +1,4 @@
-export const getGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) => {
+export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45]) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -8,8 +8,8 @@ export const getGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) =
             plotBackgroundImage: null,
             plotShadow: false,
             backgroundColor: "transparent",
-            height: 220,
-            width: 220
+            height: 260,
+            width: 260
         },
         plotOptions: {
             gauge: {
@@ -33,39 +33,149 @@ export const getGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) =
         yAxis: {
             min: min,
             max: max,
-            tickInterval: (max - min) / 10,
+            tickInterval: 5,
             tickWidth: 2,
             tickPosition: 'inside',
-            tickLength: 6,
-            tickColor: theme === 'light' ? '#212121' : '#AAAD9C',
+            tickLength: 4,
+            tickColor: theme === 'light' ? '#666666' : '#AAAD9C',
             minorTickInterval: null,
-            lineWidth: 1,
+            lineWidth: 0.5,
             labels: {
+                distance: -15,
                 rotation: 'auto',
                 style: {
-
-                    color: theme === 'light' ? '#101010' : '#AAAD9C'
+                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C',
+                    fontSize: '12px'
                 }
             },
             title: {
                 text: ''
             },
-            lineColor: theme === 'light' ? '#101010' : '#AAAD9C',
+            lineColor: theme === 'light' ? '#666666' : '#AAAD9C',
+            plotBands: [
+                {
+                    from: 0,
+                    to: 24,
+                    color: needleValue >= 0 ? '#5fd400' : "transparent",
+                    thickness: '20%'
+                },
+                {
+                    from: 24,
+                    to: 39,
+                    color: needleValue >= 24 ? "#eef02c" : "transparent",
+                    thickness: '20%'
+                },
+                {
+                    from: 39,
+                    to: 70,
+                    color: needleValue >= 39 ? "#e0403b" : "transparent",
+                    thickness: '20%'
+                }
+            ]
+        },
+        series: [{
+            name: '',
+            data: seriesData,
+            tooltip: {
+                valueSuffix: ' km/h',
+            },
+            dial: {
+                radius: '80%',
+                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                baseWidth: 8,
+                baseLength: '0%',
+                rearLength: '0%',
+            },
+            pivot: {
+                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                radius: 3,
+                baseWidth: 8,
+            }
+        }]
+    };
+};
+
+
+
+export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) => {
+    const needleValue = seriesData[0];
+    return {
+        chart: {
+            type: 'gauge',
+            plotBorderWidth: 0,
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotShadow: false,
+            backgroundColor: "transparent",
+            height: 260,
+            width: 260
+        },
+        plotOptions: {
+            gauge: {
+                dataLabels: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: ''
+        },
+        pane: {
+            startAngle: -150,
+            endAngle: 150,
+            background: [{
+                backgroundColor: 'transparent',
+                borderWidth: 0,
+                outerRadius: '100%'
+            }]
+        },
+        yAxis: {
+            min: min,
+            max: max,
+            tickInterval: 0.5,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 4,
+            tickColor: theme === 'light' ? '#666666' : '#AAAD9C',
+            minorTickInterval: null,
+            lineWidth: 0.5,
+            labels: {
+                distance: -15,
+                rotation: 'auto',
+                style: {
+                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C',
+                    fontSize: '12px'
+                }
+            },
+            title: {
+                text: ''
+            },
+            lineColor: theme === 'light' ? '#666666' : '#AAAD9C',
             plotBands: [{
-                from: min,
-                to: min + (max - min) * 0.28,
-                color: '#eef22c',
-                thickness: -10,
+                from: 0,
+                to: 0.5,
+                color: needleValue >= 0 ? '#d94343' : "transparent",
+                thickness: "20%",
             }, {
-                from: min + (max - min) * 0.28,
-                to: min + (max - min) * 0.75,
-                color: needleValue > min + (max - min) * 0.28 ? '#49c770' : 'transparent',
-                thickness: -10,
+                from: 0.5,
+                to: 1.5,
+                color: needleValue >= 0.5 ? "#eef02c" : "transparent",
+                thickness: "20%",
             }, {
-                from: min + (max - min) * 0.75,
-                to: max,
-                color: needleValue >= min + (max - min) * 0.75?'#ff4c4c':'transparent',
-                thickness: -10,
+                from: 1.5,
+                to: 2.7,
+                color: needleValue >= 1.5 ? "#5fd400" : "transparent",
+                thickness: "20%",
+            }, {
+                from: 2.7,
+                to: 4.4,
+                color: needleValue >= 2.7 ? "#eef22c" : "transparent",
+                thickness: "20%",
+            }, {
+                from: 4.4,
+                to: 6,
+                color: needleValue >= 4.4 ? "#f6331f" : "transparent",
+                thickness: "20%",
             }]
         },
         series: [{
@@ -76,13 +186,13 @@ export const getGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) =
             },
             dial: {
                 radius: '80%',
-                backgroundColor: theme === 'light' ? '#272525' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
                 baseWidth: 8,
                 baseLength: '0%',
                 rearLength: '0%',
             },
             pivot: {
-                backgroundColor: theme === 'light' ? '#272525' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
                 radius: 3,
                 baseWidth: 8,
             },
@@ -91,116 +201,106 @@ export const getGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) =
 }
 
 
-// export const getGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) => {
-//     const needleValue = seriesData[0];
-//     return {
-//         chart: {
-//             type: 'gauge',
-//             plotBorderWidth: 0,
-//             plotBackgroundColor: null,
-//             plotBackgroundImage: null,
-//             plotShadow: false,
-//             backgroundColor: "transparent",
-//             height: 300,
-//             width: 300
-//         },
-//         plotOptions: {
-//             gauge: {
-//                 dataLabels: {
-//                     enabled: false
-//                 }
-//             }
-//         },
-//         title: {
-//             text: ''
-//         },
-//         pane: {
-//             startAngle: -150,
-//             endAngle: 150,
-//             background: [{
-//                 backgroundColor: 'transparent',
-//                 borderWidth: 0,
-//                 outerRadius: '100%'
-//             }]
-//         },
-//         yAxis: {
-//             min: min,
-//             max: max,
-//             tickInterval: (max - min) / 10,
-//             tickWidth: 2,
-//             tickPosition: 'inside',
-//             tickLength: 6,
-//             tickColor: theme === 'light' ? '#212121' : '#AAAD9C',
-//             minorTickInterval: null,
-//             lineWidth: 1,
-//             labels: {
-//                 rotation: 'auto',
-//                 style: {
 
-//                     color: theme === 'light' ? '#101010' : '#AAAD9C'
-//                 }
-//             },
-//             title: {
-//                 text: ''
-//             },
-//             lineColor: theme === 'light' ? '#101010' : '#AAAD9C',
-//             plotBands: [
-//                 {
-//                     from: -700,
-//                     to: -466.67,
-//                     color: '#F14949',
-//                     thickness: '15%'
-//                 },
-//                 {
-//                     from: -466.66,
-//                     to: -233.33,
-//                     color: '#5F9059',
-//                     thickness: '15%'
-//                 },
-//                 {
-//                     from: -233.32,
-//                     to: 0,
-//                     color: '#55955A',
-//                     thickness: '15%'
-//                 },
-//                 {
-//                     from: 0,
-//                     to: 233.33,
-//                     color: '#EEF22C',
-//                     thickness: '15%'
-//                 },
-//                 {
-//                     from: 233.34,
-//                     to: 466.67,
-//                     color: '#42CC71',
-//                     thickness: '15%'
-//                 },
-//                 {
-//                     from: 466.68,
-//                     to: 700,
-//                     color: '#D84444',
-//                     thickness: '15%'
-//                 }
-//             ]
-//         },
-//         series: [{
-//             name: '',
-//             data: seriesData,
-//             tooltip: {
-//                 valueSuffix: ' km/h',
-//             },
-//             dial: {
-//                 radius: '80%',
-//                 backgroundColor: theme === 'light' ? '#272525' : '#AAAD9C',
-//                 baseWidth: 8,
-//                 baseLength: '0%',
-//                 rearLength: '0%',
-//             },
-//             pivot: {
-//                 backgroundColor: theme === 'light' ? '#272525' : '#AAAD9C',
-//                 radius: 3,
-//                 baseWidth: 8,
-//             },
-//         }]
-//     }
-// }
+export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [350]) => {
+    const needleValue = seriesData[0];
+    return {
+        chart: {
+            type: 'gauge',
+            plotBorderWidth: 0,
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotShadow: false,
+            backgroundColor: "transparent",
+            height: 260,
+            width: 260
+        },
+        plotOptions: {
+            gauge: {
+                dataLabels: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: ''
+        },
+        pane: {
+            startAngle: -150,
+            endAngle: 150,
+            background: [{
+                backgroundColor: 'transparent',
+                borderWidth: 0,
+                outerRadius: '100%'
+            }]
+        },
+        yAxis: {
+            min: min,
+            max: max,
+            tickInterval: 50,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 4,
+            tickColor: theme === 'light' ? '#666666' : '#AAAD9C',
+            minorTickInterval: null,
+            lineWidth: 0.5,
+            labels: {
+                distance: -15,
+                rotation: 'auto',
+                style: {
+
+                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C'
+                }
+            },
+            title: {
+                text: ''
+            },
+            lineColor: theme === 'light' ? '#666666' : '#AAAD9C',
+            plotBands: [
+                {
+                    from: 0,
+                    to: 49,
+                    color: needleValue >= 0 ? '#eeed2c' : "transparent",
+                    thickness: "20%",
+                }, {
+                    from: 49,
+                    to: 350,
+                    color: needleValue >= 49 ? "#5fd400" : "transparent",
+                    thickness: "20%",
+                }
+                , {
+                    from: 350,
+                    to: 500,
+                    color: needleValue >= 350 ? "#eeef2c" : "transparent",
+                    thickness: "20%",
+                }
+                , {
+                    from: 500,
+                    to: 700,
+                    color: needleValue >= 500 ? "#f64a20" : "transparent",
+                    thickness: "20%",
+                }
+            ]
+
+        },
+        series: [{
+            name: '',
+            data: seriesData,
+            tooltip: {
+                valueSuffix: ' km/h',
+            },
+            dial: {
+                radius: '80%',
+                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                baseWidth: 8,
+                baseLength: '0%',
+                rearLength: '0%',
+            },
+            pivot: {
+                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                radius: 3,
+                baseWidth: 8,
+            },
+        }]
+    }
+}
