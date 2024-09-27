@@ -260,11 +260,12 @@ input[type=number] {
 
 
 .weather-station-card {
-    width: 100%;
+    width: 90%;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 10px 0px;
+    margin: auto auto;
 }
 
 .weather-station-chips {
@@ -482,6 +483,7 @@ input[type=number] {
 
 .confluence-box-content>.chart-chip {
     margin-top: 20px;
+    width: 320px;
 }
 
 
@@ -933,7 +935,7 @@ input[type=number] {
 }
 
 .charts-data-around>div>p {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 400;
 }
 
@@ -1047,7 +1049,7 @@ input[type=number] {
 
 /* Chart Chip */
 .chart-chip {
-    width: 220px;
+    width: 245px;
     border-radius: 16px;
     padding: 15px;
     display: flex;
@@ -1395,6 +1397,10 @@ input[type=number] {
 
     .heading-box-content{
         padding: 2px 8px;
+    }
+
+    .chart-chip>p{
+        font-size: 14px;
     }
 }
 

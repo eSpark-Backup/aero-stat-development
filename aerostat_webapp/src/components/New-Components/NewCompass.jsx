@@ -94,13 +94,13 @@ const NewCompass = ({ needle1, needle2 }) => {
                         <p style={{ transform: 'rotate(-8.5deg) translateX(8px)', fontSize: "24px", fontWeight: "500", color: "#F60000" }}>N</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(90deg) translateY(-128px)' }}>
-                        <p style={{ fontSize: "24px", fontWeight: "500", color: "#47515C" }}>E</p>
+                        <p style={{ fontSize: "24px", fontWeight: "500", color: "#47515C", transform: "rotate(-90deg)" }}>E</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(180deg) translateY(-118px)' }}>
                         <p style={{ transform: "translateX(3px)", fontSize: "24px", fontWeight: "500", color: "#47515C" }}>S</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(270deg) translateY(-138px) translateX(-2px)', fontSize: "24px", fontWeight: "500", color: "#47515C" }}>
-                        <p>W</p>
+                        <p style={{ transform: "rotate(90deg)" }}>W</p>
                     </div>
                 </div>
             </div>

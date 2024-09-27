@@ -137,7 +137,7 @@ const Home = () => {
                     <div className="confluence-box">
                         <MainCard title={"Confluence Point Tension"}>
                             <div className="confluence-box-content">
-                                <ChartChip name={"Heading"} value={23.9} />
+                                <ChartChip name={"Max Tension"} value={23.9} />
                                 <div className='confluence-graph'>
                                     <HighchartsReact
                                         highcharts={Highcharts}

@@ -9,8 +9,17 @@
     height: 230px;
     background-color: #EFF2F7;
     box-shadow: 8px 8px 20px 0px #16192426 inset;
-    min-width: 230px; /* Prevent shrinking */
-    min-height: 230px; /* Prevent shrinking */
+    min-width: 230px;
+    /* Prevent shrinking */
+    min-height: 230px;
+    /* Prevent shrinking */
+
+    /* border: 2px solid;
+
+    border-image-source: linear-gradient(324.19deg, #CACCD0 10.39%, #EFF2F7 87.57%); */
+    border: 2px solid #CACCD0;
+
+
 }
 
 .radar {
@@ -21,8 +30,10 @@
     position: relative;
     overflow: hidden;
     z-index: 3;
-    min-width: 200px; /* Prevent shrinking */
-    min-height: 200px; /* Prevent shrinking */
+    min-width: 200px;
+    /* Prevent shrinking */
+    min-height: 200px;
+    /* Prevent shrinking */
 }
 
 
@@ -38,7 +49,7 @@
     background-image: url(../assets/blue-box.png);
 }
 
-.land{
+.land {
     background-image: url(../assets/brown-box.png);
 }
 
