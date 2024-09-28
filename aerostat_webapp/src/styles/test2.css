@@ -1,5 +1,5 @@
 .radar-container {
-    border-radius: 50%;
+    border-radius: 113.5px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,14 +12,20 @@
     min-width: 230px;
     /* Prevent shrinking */
     min-height: 230px;
-    /* Prevent shrinking */
 
-    /* border: 2px solid;
+}
 
-    border-image-source: linear-gradient(324.19deg, #CACCD0 10.39%, #EFF2F7 87.57%); */
-    border: 2px solid #CACCD0;
-
-
+.radar-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 32px;
+    padding: 113.5px;
+    background: linear-gradient(324.19deg, #CACCD0 10.39%, #EFF2F7 87.57%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .radar {

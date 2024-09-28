@@ -767,16 +767,36 @@ input[type=number] {
 
 /* StatusChip */
 .status-chip {
-    border: 2px solid;
+    /* border: 2px solid; */
     /* border-image-source: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%);
     border-image-slice: 1; */
-    border: 2px solid rgba(82, 82, 82, 0.333333);
+    /* border: 2px solid rgba(82, 82, 82, 0.333333); */
     padding: 10px 10px;
     width: fit-content;
     display: flex;
     column-gap: 10px;
     border-radius: 16px;
     align-items: center;
+    position: relative;
+}
+
+.status-chip::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+
+    /* border: 2px solid; */
+
+    /* border-image-source: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%); */
+
+
 }
 
 .status {
@@ -1061,7 +1081,21 @@ input[type=number] {
 }
 
 .chart-chip-light {
-    border: 1px solid #52525255;
+    /* border: 1px solid #52525255; */
+    position: relative;
+}
+
+.chart-chip-light::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .chart-chip-light>p {
@@ -1395,11 +1429,11 @@ input[type=number] {
         padding-bottom: 12px;
     }
 
-    .heading-box-content{
+    .heading-box-content {
         padding: 2px 8px;
     }
 
-    .chart-chip>p{
+    .chart-chip>p {
         font-size: 14px;
     }
 }
