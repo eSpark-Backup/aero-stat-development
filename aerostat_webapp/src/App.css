@@ -1704,10 +1704,6 @@ input[type=number] {
         padding: 30px 30px;
     }
 
-    .heading-box .child-card {
-        padding: 42px 30px;
-    }
-
     .pressure-box-content,
     .confluence-box-content {
         padding-bottom: 9px;
@@ -1785,6 +1781,10 @@ input[type=number] {
         padding: 20px !important;
     }
 
+    .heading-box .child-card {
+        padding: 25px 17px !important;
+    }
+
     .chart-chip {
         padding: 10px !important;
     }
@@ -1857,5 +1857,11 @@ input[type=number] {
 
     .wind-speed-card {
         padding-bottom: 0px !important;
+    }
+}
+
+@media screen and (min-width:1400px) and (max-width:1440px) {
+    .heading-box .child-card {
+        padding: 38px 17px !important;
     }
 }
