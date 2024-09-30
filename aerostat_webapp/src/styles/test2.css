@@ -7,17 +7,19 @@
     overflow: hidden;
     width: 230px;
     height: 230px;
+    min-width: 230px;
+    min-height: 230px;
+}
+
+.radar-container-light {
     background-color: #EFF2F7;
     box-shadow: 8px 8px 20px 0px #16192426 inset;
-    min-width: 230px;
-    /* Prevent shrinking */
-    min-height: 230px;
-
     border: 2px solid #EFF2F7;
-    /* border-image-source: linear-gradient(324.19deg, #CACCD0 10.39%, #EFF2F7 87.57%); */
+}
 
-
-
+.radar-container-dark {
+    background: #272727;
+    box-shadow: 0px 15px 50px 30px #00000033 inset, 0px 0px 6px 0px #00000040, -4px 0px 15px 0px #00000099;
 }
 
 /* .radar-container::before {

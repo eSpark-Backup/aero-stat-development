@@ -5,7 +5,7 @@ const StatusChip = ({ color, description }) => {
     const { theme } = useContext(ThemeContext);
 
     return (
-        <div className={`${color === "green" ? "status-chip-green" : "status-chip"}`}>
+        <div className={`${theme === "light" && color === "green" ? "status-chip-green-light" : theme === "dark" && color === "green" ? "status-chip-green-dark" : theme === "light" ? "status-chip-light" : "status-chip-dark"}`}>
             <div className={`status ${color === "red" || color === "blue" || color === "green" ? "light-" + color : ""}`}></div>
             <div
                 className={`status-desc 

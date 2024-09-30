@@ -44,8 +44,8 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], si
                 distance: -15,
                 rotation: 'auto',
                 style: {
-                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C',
-                    fontSize: '12px'
+
+                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C'
                 }
             },
             title: {
@@ -81,13 +81,13 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], si
             },
             dial: {
                 radius: '80%',
-                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF', // Light theme: same as tick color, Dark theme: white
                 baseWidth: 8,
                 baseLength: '0%',
                 rearLength: '0%',
             },
             pivot: {
-                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF',
                 radius: 3,
                 baseWidth: 8,
             }
@@ -136,14 +136,14 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
             tickWidth: 2,
             tickPosition: 'inside',
             tickLength: 4,
-            tickColor: theme === 'light' ? '#666666' : '#AAAD9C',
+            tickColor: theme === 'light' ? '#666666' : '#666666',
             minorTickInterval: null,
             lineWidth: 0.5,
             labels: {
                 distance: -15,
                 rotation: 'auto',
                 style: {
-                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C',
+                    color: theme === 'light' ? '#1B1A1A' : '#1B1A1A',
                     fontSize: '12px'
                 }
             },
@@ -186,16 +186,16 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
             },
             dial: {
                 radius: '80%',
-                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF', // Light theme: same as tick color, Dark theme: white
                 baseWidth: 8,
                 baseLength: '0%',
                 rearLength: '0%',
             },
             pivot: {
-                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF',
                 radius: 3,
                 baseWidth: 8,
-            },
+            }
         }]
     }
 }
@@ -291,16 +291,16 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [
             },
             dial: {
                 radius: '80%',
-                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF', // Light theme: same as tick color, Dark theme: white
                 baseWidth: 8,
                 baseLength: '0%',
                 rearLength: '0%',
             },
             pivot: {
-                backgroundColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF',
                 radius: 3,
                 baseWidth: 8,
-            },
+            }
         }]
     }
 }

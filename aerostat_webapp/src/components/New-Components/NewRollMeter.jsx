@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import "../../styles/test2.css";
 import { calculateSkyLandPercentage } from '../../utils';
 import lines from "../../assets/lines2.svg";
 import meter from "../../assets/meter2.png";
 import meter2 from "../../assets/meter3.png";
 import stand from "../../assets/stand.png";
+import { ThemeContext } from '../../ThemeHandler';
 
 
 const NewRollMeter = () => {
     const roll = 0;
     const { sky, land } = calculateSkyLandPercentage(0);
+    const { theme, toggleTheme } = useContext(ThemeContext);
+
 
     return (
-        <div className="radar-container">
+        <div className={`radar-container ${theme == "light" ? "radar-container-light" : "radar-container-dark"}`}>
             <div style={{ transform: `rotate(${roll}deg)` }} className="radar">
                 <div style={{ height: `${sky}%` }} className="sky"></div>
                 <div
