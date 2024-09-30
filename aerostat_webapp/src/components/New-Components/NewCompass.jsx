@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import "../../styles/test.css";
+import { ThemeContext } from '../../ThemeHandler';
 
 const getDirection = (degree) => {
     if (degree === 0 || degree === 360) return "N";
@@ -22,6 +23,7 @@ const getDirection = (degree) => {
 };
 
 const NewCompass = ({ size, needle1, needle2 }) => {
+    const { theme } = useContext(ThemeContext);
     const degrees = [...Array(12)].map((_, i) => `${i * 30}°`);
     const needleRotation = needle1;
     const needleRotation2 = needle2;
