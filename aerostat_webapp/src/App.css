@@ -9,7 +9,7 @@
 
 :root {
     --main-light-bg-color: #E7EDF2;
-    --main-dark-bg-color: #000000;
+    --main-dark-bg-color: #000000b8;
     --main-bg-color: var(--main-light-bg-color);
     /* Default to light theme */
 }
