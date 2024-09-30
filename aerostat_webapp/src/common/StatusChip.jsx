@@ -3,9 +3,9 @@ import { ThemeContext } from '../ThemeHandler';
 
 const StatusChip = ({ color, description }) => {
     const { theme } = useContext(ThemeContext);
-    
+
     return (
-        <div className='status-chip'>
+        <div className={`${color === "green" ? "status-chip-green" : "status-chip"}`}>
             <div className={`status ${color === "red" || color === "blue" || color === "green" ? "light-" + color : ""}`}></div>
             <div
                 className={`status-desc 

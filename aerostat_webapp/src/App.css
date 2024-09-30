@@ -308,6 +308,7 @@ input[type=number] {
 .fan-box {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .fan-box>p {
@@ -408,7 +409,7 @@ input[type=number] {
 
 .magnetometer-box {
     width: 100%;
-    padding: 5px 30px;
+    padding: 14px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -417,6 +418,11 @@ input[type=number] {
 .heading-box,
 .heading-box2 {
     width: 49%;
+}
+
+.heading-box .child-card,
+.heading-box2 .child-card {
+    padding: 20px 30px;
 }
 
 .heading-box-content {
@@ -462,7 +468,7 @@ input[type=number] {
     justify-content: center;
     align-items: center;
     column-gap: 0px;
-    padding-bottom: 10px;
+    padding-bottom: 4px;
 }
 
 .pressure-box-content>div {
@@ -478,7 +484,7 @@ input[type=number] {
     padding: 0px 15px;
     display: flex;
     justify-content: space-between;
-    padding-bottom: 10px;
+    padding-bottom: 4px;
 }
 
 .confluence-box-content>.chart-chip {
@@ -496,16 +502,16 @@ input[type=number] {
 }
 
 .radio-box {
-    width: 60%;
+    width: 68%;
 }
 
 .log-box {
-    width: 38%;
+    width: 30%;
 }
 
 .radio-box-content {
     width: 100%;
-    padding: 10px;
+    padding: 16px 20px;
     display: flex;
     justify-content: space-between;
 }
@@ -641,6 +647,8 @@ input[type=number] {
     border-radius: 5px;
     height: 50px;
     padding: 15px;
+    color: #666666;
+    font-size: 14px;
 }
 
 .button-groups {
@@ -767,10 +775,6 @@ input[type=number] {
 
 /* StatusChip */
 .status-chip {
-    /* border: 2px solid; */
-    /* border-image-source: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%);
-    border-image-slice: 1; */
-    /* border: 2px solid rgba(82, 82, 82, 0.333333); */
     padding: 10px 10px;
     width: fit-content;
     display: flex;
@@ -791,12 +795,29 @@ input[type=number] {
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
+}
 
-    /* border: 2px solid; */
+.status-chip-green {
+    width: 165px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    column-gap: 10px;
+    position: relative;
+    padding: 10px 10px;
+}
 
-    /* border-image-source: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%); */
-
-
+.status-chip-green::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .status {
@@ -851,6 +872,7 @@ input[type=number] {
     background-color: #EFF2F7;
     border-radius: 32px;
     box-shadow: 8px 4px 4px 0px #1619241A inset, -4px -8px 4px 0px #FFFFFF inset;
+    height: 90px;
 }
 
 .charts-data-box-dark,
@@ -875,12 +897,12 @@ input[type=number] {
 }
 
 .charts-data-around {
-    padding: 15px 30px;
+    padding: 15px 11px;
     width: 100%;
     height: 100%;
     display: flex;
     justify-content: space-between;
-    min-height: 112px;
+    /* min-height: 112px; */
     /* align-items: center; */
 }
 
@@ -891,7 +913,7 @@ input[type=number] {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 112px;
+    /* min-height: 112px; */
     flex-direction: column;
     /* align-items: center; */
 }
@@ -938,7 +960,10 @@ input[type=number] {
 .charts-data-around>div {
     display: flex;
     flex-direction: column;
-    row-gap: 5px;
+    row-gap: 0px;
+    width: 50%;
+    justify-content: center;
+    align-items: center;
 }
 
 .charts-data-around>div>h2 {
@@ -1222,7 +1247,18 @@ input[type=number] {
         grid-template-columns: 98%;
         padding: 0px 10px 0px 10px;
         justify-content: center;
+        gap: 20px;
         /* padding-bottom: 20px; */
+    }
+
+    .main>*:first-child {
+        order: 2;
+        /* This makes the first child appear second */
+    }
+
+    .main>*:nth-child(2) {
+        order: 1;
+        /* This makes the second child appear first */
     }
 
     .weather-station-chips {
@@ -1250,11 +1286,12 @@ input[type=number] {
     .log-box,
     .heading-box2,
     .pressure-box-content>div,
-    .confluence-graph {
+    .confluence-graph,
+    .weather-station-card {
         width: 100%;
     }
 
-    .box2 {
+    .box1 {
         padding-bottom: 10px;
     }
 
@@ -1270,6 +1307,26 @@ input[type=number] {
         text-align: center;
     }
 
+    .charts-data-box-light {
+        min-height: 150px;
+    }
+
+    .confluence-box-content>.chart-chip{
+        width: 100%;
+    }
+
+    .log-detail{
+        flex-direction: column;
+        row-gap: 4px;
+    }
+
+}
+
+@media screen and (min-width:769px) and (max-width:1040px) {
+    .time {
+        width: 45px;
+        height: 45px;
+    }
 }
 
 @media screen and (min-width:769px) and (max-width:1200px) {
@@ -1373,6 +1430,10 @@ input[type=number] {
         gap: 1%;
     }
 
+    /* .heading-box .child-card, .heading-box2 .child-card{
+        padding: 20px 30px;
+    } */
+
     .header {
         padding: 23px 19px;
     }
@@ -1384,11 +1445,11 @@ input[type=number] {
     }
 
     .charts-data-around>div {
-        padding-top: 15px;
+        padding-top: 0px;
     }
 
     .magnetometer-box {
-        padding: 24px 30px 33px 30px;
+        padding: 15px 30px 10px 30px;
     }
 
     .charts-data-box3 {
@@ -1426,7 +1487,7 @@ input[type=number] {
     }
 
     .wind-speed-card {
-        padding-bottom: 12px;
+        padding-bottom: 7px;
     }
 
     .heading-box-content {
@@ -1436,6 +1497,22 @@ input[type=number] {
     .chart-chip>p {
         font-size: 14px;
     }
+
+    /* .heading-box .child-card, */
+    .heading-box2 .child-card {
+        padding: 30px 30px;
+    }
+
+    .heading-box .child-card{
+        padding: 42px 30px;
+    }
+}
+
+@media screen and (min-width:1651px) and (max-width:1880px) {
+    .magnetometer-box {
+        padding: 14px 30px;
+    }
+
 }
 
 /* Media Queries */

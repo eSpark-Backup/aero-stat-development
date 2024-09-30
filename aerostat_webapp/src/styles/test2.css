@@ -13,9 +13,14 @@
     /* Prevent shrinking */
     min-height: 230px;
 
+    border: 2px solid #EFF2F7;
+    /* border-image-source: linear-gradient(324.19deg, #CACCD0 10.39%, #EFF2F7 87.57%); */
+
+
+
 }
 
-.radar-container::before {
+/* .radar-container::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -26,7 +31,7 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
-}
+} */
 
 .radar {
     width: 200px;
