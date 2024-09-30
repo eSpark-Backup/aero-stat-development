@@ -1791,7 +1791,10 @@ input[type=number] {
 
     .charts-data-box-light,
     .charts-data-box2-light,
-    .charts-data-box3-light {
+    .charts-data-box3-light,
+    .charts-data-box-dark,
+    .charts-data-box2-dark,
+    .charts-data-box3-dark {
         bottom: 0 !important;
         margin-top: -43px !important;
         margin-bottom: 10px !important;

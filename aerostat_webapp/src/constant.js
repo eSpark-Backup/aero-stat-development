@@ -248,7 +248,7 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [
                 distance: -15,
                 rotation: 'auto',
                 style: {
-
+                    fontSize: size === 200 ? "8px" : "12px",
                     color: theme === 'light' ? '#1B1A1A' : '#AAAD9C'
                 }
             },
