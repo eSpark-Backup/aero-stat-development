@@ -152,3 +152,31 @@
     width: 150px;
     /* Reduced size */
 }
+
+
+@media screen and (min-width:1280px) and (max-width:1440px) {
+    .blue-box {
+        border-top-right-radius: 12px;
+        border-top-left-radius: 12px;
+        position: absolute;
+        top: 40px;
+        z-index: 4;
+        left: 32px;
+        width: 64%;
+        background-color: lightblue;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .stand {
+        transform: translateX(-12px) translateY(-8px);
+    }
+
+    .meter-lines2 {
+        position: absolute;
+        top: 32px;
+        z-index: 4;
+        left: -2px;
+    }
+}
