@@ -9,7 +9,7 @@
 
 :root {
     --main-light-bg-color: #E7EDF2;
-    --main-dark-bg-color: #000000b8;
+    --main-dark-bg-color: #000000;
     --main-bg-color: var(--main-light-bg-color);
     /* Default to light theme */
 }
@@ -709,11 +709,11 @@ input[type=number] {
     font-weight: 600;
 }
 
-.log-input-box-light>p{
+.log-input-box-light>p {
     color: #4C4C4C;
 }
 
-.log-input-box-dark>p{
+.log-input-box-dark>p {
     color: #F8F8F8;
 }
 
@@ -873,7 +873,7 @@ input[type=number] {
 }
 
 .child-card-dark {
-    background: linear-gradient(180deg, #000000 0%, #282801 100%);
+    background: linear-gradient(360deg, #000000 0%, #282801 100%);
     box-shadow: -4px -4px 15px 0px #303240 inset, 4px 4px 15px 0px #14151D inset;
 }
 
