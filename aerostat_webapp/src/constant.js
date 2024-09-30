@@ -1,4 +1,4 @@
-export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45]) => {
+export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -8,8 +8,8 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45]) =>
             plotBackgroundImage: null,
             plotShadow: false,
             backgroundColor: "transparent",
-            height: 260,
-            width: 260
+            height: size,
+            width: size
         },
         plotOptions: {
             gauge: {
@@ -97,7 +97,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45]) =>
 
 
 
-export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [450]) => {
+export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [450], size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -107,8 +107,8 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
             plotBackgroundImage: null,
             plotShadow: false,
             backgroundColor: "transparent",
-            height: 260,
-            width: 260
+            height: size,
+            width: size
         },
         plotOptions: {
             gauge: {
@@ -202,7 +202,7 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
 
 
 
-export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [350]) => {
+export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [350], size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -212,8 +212,8 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [
             plotBackgroundImage: null,
             plotShadow: false,
             backgroundColor: "transparent",
-            height: 260,
-            width: 260
+            height: size,
+            width: size
         },
         plotOptions: {
             gauge: {

@@ -1,3 +1,23 @@
+import { useEffect, useState } from 'react';
+
+export const useWindowWidth = () => {
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  return width;
+};
+
 export function calculateSkyLandPercentage(pitch) {
   if (pitch < -90) pitch = -90;
   if (pitch > 90) pitch = 90;

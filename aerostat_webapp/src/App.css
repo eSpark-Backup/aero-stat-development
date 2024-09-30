@@ -1516,3 +1516,118 @@ input[type=number] {
 }
 
 /* Media Queries */
+
+@media only screen and (min-width: 1280px) and (max-width: 1440px) {
+    .header {
+        padding: 10px 23px !important;
+    }
+
+    .main-card-title {
+        height: 45px !important;
+    }
+
+    .main-card-title h1 {
+        font-size: 22px !important;
+    }
+
+    .box1,
+    .box2 {
+        row-gap: 10px !important;
+    }
+
+    .compass {
+        width: 175px !important;
+        height: 175px !important;
+    }
+
+    .heading-box2 .child-card {
+        padding: 26px !important;
+    }
+
+    .status-chip {
+        padding: 10px !important;
+    }
+
+    .weather-station-chips .status-desc {
+        font-size: 11px !important;
+    }
+
+    .weather-station-card .child-card {
+        padding: 22px !important;
+    }
+
+    .child-card {
+        padding: 40px !important;
+    }
+
+    .chart-chip {
+        padding: 10px !important;
+    }
+
+    .charts-data-box-light,
+    .charts-data-box2-light,
+    .charts-data-box3-light {
+        bottom: 0 !important;
+        margin-top: -50px !important;
+        margin-bottom: 10px !important;
+        z-index: 999 !important;
+    }
+
+    .heading-box2 .chart-chip {
+        width: 160px !important;
+    }
+
+    .radar-container {
+        width: 200px !important;
+        height: 200px !important;
+        min-width: 200px !important;
+        min-height: 200px !important;
+    }
+
+    .radar {
+        width: 170px !important;
+        height: 170px !important;
+        min-width: 170px !important;
+        min-height: 170px !important;
+        margin: 0 !important;
+    }
+
+    .charts-data-box-light,
+    .charts-data-box2-light,
+    .charts-data-box3-light {
+        width: 80% !important;
+        height: 70px !important;
+    }
+
+    .charts-data-around>div>h2 {
+        font-size: 20px !important;
+    }
+
+    .charts-data-center>h2 {
+        font-size: 20px !important;
+    }
+
+    .chart-value h2 {
+        font-size: 20px !important;
+    }
+
+    .charts-data-around>div>p {
+        font-size: 12px;
+    }
+
+    .charts-data-center>p {
+        font-size: 12px;
+    }
+
+    .box-values>p {
+        font-size: 12px;
+    }
+
+    .chart-value p {
+        font-size: 12px;
+    }
+
+    .wind-speed-card {
+        padding-bottom: 0px !important;
+    }
+}
