@@ -1793,7 +1793,7 @@ input[type=number] {
     .charts-data-box2-light,
     .charts-data-box3-light {
         bottom: 0 !important;
-        margin-top: -50px !important;
+        margin-top: -43px !important;
         margin-bottom: 10px !important;
         z-index: 999 !important;
     }
