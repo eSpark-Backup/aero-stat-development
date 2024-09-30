@@ -23,7 +23,7 @@ const getDirection = (degree) => {
 };
 
 const NewCompass = ({ size, needle1, needle2 }) => {
-    const { theme } = useContext(ThemeContext);
+    const { theme, toggleTheme } = useContext(ThemeContext);
     const degrees = [...Array(12)].map((_, i) => `${i * 30}°`);
     const needleRotation = needle1;
     const needleRotation2 = needle2;
@@ -31,14 +31,14 @@ const NewCompass = ({ size, needle1, needle2 }) => {
 
     return (
         <div>
-            <div className="compass">
-                <div className="center-main-circle">
-                    <div className="center-circle">
-                        <span className="degree" style={{ color: needle2 ? "#F30102" : "#47515C" }}>
+            <div className={`compass ${theme === "light" ? "compass-light" : "compass-dark"}`}>
+                <div className={`center-main-circle ${theme === "light" ? "center-main-circle-light" : "center-main-circle-dark"}`}>
+                    <div className={`center-circle ${theme === "light" ? "center-circle-light" : "center-circle-dark"}`}>
+                        <span style={{ color: theme === "light" && needle2 ? "#F30102" : theme === "dark" && needle2 ? "#F30102" : !needle2 && theme === "light" ? "#47515C" : "#F8F8F8" }}>
                             <p>{needleRotation}°</p>
                         </span>
                         {
-                            !needle2 && <span className="direction">
+                            !needle2 && <span className={`direction ${theme === "light" ? "direction-light" : "direction-dark"}`}>
                                 <p>{direction1}</p>
                             </span>
                         }
@@ -79,7 +79,7 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                     {degrees.map((degree, i) => (
                         <div
                             key={i}
-                            className="degree-label"
+                            className={`degree-label ${theme === "light" ? "degree-label-light" : 'degree-label-dark'}`}
                             style={{
                                 position: 'absolute',
                                 transform: `rotate(${i * 30}deg) translateY(-74px)`,
@@ -96,12 +96,12 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                         <p style={{ transform: size ? 'rotate(-8.5deg) translateX(5px) translateY(10px)' : 'rotate(-8.5deg) translateX(8px)', fontSize: size ? "18px" : "24px", fontWeight: "500", color: "#F60000" }}>N</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(90deg) translateY(-128px)' }}>
-                        <p style={{ fontSize: size ? "18px" : "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF", transform: size ? "rotate(-90deg) translate(-13px, 5px)" : "rotate(-90deg)" }}>E</p>
+                        <p style={{ fontSize: "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF", transform: "rotate(-90deg)" }}>E</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(180deg) translateY(-118px)' }}>
-                        <p style={{ transform: size ? "translateX(2px) translateY(7px)" : "translateX(3px)", fontSize: size ? "18px" : "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF" }}>S</p>
+                        <p style={{ transform: "translateX(3px)", fontSize: "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF" }}>S</p>
                     </div>
-                    <div className="direction-label" style={{ transform: size ? 'rotate(270deg) translateY(-125px) translateX(-5px)' : 'rotate(270deg) translateY(-138px) translateX(-2px)', fontSize: size ? "18px" : "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF" }}>
+                    <div className="direction-label" style={{ transform: 'rotate(270deg) translateY(-138px) translateX(-2px)', fontSize: "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF" }}>
                         <p style={{ transform: "rotate(90deg)" }}>W</p>
                     </div>
                 </div>

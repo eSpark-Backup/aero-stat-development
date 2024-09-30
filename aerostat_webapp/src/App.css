@@ -135,7 +135,7 @@ input[type=number] {
 .data-type {
     font-size: 20px;
     font-weight: 500;
-    width: 30%;
+    width: fit-content;
 }
 
 .data-type-light {
@@ -170,7 +170,7 @@ input[type=number] {
 }
 
 .day-dark>h2 {
-    color: #FFFFFF;
+    color: #CACACA;
 }
 
 .day>h2 {
@@ -207,7 +207,7 @@ input[type=number] {
 }
 
 .time-dark>h3 {
-    color: #FFFFFF;
+    color: #CACACA;
 }
 
 .colon-box {
@@ -539,11 +539,11 @@ input[type=number] {
 
 .config-details {
     width: 40%;
-    border-radius: 20px;
     padding: 15px;
 }
 
 .config-details-light {
+    border-radius: 20px;
     background-color: #EFF2F7;
     box-shadow: -4px -4px 8px 0px #FFFFFF inset, 8px 4px 4px 0px #1619241A inset;
 }
@@ -552,6 +552,8 @@ input[type=number] {
     background: linear-gradient(180deg, #000000 0%, #202000 100%);
     border: 2px solid #20222C4D;
     box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 
 .log-detail {
@@ -576,9 +578,17 @@ input[type=number] {
 .loading-bar {
     width: 100%;
     height: 8px;
-    box-shadow: 4px 4px 6px 0px #ABC2D436, -4px -4px 6px 0px #FFFFFF60, 0px 4px 6px 0px #ABC2D480 inset;
     border-radius: 4px;
     overflow: hidden;
+}
+
+.loading-bar-light {
+    box-shadow: 4px 4px 6px 0px #ABC2D436, -4px -4px 6px 0px #FFFFFF60, 0px 4px 6px 0px #ABC2D480 inset;
+}
+
+.loading-bar-dark {
+    background: linear-gradient(180deg, #E7EDF2 0%, #F5F7FA 100%);
+    box-shadow: 4px 4px 6px 0px #212121, -4px -4px 6px 0px #09090966, 0px 4px 6px 0px #2C2F3333 inset;
 }
 
 .progress {
@@ -695,9 +705,16 @@ input[type=number] {
 }
 
 .log-input-box>p {
-    color: #4C4C4C;
     font-size: 16px;
     font-weight: 600;
+}
+
+.log-input-box-light>p{
+    color: #4C4C4C;
+}
+
+.log-input-box-dark>p{
+    color: #F8F8F8;
 }
 
 .file-name-box {
@@ -811,6 +828,8 @@ input[type=number] {
     justify-content: center;
     align-items: center;
     height: 60px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
 }
 
 .main-card-title-light {
@@ -823,7 +842,8 @@ input[type=number] {
 }
 
 .main-card-title-dark {
-    border-bottom: 1px solid #3E4952;
+    border-bottom: 1px solid #BBDAF2;
+    box-shadow: 0px 0px 6px 0px #CEE3F3;
 }
 
 .main-card-title-dark>h1 {
@@ -938,7 +958,21 @@ input[type=number] {
 .status {
     width: 18.16px;
     height: 18px;
-    border-radius: 50%;
+    border-radius: 120px;
+    position: relative;
+}
+
+.status::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 120px;
+    padding: 2px;
+    background: linear-gradient(148.29deg, #FFFFFF 11.79%, #8A8A8A 80.91%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .status-desc {
@@ -949,6 +983,8 @@ input[type=number] {
 .light-red {
     background: linear-gradient(130.36deg, #9D2D2D 28.38%, rgba(247, 0, 0, 0.3) 98.83%);
 }
+
+
 
 .light-red-text,
 .dark-red-text {
@@ -1000,8 +1036,7 @@ input[type=number] {
     bottom: 50px;
     background: linear-gradient(180deg, #000000 0%, #282801 100%);
     border-radius: 32px;
-    box-shadow: -4px -4px 15px 0px #303240 inset;
-    box-shadow: 4px 4px 15px 0px #14151D inset;
+    box-shadow: -4px -4px 15px 0px #303240 inset, 4px 4px 15px 0px #14151D inset;
     height: 90px;
 }
 
@@ -1107,7 +1142,7 @@ input[type=number] {
 }
 
 .charts-data-around-dark>div>p {
-    color: #FFFFFF;
+    color: #F8F8F8;
 }
 
 .box-values {
@@ -1459,7 +1494,8 @@ input[type=number] {
         row-gap: 4px;
     }
 
-    .charts-data-box-light, .charts-data-box-dark{
+    .charts-data-box-light,
+    .charts-data-box-dark {
         height: 150px;
     }
 
@@ -1574,7 +1610,20 @@ input[type=number] {
     }
 }
 
-@media screen and (min-width:1201px) and (max-width:1650px) {
+@media screen and (min-width:1201px) and (max-width:1399px) {
+    .main {
+        display: grid;
+        grid-template-columns: 25% 73%;
+        padding: 0px 19px 10px 19px;
+        gap: 1%;
+    }
+
+    .header {
+        padding: 23px 19px;
+    }
+}
+
+@media screen and (min-width:1400px) and (max-width:1650px) {
     .main {
         display: grid;
         grid-template-columns: 25% 73%;

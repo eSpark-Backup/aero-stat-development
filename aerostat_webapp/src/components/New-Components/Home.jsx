@@ -176,21 +176,21 @@ const Home = () => {
                             <MainCard title={"Radio Link"}>
                                 <div className='radio-box-content'>
                                 <div className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"}`}>
-                                        <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
-                                            <p>RF Link:</p>
-                                            <StatusChip color={"green"} description={"Connected"} />
-                                        </div>
-                                        <div className="loading-bar">
-                                            <div className="progress"></div>
-                                        </div>
-                                        <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
-                                            <p>Tether Link:</p>
-                                            <StatusChip color={"green"} description={"Connected"} />
-                                        </div>
-                                        <div className="loading-bar">
-                                            <div className="progress"></div>
-                                        </div>
-                                        <button>Config</button>
+                                    <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
+                                        <p>RF Link:</p>
+                                        <StatusChip color={"green"} description={"Connected"} />
+                                    </div>
+                                    <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
+                                        <div className="progress"></div>
+                                    </div>
+                                    <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
+                                        <p>Tether Link:</p>
+                                        <StatusChip color={"green"} description={"Connected"} />
+                                    </div>
+                                    <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
+                                        <div className="progress"></div>
+                                    </div>
+                                    <button>Config</button>
 
                                     </div>
                                 <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>
