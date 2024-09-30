@@ -1778,11 +1778,11 @@ input[type=number] {
     }
 
     .weather-station-card .child-card {
-        padding: 22px !important;
+        padding: 26px !important;
     }
 
     .child-card {
-        padding: 40px !important;
+        padding: 20px !important;
     }
 
     .chart-chip {
@@ -1837,19 +1837,19 @@ input[type=number] {
     }
 
     .charts-data-around>div>p {
-        font-size: 12px;
+        font-size: 12px !important;
     }
 
     .charts-data-center>p {
-        font-size: 12px;
+        font-size: 12px !important;
     }
 
     .box-values>p {
-        font-size: 12px;
+        font-size: 12px !important;
     }
 
     .chart-value p {
-        font-size: 12px;
+        font-size: 12px !important;
     }
 
     .wind-speed-card {
