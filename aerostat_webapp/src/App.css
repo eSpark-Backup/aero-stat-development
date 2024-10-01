@@ -1902,7 +1902,7 @@ input[type=number] {
 }
 
 .modal.dark {
-    background: #20222C;
+    background: #000000;
     box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
 }
 
@@ -1912,11 +1912,9 @@ input[type=number] {
 }
 
 .modal-header {
-    /* text-align: center; */
-    padding: 10px 10px 10px 0px;
+    padding: 17px 20px 17px 0px;
     border-bottom: 1px solid #E4E4E4;
     box-shadow: 0px 0px 4px 0px #00000040;
-
     border-top-left-radius: 17px;
     border-top-right-radius: 17px;
     display: flex;
@@ -1956,7 +1954,7 @@ input[type=number] {
 }
 
 .modal-header.dark>div>button {
-    background: linear-gradient(180deg, #3B3D4B 0%, #272934 100%);
+    background: linear-gradient(180deg, #000000 0%, #282801 100%);
     box-shadow: 0px 0px 6px 0px #00000040;
 }
 
@@ -2009,7 +2007,7 @@ input[type=number] {
 }
 
 .modal-btn-group.dark button {
-    background: linear-gradient(180deg, #3B3D4B 0%, #272934 100%);
+    background: linear-gradient(180deg, #000000 0%, #202000 100%);
     border: 2px solid #20222C4D;
     box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
     color: #FFFFFF;
@@ -2068,8 +2066,8 @@ input[type=number] {
 }
 
 .modal-input.dark input {
+    background: linear-gradient(180deg, #000000 0%, #282801 100%);
     border: 1px solid #E4E4E4;
-    background: transparent;
 }
 
 @media screen and (max-width: 768px) {

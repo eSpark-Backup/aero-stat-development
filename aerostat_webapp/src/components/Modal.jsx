@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import close from "../assets/close.svg"
+import close2 from "../assets/close-dark.svg"
 
 
 const validateIpAddress = (ip) => {
@@ -55,7 +56,7 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
           <div>
             <p>Configuration</p>
             <button onClick={handleClose}>
-              <img src={close} alt="" />
+              <img src={theme === "light" ? close : close2} alt="" />
             </button>
           </div>
         </div>
