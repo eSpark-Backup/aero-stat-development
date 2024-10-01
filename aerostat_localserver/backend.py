@@ -1,4 +1,5 @@
 import socket
+from log_file import create_log_file, setup_log_directory
 from flask_cors import CORS  # type: ignore
 from digital_compass import digital_compass
 from weather_station import weatherstation_data
@@ -17,6 +18,9 @@ ports = []
 target_port = 4007  # Default target port for fan and lights command
 data_packets = []
 
+setup_log_directory()
+create_log_file()
+
 # Function to connect to specific port and fetch data
 def connect_to_port(port):
     global data_packets
@@ -26,12 +30,17 @@ def connect_to_port(port):
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(5)
             sock.connect((host, port))
             print(f"Connected to {host}:{port}")
             sock.sendall(b'Hello Server')
             data = sock.recv(1024)
             return data.decode('utf-8')
-        
+
+    except socket.timeout:
+        print(f"Connection timed out on port {port}")
+        return None
+
     except socket.error as e:
         print(f"Error on port {port}: {e}")
         return None
@@ -47,23 +56,23 @@ def get_port_data():
         data = connect_to_port(port)
         if data:
             if(port == 4002):
-                print(f"Weather data received from port {port}:{weatherstation_data(data)}")
                 port_data[f"port_{port}"] = weatherstation_data(data)
+                print(f"Weather data received from port {port}:{port_data[f"port_{port}"]}")
             elif(port == 4003):
-                print(f"Digital Compass data received from port {port}:{digital_compass(data)}")
                 port_data[f"port_{port}"] = digital_compass(data)
+                print(f"Digital Compass data received from port {port}:{port_data[f"port_{port}"]}")
             elif(port == 4004):
-                print(f"Ballonet Pressure received from port {port}:{ballonet_data(data)}")
                 port_data[f"port_{port}"] = ballonet_data(data)
+                print(f"Ballonet Pressure received from port {port}:{port_data[f"port_{port}"]}")
             elif(port == 4005):
-                print(f"Helium Pressure data received from port {port}:{helium_data(data)}")
                 port_data[f"port_{port}"] = helium_data(data)
+                print(f"Helium Pressure data received from port {port}:{port_data[f"port_{port}"]}")
             elif(port == 4006):
-                print(f"Tension Value data received from port {port}:{adams_sensor_data(data)}")
                 port_data[f"port_{port}"] = adams_sensor_data(data)
+                print(f"Tension Value data received from port {port}:{port_data[f"port_{port}"]}")
             elif(port == 4007):
-                print(f"Internal Temp & Buttons data received from port {port}:{e_box_sensor_data(data)}")
                 port_data[f"port_{port}"] = e_box_sensor_data(data)
+                print(f"Internal Temp & Buttons data received from port {port}:{port_data[f"port_{port}"]}")
 
     return jsonify(port_data)
 

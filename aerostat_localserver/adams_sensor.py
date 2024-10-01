@@ -1,9 +1,11 @@
+from log_file import log_message
+
 def adams_sensor_data(nmea_data):
     parsed_data = {
         'Tension': None,
         'MaxTension': None,
     }
-    
+    m_msgStr = ""
     # Initialize Max Tension
     max_tension = 0.0
 
@@ -27,9 +29,12 @@ def adams_sensor_data(nmea_data):
                 # Assign values to the parsed_data dictionary
                 parsed_data['Tension'] = tension_value
                 parsed_data['MaxTension'] = max_tension
+                m_msgStr += f"Tension: {tension_value}\tMax Tension: {max_tension}"
 
         except ValueError:
             # Handle cases where conversion to float fails
             pass
+    if len(m_msgStr) != 0:
+        log_message(m_msgStr)
 
     return parsed_data

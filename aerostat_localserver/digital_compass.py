@@ -1,10 +1,12 @@
+from log_file import log_message
+
 def digital_compass(nmea_data):
     parsed_data = {
         'Magheading' :None,  
         'Pitch' : None,
         'Roll' : None,
     }
-
+    m_msgStr = ""
     msgs_list = nmea_data.strip().split('\n')
 
     for msg in msgs_list:
@@ -25,7 +27,10 @@ def digital_compass(nmea_data):
                     parsed_data['Magheading'] = heading_v
                     parsed_data['Pitch'] = pitch_v
                     parsed_data['Roll'] = roll_v
+                    m_msgStr += "Mag Heading: " + h + "\tPitch: " + p + "\tRoll: " + r
             except ValueError:
                 pass
-            
+    if len(m_msgStr) != 0:
+        log_message(m_msgStr)
+
     return parsed_data
