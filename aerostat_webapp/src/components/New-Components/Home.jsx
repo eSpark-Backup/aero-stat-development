@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import MainCard from '../../common/MainCard'
 import ChildCard from '../../common/ChildCard'
 import StatusChip from '../../common/StatusChip'
@@ -18,6 +18,7 @@ import HighchartsGauge from "highcharts/modules/solid-gauge";
 import { confluenceGaugeOptions, pressureGaugeOptions, windGaugeOptions } from '../../constant'
 import { ThemeContext } from '../../ThemeHandler'
 import { useWindowWidth } from '../../utils'
+import Modal from '../Modal'
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -26,32 +27,44 @@ const Home = () => {
     const { theme, toggleTheme } = useContext(ThemeContext);
     const width = useWindowWidth();
     const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
-    const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false
-        return (
+    const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
+    const [openModal, setOpenModal] = useState(false);
+    const [form, setForm] = useState({
+        ip: "192.168.0.102",
+        weather: "4002",
+        hmr: "4003",
+        ballonet: "4004",
+        helium: "4005",
+        adam: "4006",
+        ebox: "4007",
+    });
+    const [errorValues, setErrorValues] = useState([]);
+    return (
+        <>
             <div className="main">
-            <div className={`preferences2 ${theme === "light" ? "preferences2-light" : "preferences2-dark"}`} >
-                <p>Preference</p>
-                <div className={`choice ${theme === "light" ? "choice-light" : "choice-dark"}`} onClick={toggleTheme}>
-                    {
-                        theme === "light"
-                            ?
-                            <>
-                                <div className="theme-light"></div>
-                                <p className='theme-text-light'>Light</p>
-                            </>
-                            :
-                            <>
-                                <p className='theme-text-dark'>Dark</p>
-                                <div className="theme-dark"></div>
-                            </>
-                    }
+                <div className={`preferences2 ${theme === "light" ? "preferences2-light" : "preferences2-dark"}`} >
+                    <p>Preference</p>
+                    <div className={`choice ${theme === "light" ? "choice-light" : "choice-dark"}`} onClick={toggleTheme}>
+                        {
+                            theme === "light"
+                                ?
+                                <>
+                                    <div className="theme-light"></div>
+                                    <p className='theme-text-light'>Light</p>
+                                </>
+                                :
+                                <>
+                                    <p className='theme-text-dark'>Dark</p>
+                                    <div className="theme-dark"></div>
+                                </>
+                        }
+                    </div>
                 </div>
-            </div>
-            <div className="box1">
-                <MainCard title={"Weather Station"}>
-                    <div className='weather-station-card'>
-                        <ChildCard>
-                            <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", rowGap: "40px", paddingTop: "10px" }}>
+                <div className="box1">
+                    <MainCard title={"Weather Station"}>
+                        <div className='weather-station-card'>
+                            <ChildCard>
+                                <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", rowGap: "40px", paddingTop: "10px" }}>
                                     <NewCompass size={getCompassSize()} needle1={260} needle2={110} />
                                     <div className='weather-station-chips'>
                                         <StatusChip color={"blue"} description={"Wind Angle"} />
@@ -175,66 +188,66 @@ const Home = () => {
                         <div className="radio-box">
                             <MainCard title={"Radio Link"}>
                                 <div className='radio-box-content'>
-                                <div className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"}`}>
-                                    <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
-                                        <p>RF Link:</p>
-                                        <StatusChip color={"green"} description={"Connected"} />
-                                    </div>
-                                    <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
-                                        <div className="progress"></div>
-                                    </div>
-                                    <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
-                                        <p>Tether Link:</p>
-                                        <StatusChip color={"green"} description={"Connected"} />
-                                    </div>
-                                    <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
-                                        <div className="progress"></div>
-                                    </div>
-                                    <button>Config</button>
+                                    <div className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"}`}>
+                                        <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
+                                            <p>RF Link:</p>
+                                            <StatusChip color={"green"} description={"Connected"} />
+                                        </div>
+                                        <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
+                                            <div className="progress"></div>
+                                        </div>
+                                        <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
+                                            <p>Tether Link:</p>
+                                            <StatusChip color={"green"} description={"Connected"} />
+                                        </div>
+                                        <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
+                                            <div className="progress"></div>
+                                        </div>
+                                        <button onClick={() => setOpenModal(true)}>Config</button>
 
                                     </div>
-                                <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>
+                                    <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>
                                         <h1>Details</h1>
-                                    <div className={`config-details-items ${theme === "light" ? "config-details-items-light" : "config-details-items-dark"}`}>
+                                        <div className={`config-details-items ${theme === "light" ? "config-details-items-light" : "config-details-items-dark"}`}>
                                             <div>
                                                 <p>GCS Address</p>
-                                            <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
+                                                <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p>192.168.0.102</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Weather Station Port</p>
-                                            <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
+                                                <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p>4002</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>HMR Port  </p>
-                                            <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
+                                                <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p>4003</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Ballonet Pressure Port</p>
-                                            <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
+                                                <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p>4004</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Helium Pressure Port</p>
-                                            <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
+                                                <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p>4005</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>ADAM Port</p>
-                                            <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
+                                                <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p>4006</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>EBox Port</p>
-                                            <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
+                                                <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p>4007</p>
                                                 </div>
                                             </div>
@@ -246,23 +259,23 @@ const Home = () => {
                         <div className="log-box">
                             <MainCard title={"Data Logging"}>
                                 <div className='log-box-content'>
-                                <div className={`log-input-box ${theme === "light" ? "log-input-box-light" : "log-input-box-dark"}`}>
+                                    <div className={`log-input-box ${theme === "light" ? "log-input-box-light" : "log-input-box-dark"}`}>
                                         <p>Log File</p>
-                                    <div className={`file-name-box ${theme === "light" ? "file-name-box-light" : "file-name-box-dark"}`}>Aero/Nw7/Fgs/70082024</div>
+                                        <div className={`file-name-box ${theme === "light" ? "file-name-box-light" : "file-name-box-dark"}`}>Aero/Nw7/Fgs/70082024</div>
                                         <button>Browse</button>
                                     </div>
                                     <div className="button-groups">
-                                    <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
+                                        <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
                                             <div className="upper-part">
                                                 <img src={play} alt="" />
                                             </div>
                                         </div>
-                                    <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
+                                        <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
                                             <div className="upper-part">
                                                 <img src={forward} alt="" />
                                             </div>
                                         </div>
-                                    <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
+                                        <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
                                             <div className="upper-part">
                                                 <img src={stop} alt="" />
                                             </div>
@@ -273,8 +286,21 @@ const Home = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-        )
-    }
 
-    export default Home
+
+            </div>
+            <Modal
+                theme={theme}
+                open={openModal}
+                handleClose={() => setOpenModal(false)}
+                handleSubmit={() => setOpenModal(false)}
+                form={form}
+                setForm={setForm}
+                errorValues={errorValues}
+                setErrorValues={setErrorValues}
+            />
+        </>
+    )
+}
+
+export default Home
