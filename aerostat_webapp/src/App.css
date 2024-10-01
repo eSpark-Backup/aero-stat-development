@@ -846,7 +846,7 @@ input[type=number] {
 
 .main-card-title-dark {
     border-bottom: 1px solid #BBDAF2;
-    box-shadow: 0px 0px 6px 0px #CEE3F3;
+    /* box-shadow: 0px 0px 6px 0px #CEE3F3; */
 }
 
 .main-card-title-dark>h1 {
