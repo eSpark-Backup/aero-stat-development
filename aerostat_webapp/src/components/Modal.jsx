@@ -23,6 +23,15 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
     };
   }, [open, handleClose]);
 
+  useEffect(() => {
+    if (!open) {
+      document.body.style.overflow = "auto";
+    }
+    if (open) {
+      document.body.style.overflow = "hidden"
+    }
+  }, [open])
+
   const handleChange = (val, field) => {
     setForm((prev) => {
       const newForm = { ...prev, [field]: val };
