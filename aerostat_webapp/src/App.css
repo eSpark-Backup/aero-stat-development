@@ -1760,9 +1760,16 @@ input[type=number] {
     }
 
     .compass {
-        width: 175px !important;
-        height: 175px !important;
+        width: 200px !important;
+        height: 200px !important;
     }
+/* 
+    .heading-box .compass {
+        width: 200px !important;
+        height: 200px !important;
+    } */
+
+
 
     .heading-box2 .child-card {
         padding: 26px !important;
@@ -1785,7 +1792,7 @@ input[type=number] {
     }
 
     .heading-box .child-card {
-        padding: 25px 17px !important;
+        padding: 25px 7px !important;
     }
 
     .chart-chip {
@@ -2108,7 +2115,7 @@ input[type=number] {
         font-size: 12px;
     }
 
-    .modal-header>div{
+    .modal-header>div {
         width: 100%;
         justify-content: space-between;
         align-items: center;

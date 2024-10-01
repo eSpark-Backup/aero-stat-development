@@ -140,11 +140,11 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
             minorTickInterval: null,
             lineWidth: 0.5,
             labels: {
-                distance: -15,
+                distance: size === 200 ? -13 : -15,
                 rotation: 'auto',
                 style: {
                     color: theme === 'light' ? '#1B1A1A' : '#1B1A1A',
-                    fontSize: '12px'
+                    fontSize: size === 200 ? '10px' : '12px'
                 }
             },
             title: {
