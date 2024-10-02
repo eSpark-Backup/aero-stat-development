@@ -1,4 +1,4 @@
-export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], size) => {
+export const windGaugeOptions = (theme, min = 0, max = 70, seriesData, size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -97,7 +97,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], si
 
 
 
-export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [450], size) => {
+export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData, size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -202,7 +202,7 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
 
 
 
-export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [350], size) => {
+export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, size) => {
     const needleValue = seriesData[0];
     return {
         chart: {

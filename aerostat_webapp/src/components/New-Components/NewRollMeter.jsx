@@ -8,9 +8,8 @@ import stand from "../../assets/stand.png";
 import { ThemeContext } from '../../ThemeHandler';
 
 
-const NewRollMeter = () => {
-    const roll = 0;
-    const { sky, land } = calculateSkyLandPercentage(0);
+const NewRollMeter = ({ roll, pitch }) => {
+    const { sky, land } = calculateSkyLandPercentage(pitch);
     const { theme, toggleTheme } = useContext(ThemeContext);
 
 

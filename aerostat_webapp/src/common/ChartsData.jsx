@@ -42,7 +42,7 @@ const ChartsData = ({ position, description1, description2, value1, value2, grap
                         <h2>{graphValue}</h2>
                         <p>{graphName}</p>
                     </div>
-                    <p>-ve side</p>
+                    <p>+ve side</p>
                 </div>
             }
             {

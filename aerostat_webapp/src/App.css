@@ -1244,12 +1244,14 @@ input[type=number] {
     font-size: 16px;
     font-weight: 500;
     color: #4AB940;
+    cursor: pointer;
 }
 
 .not-selected {
     font-size: 16px;
     font-weight: 400;
     color: #8D8E90;
+    cursor: pointer;
 }
 
 /* Option Box */
@@ -1763,7 +1765,8 @@ input[type=number] {
         width: 200px !important;
         height: 200px !important;
     }
-/* 
+
+    /* 
     .heading-box .compass {
         width: 200px !important;
         height: 200px !important;
@@ -2123,3 +2126,8 @@ input[type=number] {
 }
 
 /* ///Modal/// */
+
+.input-err,
+.input-err:focus {
+    border: 1px solid #ff0000 !important;
+}

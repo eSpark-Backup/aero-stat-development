@@ -1,14 +1,14 @@
 import React, { useContext } from 'react'
 import { ThemeContext } from '../ThemeHandler';
 
-const OptionBox = ({ option1, option2, selectedOption }) => {
+const OptionBox = ({ option1, option2, selectedOption, setSelectedOption }) => {
     const { theme } = useContext(ThemeContext);
 
     return (
         <div className={`option-box ${theme === "light" ? "option-box-light" : "option-box-dark"}`}>
-            <div className={selectedOption.toLowerCase() === option1.toLowerCase() ? "selected" : "not-selected"}>{option1}</div>
+            <div onClick={() => setSelectedOption(option1)} className={selectedOption.toLowerCase() === option1.toLowerCase() ? "selected" : "not-selected"}>{option1}</div>
             <div className={theme === "light" ? "breaker-light" : "breaker-dark"}><p>|</p></div>
-            <div className={selectedOption.toLowerCase() === option2.toLowerCase() ? "selected" : "not-selected"}>{option2}</div>
+            <div onClick={() => setSelectedOption(option2)} className={selectedOption.toLowerCase() === option2.toLowerCase() ? "selected" : "not-selected"}>{option2}</div>
         </div>
     )
 }

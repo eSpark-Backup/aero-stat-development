@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import MainCard from '../../common/MainCard'
 import ChildCard from '../../common/ChildCard'
 import StatusChip from '../../common/StatusChip'
@@ -19,6 +19,7 @@ import { confluenceGaugeOptions, pressureGaugeOptions, windGaugeOptions } from '
 import { ThemeContext } from '../../ThemeHandler'
 import { useWindowWidth, fetchDataUtil } from '../../utils'
 import Modal from '../Modal'
+import { formatDateTime } from '../../Js_parsing'
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -29,8 +30,9 @@ const Home = () => {
     const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
     const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
     const [openModal, setOpenModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(1);
     const [form, setForm] = useState({
-        ip: "192.168.0.102",
+        ip: "192.168.100.5",
         weather: "4002",
         hmr: "4003",
         ballonet: "4004",
@@ -38,37 +40,144 @@ const Home = () => {
         adam: "4006",
         ebox: "4007",
     });
-    const [responses, setResponses] = useState({});
     const [startFetchingFromFile, setStartFetchingFromFile] = useState(false);
+
+    const lastPerfectResponses = useRef({
+        adams: { MaxTension: 700, Tension: 0 },
+        ballonet: { BalPressure: 0.071 },
+        digitalCompass: { Magheading: 240.1, Pitch: 6, Roll: 6 },
+        ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
+        helium: { HelPressure: -0.398 },
+        weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 }
+    });
+
+    const [responses, setResponses] = useState(lastPerfectResponses.current);
+
     const fetchData = async () => {
         try {
             const results = await fetchDataUtil();
             const parsedResponses = {
-                weather: results.port_4002,
-                digitalCompass: results.port_4003,
-                ballonet: results.port_4004,
-                helium: results.port_4005,
-                adams: results.port_4006,
-                ebox: results.port_4007,
-                time: formatDateTime()
+                weather: results.port_4002 || lastPerfectResponses.current.weather,
+                digitalCompass: results.port_4003 || lastPerfectResponses.current.digitalCompass,
+                ballonet: results.port_4004 || lastPerfectResponses.current.ballonet,
+                helium: results.port_4005 || lastPerfectResponses.current.helium,
+                adams: results.port_4006 || lastPerfectResponses.current.adams,
+                ebox: results.port_4007 || lastPerfectResponses.current.ebox,
+                time: formatDateTime(),
             };
-            console.log(results);
-          setResponses(parsedResponses);
-          setIsLoading(false)
+            lastPerfectResponses.current = {
+                ...lastPerfectResponses.current,
+                weather: parsedResponses.weather,
+                digitalCompass: parsedResponses.digitalCompass,
+                ballonet: parsedResponses.ballonet,
+                helium: parsedResponses.helium,
+                adams: parsedResponses.adams,
+                ebox: parsedResponses.ebox,
+            };
+            if (Object.keys(results).length > 0) {
+                setIsLoading(0);
+            }
+            else {
+                setIsLoading(2);
+            }
+            setResponses(parsedResponses);
         } catch (error) {
-          console.error("Error in fetchData:", error);
-          setIsLoading(null)
+            setIsLoading(2);
+            console.error("Error in fetchData:", error);
         }
-      };
-    
-      useEffect(() => {
+    };
+
+    useEffect(() => {
         if (!startFetchingFromFile) {
-          fetchData();
-          const interval = setInterval(fetchData, 1000);
-          return () => clearInterval(interval);
+            fetchData();
+            const interval = setInterval(fetchData, 1000);
+            return () => clearInterval(interval);
         }
-      }, [startFetchingFromFile]);
+    }, [startFetchingFromFile]);
     const [errorValues, setErrorValues] = useState([]);
+
+
+    const handleSubmit = async () => {
+        const errors = [];
+
+
+        const ipRegex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
+
+        Object.keys(form).forEach(key => {
+            if (form[key].trim() === "") {
+                errors.push(key);
+            }
+        });
+
+
+        if (form.ip && !ipRegex.test(form.ip.trim())) {
+            errors.push('ip');
+        }
+
+        setErrorValues(errors);
+        if (errors.length > 0) {
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:5000/update-config", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(form),
+            })
+            if (response.ok) {
+                const result = await response.json();
+                console.log("Form successfully posted:");
+                setOpenModal(false);
+                setErrorValues([]);
+                setForm({
+                    ip: "",
+                    weather: "",
+                    hmr: "",
+                    ballonet: "",
+                    helium: "",
+                    adam: "",
+                    ebox: "",
+                })
+                // setStartFetchingFromFile(false);
+                // setFwdBtn(false);
+                // setPlayBtn(false);
+                // setHeaderText("LIVE DATA");
+                // setFileContent("");
+                // setLogFile("");
+                // setStopBtn(false)
+                // setFetchingSpeed(1000);
+            }
+        } catch (error) {
+            console.log("Error in form posting:", error);
+            setOpenModal(false);
+            setErrorValues([]);
+            setForm({
+                ip: "",
+                weather: "",
+                hmr: "",
+                ballonet: "",
+                helium: "",
+                adam: "",
+                ebox: "",
+            })
+        }
+    };
+
+
+    const [fan1, setFan1] = useState(responses?.ebox?.fan1 === "ON" ? "Continuous" : responses?.ebox?.fan1 === "OFF" ? "Pressured" : "Continuous");
+    const [fan2, setFan2] = useState(responses?.ebox?.fan2 === "ON" ? "Continuous" : responses?.ebox?.fan2 === "OFF" ? "Pressured" : "Continuous");
+    const [position, setPosition] = useState(responses?.ebox?.position === "1" ? "Continuous" : responses?.ebox?.position === "0" ? "Off" : "Off");
+    const [strobe, setStrobe] = useState(responses?.ebox?.strobe === "ON" ? "Continuous" : responses?.ebox?.strobe === "OFF" ? "Off" : "Continuous");
+
+
+    useEffect(() => {
+        // if (responses) {
+        console.log(responses)
+        // }
+    }, [responses])
     return (
         <>
             <div className="main">
@@ -95,7 +204,7 @@ const Home = () => {
                         <div className='weather-station-card'>
                             <ChildCard>
                                 <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", rowGap: "40px", paddingTop: "10px" }}>
-                                    <NewCompass size={getCompassSize()} needle1={260} needle2={110} />
+                                    <NewCompass size={getCompassSize()} needle1={responses?.weather?.heading} needle2={responses?.weather?.windAngle} />
                                     <div className='weather-station-chips'>
                                         <StatusChip color={"blue"} description={"Wind Angle"} />
                                         <StatusChip color={"red"} description={"Aerostats Heading"} />
@@ -108,9 +217,10 @@ const Home = () => {
                         <div className='wind-speed-card'>
                             <HighchartsReact
                                 highcharts={Highcharts}
-                                options={windGaugeOptions(theme, 0, 70, [2], getChartSize())}
+                                options={windGaugeOptions(theme, 0, 70, [responses?.weather?.windSpeed], getChartSize())}
                             />
-                            <ChartsData position={"between"} description1={"Air Temp (C):"} value1={15} description2={"Bare Press (inHg):"} value2={292} graphValue={0.295} graphName={"Wind Speed"} />
+                            <ChartsData position={"between"} description1={"Air Temp (C):"} value1={responses?.weather?.airTemp} description2={"Baro Press (inHg):"} value2={responses?.weather?.baroPres} graphValue={responses?.weather?.windSpeed}
+                                graphName={"Wind Speed"} />
                         </div>
                     </MainCard>
                     <MainCard title={"Controls"}>
@@ -118,20 +228,20 @@ const Home = () => {
                             <h2>Fan Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 1 <span>(Left direction)</span></p>
-                                <OptionBox option1={"Continuous"} option2={"Pressured"} selectedOption={"Continuous"} />
+                                <OptionBox setSelectedOption={setFan1} option1={"Continuous"} option2={"Pressured"} selectedOption={fan1} />
                             </div>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 2 <span>(Right direction)</span></p>
-                                <OptionBox option1={"Continuous"} option2={"Pressured"} selectedOption={"Pressured"} />
+                                <OptionBox setSelectedOption={setFan2} option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
                             </div>
                             <h2>Lights Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Strobe Control</p>
-                                <OptionBox option1={"Continuous"} option2={"Off"} selectedOption={"Continuous"} />
+                                <OptionBox setSelectedOption={setStrobe} option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
                             </div>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Position Control</p>
-                                <OptionBox option1={"Continuous"} option2={"Off"} selectedOption={"off"} />
+                                <OptionBox setSelectedOption={setPosition} option1={"Continuous"} option2={"Off"} selectedOption={position} />
                             </div>
                         </div>
                     </MainCard>
@@ -160,8 +270,8 @@ const Home = () => {
                             <div className="heading-box">
                                 <ChildCard>
                                     <div className="heading-box-content">
-                                        <ChartChip name={"Heading"} value={23.9} />
-                                        <NewCompass size={getCompassSize()} needle1={260} />
+                                        <ChartChip name={"Heading"} value={responses?.digitalCompass?.Magheading} />
+                                        <NewCompass size={getCompassSize()} needle1={responses?.digitalCompass?.Magheading} />
                                     </div>
                                 </ChildCard>
                             </div>
@@ -169,10 +279,10 @@ const Home = () => {
                                 <ChildCard>
                                     <div className="pitch-box-content">
                                         <div className='pitch-roll-chips'>
-                                            <ChartChip name={"Roll:"} value={"2 degree"} />
-                                            <ChartChip name={"Pitch:"} value={"2 degree"} />
+                                            <ChartChip name={"Roll:"} value={responses?.digitalCompass?.Roll} />
+                                            <ChartChip name={"Pitch:"} value={responses?.digitalCompass?.Pitch} />
                                         </div>
-                                        <NewRollMeter />
+                                        <NewRollMeter roll={responses?.digitalCompass?.Roll} pitch={responses?.digitalCompass?.Pitch} />
                                     </div>
                                 </ChildCard>
                             </div>
@@ -185,16 +295,16 @@ const Home = () => {
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [4], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [responses?.helium?.HelPressure], getChartSize())}
                                         />
-                                        <ChartsData position={"around"} graphValue={0.295} graphName={"Hull Helium"} />
+                                        <ChartsData position={"around"} graphValue={responses?.helium?.HelPressure} graphName={"Hull Helium"} />
                                     </div>
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [0.295], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [responses?.ballonet?.BalPressure], getChartSize())}
                                         />
-                                        <ChartsData position={"around"} graphValue={0.295} graphName={"Ballonet Air"} />
+                                        <ChartsData position={"around"} graphValue={responses?.ballonet?.BalPressure} graphName={"Ballonet Air"} />
                                     </div>
                                 </div>
                             </MainCard>
@@ -202,13 +312,13 @@ const Home = () => {
                         <div className="confluence-box">
                             <MainCard title={"Confluence Point Tension"}>
                                 <div className="confluence-box-content">
-                                    <ChartChip name={"Max Tension"} value={23.9} />
+                                    <ChartChip name={"Max Tension"} value={responses?.adams?.MaxTension} />
                                     <div className='confluence-graph'>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={confluenceGaugeOptions(theme, 0, 700, [100], getChartSize())}
+                                            options={confluenceGaugeOptions(theme, 0, 700, [responses?.adams?.Tension], getChartSize())}
                                         />
-                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={1} />
+                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={responses?.adams?.Tension} />
                                     </div>
                                 </div>
                             </MainCard>
@@ -221,7 +331,7 @@ const Home = () => {
                                     <div className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"}`}>
                                         <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
                                             <p>RF Link:</p>
-                                            <StatusChip color={"green"} description={"Connected"} />
+                                            <StatusChip color={"green"} description={isLoading === 2 ? "Disconnected" : isLoading === 1 ? "Loading..." : "Connected"} />
                                         </div>
                                         <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress"></div>
@@ -242,43 +352,43 @@ const Home = () => {
                                             <div>
                                                 <p>GCS Address</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p>192.168.0.102</p>
+                                                    <p>{form?.ip}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Weather Station Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p>4002</p>
+                                                    <p>{form?.weather}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>HMR Port  </p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p>4003</p>
+                                                    <p>{form?.hmr}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Ballonet Pressure Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p>4004</p>
+                                                    <p>{form?.ballonet}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Helium Pressure Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p>4005</p>
+                                                    <p>{form?.helium}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>ADAM Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p>4006</p>
+                                                    <p>{form?.adam}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>EBox Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p>4007</p>
+                                                    <p>{form?.ebox}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -323,7 +433,7 @@ const Home = () => {
                 theme={theme}
                 open={openModal}
                 handleClose={() => setOpenModal(false)}
-                handleSubmit={() => setOpenModal(false)}
+                handleSubmit={handleSubmit}
                 form={form}
                 setForm={setForm}
                 errorValues={errorValues}
