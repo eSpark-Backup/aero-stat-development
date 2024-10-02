@@ -1,6 +1,13 @@
-from flask import Flask, jsonify, request  # type: ignore
-from flask_cors import CORS  # type: ignore
 import socket
+from log_file import create_log_file, setup_log_directory
+from flask_cors import CORS  # type: ignore
+from digital_compass import digital_compass
+from weather_station import weatherstation_data
+from ballonet_pressure import ballonet_data
+from helium_pressure import helium_data
+from adams_sensor import adams_sensor_data
+from ebox_sensor import e_box_sensor_data
+from flask import Flask, jsonify, request  # type: ignore
 
 app = Flask(__name__)
 CORS(app)
@@ -9,24 +16,35 @@ CORS(app)
 host = None
 ports = []
 target_port = 4007  # Default target port for fan and lights command
+data_packets = []
+
+setup_log_directory()
+create_log_file()
 
 # Function to connect to specific port and fetch data
 def connect_to_port(port):
+    global data_packets
+
     if not host or not ports:
         return "Host and ports are not configured", 500
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(5)
             sock.connect((host, port))
             print(f"Connected to {host}:{port}")
             sock.sendall(b'Hello Server')
             data = sock.recv(1024)
-            print(f"Data from port {port}: {data.decode('utf-8')}")
             return data.decode('utf-8')
+
+    except socket.timeout:
+        print(f"Connection timed out on port {port}")
+        return None
+
     except socket.error as e:
         print(f"Error on port {port}: {e}")
         return None
-
+    
 # GET endpoint to fetch data from multiple ports
 @app.route('/get-port-data', methods=['GET'])
 def get_port_data():
@@ -37,7 +55,25 @@ def get_port_data():
     for port in ports:
         data = connect_to_port(port)
         if data:
-            port_data[f"port_{port}"] = data
+            if(port == 4002):
+                port_data[f"port_{port}"] = weatherstation_data(data)
+                print(f"Weather data received from port {port}:{port_data[f"port_{port}"]}")
+            elif(port == 4003):
+                port_data[f"port_{port}"] = digital_compass(data)
+                print(f"Digital Compass data received from port {port}:{port_data[f"port_{port}"]}")
+            elif(port == 4004):
+                port_data[f"port_{port}"] = ballonet_data(data)
+                print(f"Ballonet Pressure received from port {port}:{port_data[f"port_{port}"]}")
+            elif(port == 4005):
+                port_data[f"port_{port}"] = helium_data(data)
+                print(f"Helium Pressure data received from port {port}:{port_data[f"port_{port}"]}")
+            elif(port == 4006):
+                port_data[f"port_{port}"] = adams_sensor_data(data)
+                print(f"Tension Value data received from port {port}:{port_data[f"port_{port}"]}")
+            elif(port == 4007):
+                port_data[f"port_{port}"] = e_box_sensor_data(data)
+                print(f"Internal Temp & Buttons data received from port {port}:{port_data[f"port_{port}"]}")
+
     return jsonify(port_data)
 
 # Function to send commands to the target port

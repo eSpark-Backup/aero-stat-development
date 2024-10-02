@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import MainCard from '../../common/MainCard'
 import ChildCard from '../../common/ChildCard'
 import StatusChip from '../../common/StatusChip'
@@ -17,7 +17,7 @@ import HighchartsMore from "highcharts/highcharts-more";
 import HighchartsGauge from "highcharts/modules/solid-gauge";
 import { confluenceGaugeOptions, pressureGaugeOptions, windGaugeOptions } from '../../constant'
 import { ThemeContext } from '../../ThemeHandler'
-import { useWindowWidth } from '../../utils'
+import { useWindowWidth, fetchDataUtil } from '../../utils'
 import Modal from '../Modal'
 
 HighchartsMore(Highcharts);
@@ -38,6 +38,36 @@ const Home = () => {
         adam: "4006",
         ebox: "4007",
     });
+    const [responses, setResponses] = useState({});
+    const [startFetchingFromFile, setStartFetchingFromFile] = useState(false);
+    const fetchData = async () => {
+        try {
+            const results = await fetchDataUtil();
+            const parsedResponses = {
+                weather: results.port_4002,
+                digitalCompass: results.port_4003,
+                ballonet: results.port_4004,
+                helium: results.port_4005,
+                adams: results.port_4006,
+                ebox: results.port_4007,
+                time: formatDateTime()
+            };
+            console.log(results);
+          setResponses(parsedResponses);
+          setIsLoading(false)
+        } catch (error) {
+          console.error("Error in fetchData:", error);
+          setIsLoading(null)
+        }
+      };
+    
+      useEffect(() => {
+        if (!startFetchingFromFile) {
+          fetchData();
+          const interval = setInterval(fetchData, 1000);
+          return () => clearInterval(interval);
+        }
+      }, [startFetchingFromFile]);
     const [errorValues, setErrorValues] = useState([]);
     return (
         <>
