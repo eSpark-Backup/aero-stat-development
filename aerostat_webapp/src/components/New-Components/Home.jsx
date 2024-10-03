@@ -24,173 +24,44 @@ import { formatDateTime } from '../../Js_parsing'
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
 
-const Home = () => {
+const Home = ({ form, setForm, handleSubmit, errorValues, setErrorValues, response, isLoading, openModal, setOpenModal, handleOpenModal, fetchingStart }) => {
     const { theme, toggleTheme } = useContext(ThemeContext);
     const width = useWindowWidth();
     const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
     const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
-    const [openModal, setOpenModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(1);
-    const [form, setForm] = useState({
-        ip: "192.168.100.5",
-        weather: "4002",
-        hmr: "4003",
-        ballonet: "4004",
-        helium: "4005",
-        adam: "4006",
-        ebox: "4007",
-    });
-    const [startFetchingFromFile, setStartFetchingFromFile] = useState(false);
+    // const [openModal, setOpenModal] = useState(false);
 
-    const lastPerfectResponses = useRef({
-        adams: { MaxTension: 700, Tension: 10 },
-        ballonet: { BalPressure: 0.071 },
-        digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
-        ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
-        helium: { HelPressure: 0.398 },
-        weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 }
-    });
-
-    const [responses, setResponses] = useState(lastPerfectResponses.current);
-
-    const fetchData = async () => {
-        try {
-            const results = await fetchDataUtil();
-            const parsedResponses = {
-                weather: results.port_4002 || lastPerfectResponses.current.weather,
-                digitalCompass: results.port_4003 || lastPerfectResponses.current.digitalCompass,
-                ballonet: results.port_4004 || lastPerfectResponses.current.ballonet,
-                helium: results.port_4005 || lastPerfectResponses.current.helium,
-                adams: results.port_4006 || lastPerfectResponses.current.adams,
-                ebox: results.port_4007 || lastPerfectResponses.current.ebox,
-                time: formatDateTime(),
-            };
-            lastPerfectResponses.current = {
-                ...lastPerfectResponses.current,
-                weather: parsedResponses.weather,
-                digitalCompass: parsedResponses.digitalCompass,
-                ballonet: parsedResponses.ballonet,
-                helium: parsedResponses.helium,
-                adams: parsedResponses.adams,
-                ebox: parsedResponses.ebox,
-            };
-            if (Object.keys(results).length > 0) {
-                setIsLoading(0);
-            }
-            else {
-                setIsLoading(2);
-            }
-            setResponses(parsedResponses);
-        } catch (error) {
-            setIsLoading(2);
-            console.error("Error in fetchData:", error);
-        }
-    };
-
-    useEffect(() => {
-        if (!startFetchingFromFile) {
-            const interval = setInterval(fetchData, 1000);
-            return () => clearInterval(interval);
-        }
-    }, [startFetchingFromFile]);
-    const [errorValues, setErrorValues] = useState([]);
-
-
-    const handleSubmit = async () => {
-        const errors = [];
-
-
-        const ipRegex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
-
-        Object.keys(form).forEach(key => {
-            if (form[key].trim() === "") {
-                errors.push(key);
-            }
-        });
-
-
-        if (form.ip && !ipRegex.test(form.ip.trim())) {
-            errors.push('ip');
-        }
-
-        setErrorValues(errors);
-        if (errors.length > 0) {
-            return;
-        }
-
-        try {
-            const response = await fetch("http://localhost:5000/update-config", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(form),
-            })
-            if (response.ok) {
-                const result = await response.json();
-                console.log("Form successfully posted:");
-                setOpenModal(false);
-                setErrorValues([]);
-                setForm({
-                    ip: "",
-                    weather: "",
-                    hmr: "",
-                    ballonet: "",
-                    helium: "",
-                    adam: "",
-                    ebox: "",
-                })
-                // setStartFetchingFromFile(false);
-                // setFwdBtn(false);
-                // setPlayBtn(false);
-                // setHeaderText("LIVE DATA");
-                // setFileContent("");
-                // setLogFile("");
-                // setStopBtn(false)
-                // setFetchingSpeed(1000);
-            }
-        } catch (error) {
-            console.log("Error in form posting:", error);
-            setOpenModal(false);
-            setErrorValues([]);
-            setForm({
-                ip: "",
-                weather: "",
-                hmr: "",
-                ballonet: "",
-                helium: "",
-                adam: "",
-                ebox: "",
-            })
-        }
-    };
-
-    const [fan1, setFan1] = useState(responses?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
-    const [fan2, setFan2] = useState(responses?.ebox?.fan2 === "ON" ? "Continuous" : "Pressured");
-    const [position, setPosition] = useState(responses?.ebox?.position === "1" ? "Continuous" : "Off");
-    const [strobe, setStrobe] = useState(responses?.ebox?.strobe === "ON" ? "Continuous" : "Off");
+    const [fan1, setFan1] = useState(response?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
+    const [fan2, setFan2] = useState(response?.ebox?.fan2 === "ON" ? "Continuous" : "Pressured");
+    const [position, setPosition] = useState(response?.ebox?.position === "1" ? "Continuous" : "Off");
+    const [strobe, setStrobe] = useState(response?.ebox?.strobe === "ON" ? "Continuous" : "Off");
     const [sendData, setSendData] = useState(false);
 
     const handleChange = (name, value) => {
-        switch (name) {
-            case 'fan1':
-                setFan1(value);
-                setSendData(true);
-                break;
-            case 'fan2':
-                setFan2(value);
-                setSendData(true);
-                break;
-            case 'position':
-                setPosition(value);
-                setSendData(true);
-                break;
-            case 'strobe':
-                setStrobe(value);
-                setSendData(true);
-                break;
-            default:
-                break;
+        if (fetchingStart) {
+            switch (name) {
+                case 'fan1':
+                    setFan1(value);
+                    setSendData(true);
+                    break;
+                case 'fan2':
+                    setFan2(value);
+                    setSendData(true);
+                    break;
+                case 'position':
+                    setPosition(value);
+                    setSendData(true);
+                    break;
+                case 'strobe':
+                    setStrobe(value);
+                    setSendData(true);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            alert("No Data Source connected")
         }
     };
 
@@ -237,6 +108,10 @@ const Home = () => {
 
     }, [fan1, fan2, strobe, position]);
 
+    useEffect(() => {
+        // console.log(response)
+    }, [response])
+
     return (
         <>
             <div className="main">
@@ -263,7 +138,7 @@ const Home = () => {
                         <div className='weather-station-card'>
                             <ChildCard>
                                 <div style={{ width: "100%", display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", rowGap: "40px", paddingTop: "10px" }}>
-                                    <NewCompass size={getCompassSize()} needle1={responses?.weather?.heading} needle2={responses?.weather?.windAngle} />
+                                    <NewCompass size={getCompassSize()} needle1={response?.weather?.heading} needle2={response?.weather?.windAngle} />
                                     <div className='weather-station-chips'>
                                         <StatusChip color={"blue"} description={"Wind Angle"} />
                                         <StatusChip color={"red"} description={"Aerostats Heading"} />
@@ -276,9 +151,9 @@ const Home = () => {
                         <div className='wind-speed-card'>
                             <HighchartsReact
                                 highcharts={Highcharts}
-                                options={windGaugeOptions(theme, 0, 70, [responses?.weather?.windSpeed], getChartSize())}
+                                options={windGaugeOptions(theme, 0, 70, [response?.weather?.windSpeed], getChartSize())}
                             />
-                            <ChartsData position={"between"} description1={"Air Temp (C):"} value1={responses?.weather?.airTemp} description2={"Baro Press (inHg):"} value2={responses?.weather?.baroPres} graphValue={responses?.weather?.windSpeed}
+                            <ChartsData position={"between"} description1={"Air Temp (C):"} value1={response?.weather?.airTemp} description2={"Baro Press (inHg):"} value2={response?.weather?.baroPres} graphValue={response?.weather?.windSpeed}
                                 graphName={"Wind Speed"} />
                         </div>
                     </MainCard>
@@ -329,8 +204,8 @@ const Home = () => {
                             <div className="heading-box">
                                 <ChildCard>
                                     <div className="heading-box-content">
-                                        <ChartChip name={"Heading"} value={responses?.digitalCompass?.Magheading} />
-                                        <NewCompass size={getCompassSize()} needle1={responses?.digitalCompass?.Magheading} />
+                                        <ChartChip name={"Heading"} value={response?.digitalCompass?.Magheading} />
+                                        <NewCompass size={getCompassSize()} needle1={response?.digitalCompass?.Magheading} />
                                     </div>
                                 </ChildCard>
                             </div>
@@ -338,10 +213,10 @@ const Home = () => {
                                 <ChildCard>
                                     <div className="pitch-box-content">
                                         <div className='pitch-roll-chips'>
-                                            <ChartChip name={"Roll:"} value={responses?.digitalCompass?.Roll} />
-                                            <ChartChip name={"Pitch:"} value={responses?.digitalCompass?.Pitch} />
+                                            <ChartChip name={"Roll:"} value={response?.digitalCompass?.Roll} />
+                                            <ChartChip name={"Pitch:"} value={response?.digitalCompass?.Pitch} />
                                         </div>
-                                        <NewRollMeter roll={responses?.digitalCompass?.Roll} pitch={responses?.digitalCompass?.Pitch} />
+                                        <NewRollMeter roll={response?.digitalCompass?.Roll} pitch={response?.digitalCompass?.Pitch} />
                                     </div>
                                 </ChildCard>
                             </div>
@@ -354,16 +229,16 @@ const Home = () => {
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [responses?.helium?.HelPressure], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [response?.helium?.HelPressure], getChartSize())}
                                         />
-                                        <ChartsData position={"around"} graphValue={responses?.helium?.HelPressure} graphName={"Hull Helium"} />
+                                        <ChartsData position={"around"} graphValue={response?.helium?.HelPressure} graphName={"Hull Helium"} />
                                     </div>
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [responses?.ballonet?.BalPressure], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [response?.ballonet?.BalPressure], getChartSize())}
                                         />
-                                        <ChartsData position={"around"} graphValue={responses?.ballonet?.BalPressure} graphName={"Ballonet Air"} />
+                                        <ChartsData position={"around"} graphValue={response?.ballonet?.BalPressure} graphName={"Ballonet Air"} />
                                     </div>
                                 </div>
                             </MainCard>
@@ -371,13 +246,13 @@ const Home = () => {
                         <div className="confluence-box">
                             <MainCard title={"Confluence Point Tension"}>
                                 <div className="confluence-box-content">
-                                    <ChartChip name={"Max Tension"} value={responses?.adams?.MaxTension} />
+                                    <ChartChip name={"Max Tension"} value={response?.adams?.MaxTension} />
                                     <div className='confluence-graph'>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={confluenceGaugeOptions(theme, 0, 700, [responses?.adams?.Tension], getChartSize())}
+                                            options={confluenceGaugeOptions(theme, 0, 700, [response?.adams?.Tension], getChartSize())}
                                         />
-                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={responses?.adams?.Tension} />
+                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={response?.adams?.Tension} />
                                     </div>
                                 </div>
                             </MainCard>
@@ -390,19 +265,19 @@ const Home = () => {
                                     <div className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"}`}>
                                         <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
                                             <p>RF Link:</p>
-                                            <StatusChip color={"green"} description={isLoading === 2 ? "Disconnected" : isLoading === 1 ? "Loading..." : "Connected"} />
+                                            <StatusChip color={"green"} description={"Connected"} />
                                         </div>
                                         <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress"></div>
                                         </div>
                                         <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
                                             <p>Tether Link:</p>
-                                            <StatusChip color={"green"} description={"Connected"} />
+                                            <StatusChip color={"green"} description={!fetchingStart ? "Disconnected" : isLoading === 2 ? "Disconnected" : isLoading === 1 ? "Loading..." : "Connected"} />
                                         </div>
                                         <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress"></div>
                                         </div>
-                                        <button onClick={() => setOpenModal(true)}>Config</button>
+                                        <button onClick={handleOpenModal}>Config</button>
 
                                     </div>
                                     <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>

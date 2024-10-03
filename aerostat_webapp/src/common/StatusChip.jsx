@@ -13,7 +13,7 @@ const StatusChip = ({ color, description }) => {
   ${theme === "dark" && color === "red" || theme === "dark" && color === "blue" ? "dark-" + color + "-text" : ""}`
                 }
             >
-                <p>{description}</p>
+                <p style={{ color: description === "Disconnected" ? "red" : "" }}>{description}</p>
             </div>
         </div>
     )
