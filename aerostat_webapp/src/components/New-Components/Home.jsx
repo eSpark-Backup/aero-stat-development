@@ -43,11 +43,11 @@ const Home = () => {
     const [startFetchingFromFile, setStartFetchingFromFile] = useState(false);
 
     const lastPerfectResponses = useRef({
-        adams: { MaxTension: 700, Tension: 0 },
+        adams: { MaxTension: 700, Tension: 10 },
         ballonet: { BalPressure: 0.071 },
-        digitalCompass: { Magheading: 240.1, Pitch: 6, Roll: 6 },
+        digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
         ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
-        helium: { HelPressure: -0.398 },
+        helium: { HelPressure: 0.398 },
         weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 }
     });
 
@@ -89,9 +89,8 @@ const Home = () => {
 
     useEffect(() => {
         if (!startFetchingFromFile) {
-            fetchData();
-            const interval = setInterval(fetchData, 1000);
-            return () => clearInterval(interval);
+            // const interval = setInterval(fetchData, 1000);
+            // return () => clearInterval(interval);
         }
     }, [startFetchingFromFile]);
     const [errorValues, setErrorValues] = useState([]);
@@ -166,18 +165,78 @@ const Home = () => {
         }
     };
 
+    const [fan1, setFan1] = useState(responses?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
+    const [fan2, setFan2] = useState(responses?.ebox?.fan2 === "ON" ? "Continuous" : "Pressured");
+    const [position, setPosition] = useState(responses?.ebox?.position === "1" ? "Continuous" : "Off");
+    const [strobe, setStrobe] = useState(responses?.ebox?.strobe === "ON" ? "Continuous" : "Off");
+    const [sendData, setSendData] = useState(false);
 
-    const [fan1, setFan1] = useState(responses?.ebox?.fan1 === "ON" ? "Continuous" : responses?.ebox?.fan1 === "OFF" ? "Pressured" : "Continuous");
-    const [fan2, setFan2] = useState(responses?.ebox?.fan2 === "ON" ? "Continuous" : responses?.ebox?.fan2 === "OFF" ? "Pressured" : "Continuous");
-    const [position, setPosition] = useState(responses?.ebox?.position === "1" ? "Continuous" : responses?.ebox?.position === "0" ? "Off" : "Off");
-    const [strobe, setStrobe] = useState(responses?.ebox?.strobe === "ON" ? "Continuous" : responses?.ebox?.strobe === "OFF" ? "Off" : "Continuous");
-
+    const handleChange = (name, value) => {
+        switch (name) {
+            case 'fan1':
+                setFan1(value);
+                setSendData(true);
+                break;
+            case 'fan2':
+                setFan2(value);
+                setSendData(true);
+                break;
+            case 'position':
+                setPosition(value);
+                setSendData(true);
+                break;
+            case 'strobe':
+                setStrobe(value);
+                setSendData(true);
+                break;
+            default:
+                break;
+        }
+    };
 
     useEffect(() => {
-        // if (responses) {
-        console.log(responses)
-        // }
-    }, [responses])
+        let FansLight = {
+            Fans: null,
+            Lights: null
+        };
+        if (fan1 === "Continuous" && fan2 === "Continuous") {
+            FansLight.Fans = "@01DO00\r";
+        } else if (fan1 === "Continuous" && fan2 === "Pressured") {
+            FansLight.Fans = "@01DO02\r";
+        } else if (fan1 === "Pressured" && fan2 === "Continuous") {
+            FansLight.Fans = "@01DO01\r";
+        } else if (fan1 === "Pressured" && fan2 === "Pressured") {
+            FansLight.Fans = "@01DO03\r";
+        }
+        if (strobe === "Continuous" && position === "Continuous") {
+            FansLight.Lights = "@01DO10\r";
+        } else if (strobe === "Continuous" && position === "Off") {
+            FansLight.Lights = "@01DO12\r";
+        } else if (strobe === "Off" && position === "Continuous") {
+            FansLight.Lights = "@01DO11\r";
+        } else if (strobe === "Off" && position === "Off") {
+            FansLight.Lights = "@01DO13\r";
+        }
+        if (sendData) {
+            fetch('https://jsonplaceholder.typicode.com/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(FansLight),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    setSendData(false);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+    }, [fan1, fan2, strobe, position]);
+
     return (
         <>
             <div className="main">
@@ -228,20 +287,20 @@ const Home = () => {
                             <h2>Fan Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 1 <span>(Left direction)</span></p>
-                                <OptionBox setSelectedOption={setFan1} option1={"Continuous"} option2={"Pressured"} selectedOption={fan1} />
+                                <OptionBox handleChange={handleChange} name="fan1" option1={"Continuous"} option2={"Pressured"} selectedOption={fan1} />
                             </div>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 2 <span>(Right direction)</span></p>
-                                <OptionBox setSelectedOption={setFan2} option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
+                                <OptionBox handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
                             </div>
                             <h2>Lights Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Strobe Control</p>
-                                <OptionBox setSelectedOption={setStrobe} option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
+                                <OptionBox handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
                             </div>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Position Control</p>
-                                <OptionBox setSelectedOption={setPosition} option1={"Continuous"} option2={"Off"} selectedOption={position} />
+                                <OptionBox handleChange={handleChange} name="position" option1={"Continuous"} option2={"Off"} selectedOption={position} />
                             </div>
                         </div>
                     </MainCard>
