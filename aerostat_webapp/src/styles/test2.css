@@ -44,10 +44,10 @@
     overflow: hidden;
     z-index: 3;
     min-width: 200px;
-    /* Prevent shrinking */
     min-height: 200px;
-    /* Prevent shrinking */
+    transform-origin: 50% 50%; /* Ensures center rotation */
 }
+
 
 
 .sky,
@@ -67,7 +67,7 @@
 }
 
 .sun {
-    z-index: 7;
+    z-index: 10;
     width: 0;
     height: 0;
     position: absolute;
@@ -110,10 +110,10 @@
     border-top-right-radius: 12px;
     border-top-left-radius: 12px;
     position: absolute;
-    top: 53px;
-    z-index: 4;
-    left: 36px;
-    width: 64%;
+    top: 61px;
+    z-index: 5; /* Lowered z-index to place it behind the stand */
+    left: 51px;
+    width: 55%;
     background-color: lightblue;
     display: flex;
     justify-content: center;
@@ -132,7 +132,7 @@
 .meter-lines2 {
     position: absolute;
     top: 39px;
-    z-index: 4;
+    z-index: 5;
     left: 0px;
 }
 
@@ -147,10 +147,8 @@
 }
 
 .stand {
-    transform: translateX(-1px) translateY(-8px);
-    /* Adjusted */
+    transform: translateX(-1px) translateY(0px);
     width: 150px;
-    /* Reduced size */
 }
 
 

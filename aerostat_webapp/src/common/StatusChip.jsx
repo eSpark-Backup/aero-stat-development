@@ -6,7 +6,7 @@ const StatusChip = ({ color, description }) => {
 
     return (
         <div className={`${theme === "light" && color === "green" ? "status-chip-green-light" : theme === "dark" && color === "green" ? "status-chip-green-dark" : theme === "light" ? "status-chip-light" : "status-chip-dark"}`}>
-            <div className={`status ${color === "red" || color === "blue" || color === "green" ? "light-" + color : ""}`}></div>
+            <div className={`status ${color === "red" || color === "blue" || color === "green" ? "light-" + color : ""}`} style={{ background: description === "Disconnected" ? "red" : "" }}></div>
             <div
                 className={`status-desc 
   ${color === "red" || color === "blue" || color === "green" ? "light-" + color + "-text" : ""} 

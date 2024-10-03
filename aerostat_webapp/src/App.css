@@ -66,8 +66,13 @@ input[type=number] {
     background-image: url('./assets/watermark-dark.svg');
 }
 
+.disable {
+    cursor: not-allowed !important;
+}
 
-
+.upper-part.disable {
+    cursor: not-allowed !important;
+}
 
 /* Header */
 .header {
@@ -599,8 +604,7 @@ input[type=number] {
     border-radius: 4px;
 }
 
-.config-box>button,
-.log-input-box>button {
+.config-box>button {
     width: 100%;
     height: 50px;
     border: none;
@@ -610,15 +614,28 @@ input[type=number] {
     cursor: pointer;
 }
 
+.custom-file-input {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .config-box-light>button,
-.log-input-box-light>button {
+.custom-file-input.light {
     color: #8DA6BB;
     background-color: #E7EDF2;
     box-shadow: 4px 4px 6px 0px #ABC2D499, -4px -4px 6px 0px #FFFFFF80;
 }
 
 .config-box-dark>button,
-.log-input-box-dark>button {
+.custom-file-input.dark {
     background: linear-gradient(180deg, #000000 0%, #202000 100%);
     border: 2px solid #20222C4D;
     box-shadow: 8px 8px 15px 0px #14151D, -6px -6px 15px 0px #303240;
@@ -749,7 +766,7 @@ input[type=number] {
     height: 60px;
     border-radius: 20px;
     position: relative;
-    cursor: pointer;
+    /* cursor: pointer; */
 }
 
 .td-light {
@@ -774,6 +791,7 @@ input[type=number] {
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .td-light .upper-part {

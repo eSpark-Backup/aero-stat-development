@@ -24,7 +24,10 @@ import { formatDateTime } from '../../Js_parsing'
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
 
-const Home = ({ form, setForm, handleSubmit, errorValues, setErrorValues, response, isLoading, openModal, setOpenModal, handleOpenModal, fetchingStart }) => {
+const Home = ({
+    form, setForm, handleSubmit, errorValues, setErrorValues, response, isLoading, openModal, setOpenModal, handleOpenModal, fetchingStart, HandleBrowse, fileName, HandlePlay, HandleForward, HandleStop, playBtn, fwdBtn, StopBtn
+
+}) => {
     const { theme, toggleTheme } = useContext(ThemeContext);
     const width = useWindowWidth();
     const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
@@ -272,12 +275,12 @@ const Home = ({ form, setForm, handleSubmit, errorValues, setErrorValues, respon
                                         </div>
                                         <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
                                             <p>Tether Link:</p>
-                                            <StatusChip color={"green"} description={!fetchingStart ? "Disconnected" : isLoading === 2 ? "Disconnected" : isLoading === 1 ? "Loading..." : "Connected"} />
+                                            <StatusChip color={"green"} description={!fetchingStart ? "Disconnected" : isLoading ? isLoading : "Disconnected"} />
                                         </div>
                                         <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress"></div>
                                         </div>
-                                        <button onClick={handleOpenModal}>Config</button>
+                                        <button onClick={handleOpenModal} className={!playBtn && StopBtn && fwdBtn || !playBtn && !fwdBtn && StopBtn ? "disable" : ""}>Config</button>
 
                                     </div>
                                     <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>
@@ -335,24 +338,32 @@ const Home = ({ form, setForm, handleSubmit, errorValues, setErrorValues, respon
                                 <div className='log-box-content'>
                                     <div className={`log-input-box ${theme === "light" ? "log-input-box-light" : "log-input-box-dark"}`}>
                                         <p>Log File</p>
-                                        <div className={`file-name-box ${theme === "light" ? "file-name-box-light" : "file-name-box-dark"}`}>Aero/Nw7/Fgs/70082024</div>
-                                        <button>Browse</button>
+                                        <div className={`file-name-box ${theme === "light" ? "file-name-box-light" : "file-name-box-dark"}`}>{fileName ? fileName : ""}</div>
+                                        <input
+                                            type="file"
+                                            id="fileInput"
+                                            style={{ display: 'none' }}
+                                            onChange={HandleBrowse}
+                                        />
+                                        <label htmlFor="fileInput" className={`custom-file-input ${theme}`}>
+                                            Browse
+                                        </label>
                                     </div>
                                     <div className="button-groups">
                                         <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
-                                            <div className="upper-part">
+                                            <button className={`upper-part ${!playBtn ? "disable" : ""}`} onClick={HandlePlay}>
                                                 <img src={play} alt="" />
-                                            </div>
+                                            </button>
                                         </div>
                                         <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
-                                            <div className="upper-part">
+                                            <button className={`upper-part ${!fwdBtn ? "disable" : ""}`} onClick={HandleForward}>
                                                 <img src={forward} alt="" />
-                                            </div>
+                                            </button>
                                         </div>
                                         <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
-                                            <div className="upper-part">
+                                            <button className={`upper-part ${!StopBtn ? "disable" : ""}`} onClick={HandleStop}>
                                                 <img src={stop} alt="" />
-                                            </div>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
