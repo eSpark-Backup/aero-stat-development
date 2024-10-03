@@ -89,8 +89,8 @@ const Home = () => {
 
     useEffect(() => {
         if (!startFetchingFromFile) {
-            // const interval = setInterval(fetchData, 1000);
-            // return () => clearInterval(interval);
+            const interval = setInterval(fetchData, 1000);
+            return () => clearInterval(interval);
         }
     }, [startFetchingFromFile]);
     const [errorValues, setErrorValues] = useState([]);
