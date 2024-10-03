@@ -48,6 +48,7 @@ function App() {
   const fetchData = async () => {
     try {
       const results = await fetchDataUtil();
+      console.log(results);
       const parsedResponses = {
         weather: results.port_4002 || lastPerfectResponses.current.weather,
         digitalCompass: results.port_4003 || lastPerfectResponses.current.digitalCompass,
@@ -81,7 +82,7 @@ function App() {
 
   useEffect(() => {
     if (!startFetchingFromFile && startFetchData) {
-      const interval = setInterval(fetchData, 1000);
+      const interval = setInterval(fetchData, 3500);
       return () => clearInterval(interval);
     }
   }, [startFetchingFromFile, startFetchData]);

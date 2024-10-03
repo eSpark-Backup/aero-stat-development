@@ -1,4 +1,6 @@
 import socket
+import platform
+import subprocess
 from log_file import create_log_file, setup_log_directory
 from flask_cors import CORS  # type: ignore
 from digital_compass import digital_compass
@@ -21,10 +23,32 @@ data_packets = []
 setup_log_directory()
 create_log_file()
 
+# Function to ping the host to check if it's reachable
+def check_host_reachable(ip_address):
+    try:
+        param = "-n" if platform.system().lower() == "windows" else "-c"
+        timeout_flag = "-w" if platform.system().lower() == "windows" else "-W"
+        
+        response = subprocess.run(
+            ["ping", param, "1", timeout_flag, "1", ip_address],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        if response.returncode == 0:
+            print(f"Host {ip_address} is reachable.")
+            return True
+        else:
+            print(f"Host {ip_address} is unreachable.")
+            return False
+    except Exception as e:
+        print(f"Error occurred while pinging {ip_address}: {e}")
+        return False
+
+    
 # Function to connect to specific port and fetch data
 def connect_to_port(port):
     global data_packets
-
     if not host or not ports:
         return "Host and ports are not configured", 500
 
@@ -50,31 +74,34 @@ def connect_to_port(port):
 def get_port_data():
     if not host or not ports:
         return jsonify({"error": "Host and ports are not configured"}), 500
-
-    port_data = {}
-    for port in ports:
-        data = connect_to_port(port)
-        if data:
-            if(port == 4002):
-                port_data[f"port_{port}"] = weatherstation_data(data)
-                print(f"Weather data received from port {port}:{port_data[f"port_{port}"]}")
-            elif(port == 4003):
-                port_data[f"port_{port}"] = digital_compass(data)
-                print(f"Digital Compass data received from port {port}:{port_data[f"port_{port}"]}")
-            elif(port == 4004):
-                port_data[f"port_{port}"] = ballonet_data(data)
-                print(f"Ballonet Pressure received from port {port}:{port_data[f"port_{port}"]}")
-            elif(port == 4005):
-                port_data[f"port_{port}"] = helium_data(data)
-                print(f"Helium Pressure data received from port {port}:{port_data[f"port_{port}"]}")
-            elif(port == 4006):
-                port_data[f"port_{port}"] = adams_sensor_data(data)
-                print(f"Tension Value data received from port {port}:{port_data[f"port_{port}"]}")
-            elif(port == 4007):
-                port_data[f"port_{port}"] = e_box_sensor_data(data)
-                print(f"Internal Temp & Buttons data received from port {port}:{port_data[f"port_{port}"]}")
-
-    return jsonify(port_data)
+    response = {"connection_status": "Disconnected", "port_data": {}}
+    if(check_host_reachable(host)):
+        response["connection_status"] = "Connected"
+        port_data = {}
+        for port in ports:
+            data = connect_to_port(port)
+            if data:
+                if(port == 4002):
+                    response["port_data"][f"port_{port}"] = weatherstation_data(data)
+                    print(f"Weather data received from port {port}:{response["port_data"][f"port_{port}"]}")
+                elif(port == 4003):
+                    response["port_data"][f"port_{port}"] = digital_compass(data)
+                    print(f"Digital Compass data received from port {port}:{response["port_data"][f"port_{port}"]}")
+                elif(port == 4004):
+                    response["port_data"][f"port_{port}"] = ballonet_data(data)
+                    print(f"Ballonet Pressure received from port {port}:{response["port_data"][f"port_{port}"]}")
+                elif(port == 4005):
+                    response["port_data"][f"port_{port}"] = helium_data(data)
+                    print(f"Helium Pressure data received from port {port}:{response["port_data"][f"port_{port}"]}")
+                elif(port == 4006):
+                    response["port_data"][f"port_{port}"] = adams_sensor_data(data)
+                    print(f"Tension Value data received from port {port}:{response["port_data"][f"port_{port}"]}")
+                elif(port == 4007):
+                    response["port_data"][f"port_{port}"] = e_box_sensor_data(data)
+                    print(f"Internal Temp & Buttons data received from port {port}:{response["port_data"][f"port_{port}"]}")
+        return jsonify(response)
+    else:
+        return jsonify(response)
 
 # Function to send commands to the target port
 def connect_and_send_to_port(command):
@@ -98,33 +125,36 @@ def connect_and_send_to_port(command):
 def send_device_commands():
     if not host:
         return jsonify({"error": "Host is not configured"}), 500
-
-    json_data = request.json
-    if not json_data:
-        return jsonify({"error": "No JSON data received"}), 400
     
-    fans_command = json_data.get("Fans")
-    lights_command = json_data.get("Lights")
+    if(check_host_reachable(host)):
+        json_data = request.json
+        if not json_data:
+            return jsonify({"error": "No JSON data received"}), 400
+        
+        fans_command = json_data.get("Fans")
+        lights_command = json_data.get("Lights")
 
-    if not fans_command and not lights_command:
-        return jsonify({"error": "No valid commands provided"}), 400
+        if not fans_command and not lights_command:
+            return jsonify({"error": "No valid commands provided"}), 400
 
-    # Send Fans command to the target port and get the response
-    if fans_command:
-        fans_response = connect_and_send_to_port(fans_command)
+        # Send Fans command to the target port and get the response
+        if fans_command:
+            fans_response = connect_and_send_to_port(fans_command)
+        else:
+            fans_response = "No Fans command provided"
+
+        # Send Lights command to the target port and get the response
+        if lights_command:
+            lights_response = connect_and_send_to_port(lights_command)
+        else:
+            lights_response = "No Lights command provided"
+
+        return jsonify({
+            "FansResponse": fans_response,
+            "LightsResponse": lights_response
+        })
     else:
-        fans_response = "No Fans command provided"
-
-    # Send Lights command to the target port and get the response
-    if lights_command:
-        lights_response = connect_and_send_to_port(lights_command)
-    else:
-        lights_response = "No Lights command provided"
-
-    return jsonify({
-        "FansResponse": fans_response,
-        "LightsResponse": lights_response
-    })
+        return jsonify({"connection_status": "Disconnected"})
 
 # POST endpoint to update the IP and port configuration
 @app.route('/update-config', methods=['POST'])
@@ -153,7 +183,6 @@ def update_config():
         int(json_data['adam']),
         int(json_data['ebox'])
     ]
-
     return jsonify({
         "message": "Configuration updated successfully",
         "ip": host,

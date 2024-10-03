@@ -89,7 +89,7 @@ const Home = ({ form, setForm, handleSubmit, errorValues, setErrorValues, respon
             FansLight.Lights = "@01DO13\r";
         }
         if (sendData) {
-            fetch('https://jsonplaceholder.typicode.com/posts', {
+            fetch('http://localhost:5000/send-device-commands', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
