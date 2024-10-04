@@ -56,12 +56,79 @@ function App() {
   const fetchData = async () => {
     fetchDataUtil((data) => {
       const parsedResponses = {
-        weather: data.port_data.port_4002 || lastPerfectResponses.current.weather,
-        digitalCompass: data.port_data.port_4003 || lastPerfectResponses.current.digitalCompass,
-        ballonet: data.port_data.port_4004 || lastPerfectResponses.current.ballonet,
-        helium: data.port_data.port_4005 || lastPerfectResponses.current.helium,
-        adams: data.port_data.port_4006 || lastPerfectResponses.current.adams,
-        ebox: data.port_data.port_4007 || lastPerfectResponses.current.ebox,
+        weather: {
+          airTemp: !data?.port_data?.port_4002?.airTemp || data?.port_data?.port_4002?.airTemp === "none" || isNaN(data?.port_data?.port_4002?.airTemp)
+            ? lastPerfectResponses.current.weather.airTemp
+            : data.port_data.port_4002.airTemp,
+
+          baroPres: !data?.port_data?.port_4002?.baroPres || data?.port_data?.port_4002?.baroPres === "none" || isNaN(data?.port_data?.port_4002?.baroPres)
+            ? lastPerfectResponses.current.weather.baroPres
+            : data.port_data.port_4002.baroPres,
+
+          heading: !data?.port_data?.port_4002?.heading || data?.port_data?.port_4002?.heading === "none" || isNaN(data?.port_data?.port_4002?.heading)
+            ? lastPerfectResponses.current.weather.heading
+            : data.port_data.port_4002.heading,
+
+          windAngle: !data?.port_data?.port_4002?.windAngle || data?.port_data?.port_4002?.windAngle === "none" || isNaN(data?.port_data?.port_4002?.windAngle)
+            ? lastPerfectResponses.current.weather.windAngle
+            : data.port_data.port_4002.windAngle,
+
+          windSpeed: !data?.port_data?.port_4002?.windSpeed || data?.port_data?.port_4002?.windSpeed === "none" || isNaN(data?.port_data?.port_4002?.windSpeed)
+            ? lastPerfectResponses.current.weather.windSpeed
+            : data.port_data.port_4002.windSpeed,
+        },
+        digitalCompass: {
+          Magheading: !data?.port_data?.port_4003?.Magheading || data?.port_data?.port_4003?.Magheading === "none" || isNaN(data?.port_data?.port_4003?.Magheading)
+            ? lastPerfectResponses.current.digitalCompass.Magheading
+            : data.port_data.port_4003.Magheading,
+
+          Pitch: !data?.port_data?.port_4003?.Pitch || data?.port_data?.port_4003?.Pitch === "none" || isNaN(data?.port_data?.port_4003?.Pitch)
+            ? lastPerfectResponses.current.digitalCompass.Pitch
+            : data.port_data.port_4003.Pitch,
+
+          Roll: !data?.port_data?.port_4003?.Roll || data?.port_data?.port_4003?.Roll === "none" || isNaN(data?.port_data?.port_4003?.Roll)
+            ? lastPerfectResponses.current.digitalCompass.Roll
+            : data.port_data.port_4003.Roll,
+        },
+        ballonet: {
+          BalPressure: !data?.port_data?.port_4004?.BalPressure || data?.port_data?.port_4004?.BalPressure === "none" || isNaN(data?.port_data?.port_4004?.BalPressure)
+            ? lastPerfectResponses.current.ballonet.BalPressure
+            : data.port_data.port_4004.BalPressure,
+        },
+        helium: {
+          HelPressure: !data?.port_data?.port_4005?.HelPressure || data?.port_data?.port_4005?.HelPressure === "none" || isNaN(data?.port_data?.port_4005?.HelPressure)
+            ? lastPerfectResponses.current.helium.HelPressure
+            : data.port_data.port_4005.HelPressure,
+        },
+        adams: {
+          MaxTension: !data?.port_data?.port_4006?.MaxTension || data?.port_data?.port_4006?.MaxTension === "none" || isNaN(data?.port_data?.port_4006?.MaxTension)
+            ? lastPerfectResponses.current.adams.MaxTension
+            : data.port_data.port_4006.MaxTension,
+
+          Tension: !data?.port_data?.port_4006?.Tension || data?.port_data?.port_4006?.Tension === "none" || isNaN(data?.port_data?.port_4006?.Tension)
+            ? lastPerfectResponses.current.adams.Tension
+            : data.port_data.port_4006.Tension,
+        },
+        ebox: {
+          InternalTemp: !data?.port_data?.port_4007?.InternalTemp || data?.port_data?.port_4007?.InternalTemp === "none" || isNaN(data?.port_data?.port_4007?.InternalTemp)
+            ? lastPerfectResponses.current.ebox.InternalTemp
+            : data.port_data.port_4007.InternalTemp,
+          fan1: !data?.port_data?.port_4007?.fan1 || data?.port_data?.port_4007?.fan1 === "none"
+            ? lastPerfectResponses.current.ebox.fan1
+            : data.port_data.port_4007.fan1,
+
+          fan2: !data?.port_data?.port_4007?.fan2 || data?.port_data?.port_4007?.fan2 === "none"
+            ? lastPerfectResponses.current.ebox.fan2
+            : data.port_data.port_4007.fan2,
+
+          position: !data?.port_data?.port_4007?.position || data?.port_data?.port_4007?.position === "none"
+            ? lastPerfectResponses.current.ebox.position
+            : data.port_data.port_4007.position,
+
+          strobe: !data?.port_data?.port_4007?.strobe || data?.port_data?.port_4007?.strobe === "none"
+            ? lastPerfectResponses.current.ebox.strobe
+            : data.port_data.port_4007.strobe,
+        },
         time: formatDateTime(),
         loading: data?.connection_status
       };
@@ -81,14 +148,14 @@ function App() {
       else {
         setIsLoading(2);
       }
-      // console.log("HUHUHUHUHUHUHUUUUUUUUUUUUUUUUUUUUUUUUU",parsedResponses);
+      console.log("Parsed Responses",parsedResponses);
       setResponses(parsedResponses);
     });
   };
 
   useEffect(() => {
     if (!startFetchingFromFile && startFetchData) {
-      const interval = setInterval(fetchData, 3500);
+      const interval = setInterval(fetchData, 1000);
       return () => clearInterval(interval);
     }
   }, [startFetchingFromFile, startFetchData]);
@@ -189,14 +256,23 @@ function App() {
         setCurrentIndex(prevIndex => prevIndex + 1);
       }
       else if (currentIndex >= fileData?.length) {
+        clearInterval(intervalId);
+
+
         setStartFetchingFromFile(false);
         setFwdBtn(false);
         setPlayBtn(false);
         setFileContent("");
         setLogFile("");
-        setStopBtn(false)
+        setCurrentIndex(0);
+        setfileData(null);
+        setCurrentResult(null);
+        setStopBtn(false);
         setFetchingSpeed(1000);
-        clearInterval(intervalId);
+        setStartFetchData(false);
+
+        const fileInput = document.getElementById("fileInput");
+        if (fileInput) fileInput.value = "";
 
         const newResponse = {
           adams: { MaxTension: 700, Tension: 10 },
@@ -210,6 +286,7 @@ function App() {
 
         setResponses(newResponse);
       }
+      // Done
       else {
         clearInterval(intervalId);
       }

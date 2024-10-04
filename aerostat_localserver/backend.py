@@ -55,7 +55,7 @@ def connect_to_port(port):
 
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.settimeout(5)
+            sock.settimeout(2)
             sock.connect((host, port))
             print(f"Connected to {host}:{port}")
             sock.sendall(b'Hello Server')

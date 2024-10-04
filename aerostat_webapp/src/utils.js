@@ -40,7 +40,7 @@ export const fetchDataUtil = (callback) => {
   socket.emit('get-port-data');
 
   socket.on('response', (data) => {
-    // console.log('Data received from server:', data);
+    console.log('Data received from server:', data);
     callback(data);
   });
 };
