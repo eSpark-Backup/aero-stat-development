@@ -63,9 +63,6 @@ const Home = ({
                     break;
             }
         }
-        else {
-            alert("No Data Source connected")
-        }
     };
 
     useEffect(() => {
@@ -93,7 +90,7 @@ const Home = ({
         }
         if (sendData) {
             sendDeviceCommands(FansLight, (response) => {
-                console.log('Handled response:', response);
+                // console.log('Handled response:', response);
             });
             setSendData(false);
         }
@@ -101,6 +98,11 @@ const Home = ({
     }, [fan1, fan2, strobe, position]);
 
     useEffect(() => {
+        setFan1(response?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
+        setFan2(response?.ebox?.fan2 === "ON" ? "Continuous" : "Pressured");
+        setStrobe(response?.ebox?.strobe === "ON" ? "Continuous" : "Off");
+        setPosition(response?.ebox?.position === "1" ? "Continuous" : "Off");
+        // console.log(response)
     }, [response])
 
     return (
@@ -153,20 +155,20 @@ const Home = ({
                             <h2>Fan Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 1 <span>(Left direction)</span></p>
-                                <OptionBox handleChange={handleChange} name="fan1" option1={"Continuous"} option2={"Pressured"} selectedOption={fan1} />
+                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan1" option1={"Continuous"} option2={"Pressured"} selectedOption={fan1} />
                             </div>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 2 <span>(Right direction)</span></p>
-                                <OptionBox handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
+                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
                             </div>
                             <h2>Lights Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Strobe Control</p>
-                                <OptionBox handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
+                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
                             </div>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Position Control</p>
-                                <OptionBox handleChange={handleChange} name="position" option1={"Continuous"} option2={"Off"} selectedOption={position} />
+                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="position" option1={"Continuous"} option2={"Off"} selectedOption={position} />
                             </div>
                         </div>
                     </MainCard>
@@ -332,8 +334,9 @@ const Home = ({
                                             id="fileInput"
                                             style={{ display: 'none' }}
                                             onChange={HandleBrowse}
+                                            disabled={!playBtn && StopBtn ? true : false}
                                         />
-                                        <label htmlFor="fileInput" className={`custom-file-input ${theme}`}>
+                                        <label htmlFor="fileInput" className={`custom-file-input ${theme} ${!playBtn && StopBtn ? "disable" : ""}`}>
                                             Browse
                                         </label>
                                     </div>

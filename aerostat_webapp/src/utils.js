@@ -40,7 +40,7 @@ export const fetchDataUtil = (callback) => {
   socket.emit('get-port-data');
 
   socket.on('response', (data) => {
-    console.log('Data received from server:', data);
+    // console.log('Data received from server:', data);
     callback(data);
   });
 };
@@ -51,8 +51,8 @@ export const updateConfigUtil = (form) => {
 
   return new Promise((resolve, reject) => {
     socket.on('response', (data) => {
-      console.log('Config update response:', data);
-      resolve(data);
+      // console.log('Config update response:', data);
+      resolve(data);  
     });
     
     socket.on('error', (error) => {
@@ -67,7 +67,7 @@ export const sendDeviceCommands = (FansLight, callback) => {
   socket.emit('send-device-commands', FansLight);
 
   socket.once('response', (data) => {
-    console.log('Command response:', data);
+    // console.log('Command response:', data);
     
     if (callback) {
       callback(data);

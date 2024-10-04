@@ -2,11 +2,12 @@ import React, { useContext } from 'react'
 import logo from "../../assets/logo.svg"
 import logowhite from "../../assets/logo-white.svg"
 import { ThemeContext } from '../../ThemeHandler';
+import { formatDateTime } from '../../Js_parsing';
 
-const Header = ({ time }) => {
+const Header = ({ time, fileFetching }) => {
     const { theme } = useContext(ThemeContext);
 
-    const dateString = time ? time : 'Thu, 3 October 2024, 17:01:29';
+    const dateString = time ? time : formatDateTime();
     const date = new Date(dateString);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const day = date.toLocaleDateString('en-US', options);
@@ -21,7 +22,7 @@ const Header = ({ time }) => {
                 </div>
                 <div className={`header-details ${theme === "light" ? "header-details-light" : "header-details-dark"}`}>
                     <div>
-                        <h2 className={`data-type ${theme === "light" ? "data-type-light" : "data-type-dark"}`}>Live Data:</h2>
+                        <h2 className={`data-type ${theme === "light" ? "data-type-light" : "data-type-dark"}`}>{fileFetching ? "Recorded Data:" : "Live Data:"}</h2>
                         <div className={`day ${theme === "light" ? "day-light" : "day-dark"}`}>
                             <h2>{day}</h2>
                         </div>

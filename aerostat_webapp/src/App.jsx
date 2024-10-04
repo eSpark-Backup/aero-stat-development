@@ -109,6 +109,7 @@ function App() {
 
   const handleSubmit = async () => {
     const errors = [];
+    // console.log("In Submit")
 
 
     const ipRegex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
@@ -129,14 +130,19 @@ function App() {
       return;
     }
 
+    // console.log("After Checking", form);
+
     try {
-      const result = await updateConfigUtil(form);
-      console.log("Form successfully posted:",result);
-      setOpenModal(false);
+      // console.log("In try")
       setStartFetchData(true);
+      setOpenModal(false);
+      setStartFetchingFromFile(false);
       setErrorValues([]);
+      const result = await updateConfigUtil(form);
+      console.log("Form successfully posted:", result);
     } catch (error) {
-      console.log("Error in form posting:", error);
+      console.log("In catch")
+      // console.log("Error in form posting:", error);
       setOpenModal(false);
       setErrorValues([]);
     }
@@ -155,10 +161,14 @@ function App() {
       const reader = new FileReader();
       reader.onload = (e) => {
         setFileContent(e.target.result);
+        setfileData(null);
+        setCurrentIndex(0);
+        setCurrentResult(null);
       };
       reader.readAsText(file);
     }
   };
+
 
   useEffect(() => {
     if (fileContent) {
@@ -187,6 +197,18 @@ function App() {
         setStopBtn(false)
         setFetchingSpeed(1000);
         clearInterval(intervalId);
+
+        const newResponse = {
+          adams: { MaxTension: 700, Tension: 10 },
+          ballonet: { BalPressure: 0.071 },
+          digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
+          ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
+          helium: { HelPressure: 0.398 },
+          weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 },
+          time: formatDateTime()
+        };
+
+        setResponses(newResponse);
       }
       else {
         clearInterval(intervalId);
@@ -216,9 +238,18 @@ function App() {
     setPlayBtn(false);
     setFileContent("");
     setLogFile("");
-    setStopBtn(false)
+    setCurrentIndex(0);
+    setfileData(null);
+    setCurrentResult(null);
+    setStopBtn(false);
     setFetchingSpeed(1000);
-  }
+    setStartFetchData(false);
+
+    const fileInput = document.getElementById("fileInput");
+    if (fileInput) fileInput.value = "";
+  };
+
+
 
   useEffect(() => {
     if (fetchingSpeed == 125) {
@@ -227,9 +258,6 @@ function App() {
   }, [fetchingSpeed]);
 
 
-  useEffect(() => {
-    console.log(responses);
-  }, [responses])
 
 
   if (!isThemeLoaded) {
@@ -239,7 +267,7 @@ function App() {
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column', rowGap: '0px' }}>
-        <Header time={responses?.time} />
+        <Header time={responses?.time} fileFetching={startFetchingFromFile} />
         <Home
           response={responses}
           isLoading={responses?.loading}
