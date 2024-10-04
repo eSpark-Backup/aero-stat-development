@@ -1,6 +1,7 @@
 import socket
 import platform
 import subprocess
+from flask_socketio import SocketIO, emit # type: ignore
 from log_file import create_log_file, setup_log_directory
 from flask_cors import CORS  # type: ignore
 from digital_compass import digital_compass
@@ -12,7 +13,7 @@ from ebox_sensor import e_box_sensor_data
 from flask import Flask, jsonify, request  # type: ignore
 
 app = Flask(__name__)
-CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Initially, host and ports are empty and need to be set via /update-config
 host = None
@@ -44,7 +45,6 @@ def check_host_reachable(ip_address):
     except Exception as e:
         print(f"Error occurred while pinging {ip_address}: {e}")
         return False
-
     
 # Function to connect to specific port and fetch data
 def connect_to_port(port):
@@ -70,14 +70,18 @@ def connect_to_port(port):
         return None
     
 # GET endpoint to fetch data from multiple ports
-@app.route('/get-port-data', methods=['GET'])
-def get_port_data():
-    if not host or not ports:
-        return jsonify({"error": "Host and ports are not configured"}), 500
+# @app.route('/get-port-data', methods=['GET'])
+@socketio.on('get-port-data')
+def handle_get_port_data():
     response = {"connection_status": "Disconnected", "port_data": {}}
+
+    if not host or not ports:
+        # return jsonify({"error": "Host and ports are not configured"}), 500
+        emit('response', {"error": "Host and ports are not configured"}, broadcast=True)
+        return
+    
     if(check_host_reachable(host)):
         response["connection_status"] = "Connected"
-        port_data = {}
         for port in ports:
             data = connect_to_port(port)
             if data:
@@ -99,9 +103,11 @@ def get_port_data():
                 elif(port == 4007):
                     response["port_data"][f"port_{port}"] = e_box_sensor_data(data)
                     print(f"Internal Temp & Buttons data received from port {port}:{response["port_data"][f"port_{port}"]}")
-        return jsonify(response)
+        # return jsonify(response)
+        emit('response', response, broadcast=True)
     else:
-        return jsonify(response)
+        # return jsonify(response)
+        emit('response', {"connection_status": "Disconnected"}, broadcast=True)
 
 # Function to send commands to the target port
 def connect_and_send_to_port(command):
@@ -121,21 +127,28 @@ def connect_and_send_to_port(command):
         return None
 
 # POST endpoint to handle device commands (Fans and Lights)
-@app.route('/send-device-commands', methods=['POST'])
-def send_device_commands():
+# @app.route('/send-device-commands', methods=['POST'])
+@socketio.on('send-device-commands')
+def handle_send_device_commands(json_data):
     if not host:
-        return jsonify({"error": "Host is not configured"}), 500
+        # return jsonify({"error": "Host is not configured"}), 500
+        emit('response', {"error": "Host is not configured"}, broadcast=True)
+        return
     
     if(check_host_reachable(host)):
-        json_data = request.json
-        if not json_data:
-            return jsonify({"error": "No JSON data received"}), 400
+        # json_data = request.json
+        if not json_data: 
+            # return jsonify({"error": "No JSON data received"}), 400
+            emit('response', {"error": "No JSON data received"}, broadcast=True)
+            return
         
         fans_command = json_data.get("Fans")
         lights_command = json_data.get("Lights")
 
         if not fans_command and not lights_command:
-            return jsonify({"error": "No valid commands provided"}), 400
+            # return jsonify({"error": "No valid commands provided"}), 400
+            emit('response', {"error": "No valid commands provided"}, broadcast=True)
+            return
 
         # Send Fans command to the target port and get the response
         if fans_command:
@@ -149,25 +162,32 @@ def send_device_commands():
         else:
             lights_response = "No Lights command provided"
 
-        return jsonify({
-            "FansResponse": fans_response,
-            "LightsResponse": lights_response
-        })
+        # return jsonify({
+        #     "FansResponse": fans_response,
+        #     "LightsResponse": lights_response
+        # })
+        emit('response', {"FansResponse": fans_response, "LightsResponse": lights_response}, broadcast=True)
     else:
-        return jsonify({"connection_status": "Disconnected"})
+        # return jsonify({"connection_status": "Disconnected"})
+        emit('response', {"connection_status": "Disconnected"}, broadcast=True)
 
 # POST endpoint to update the IP and port configuration
-@app.route('/update-config', methods=['POST'])
-def update_config():
+# @app.route('/update-config', methods=['POST'])
+@socketio.on('update-config')
+def handle_update_config(json_data):
     global host, ports
 
-    json_data = request.json
+    # json_data = request.json
     if not json_data:
-        return jsonify({"error": "No JSON data received"}), 400
+        # return jsonify({"error": "No JSON data received"}), 400
+        emit('response', {"error": "No JSON data received"}, broadcast=True)
+        return
 
     # Ensure both IP and all ports are provided in the request
     if not json_data.get('ip'):
-        return jsonify({"error": "IP address is required"}), 400
+        # return jsonify({"error": "IP address is required"}), 400
+        emit('response', {"error": "All configuration fields are required"}, broadcast=True)
+        return
 
     required_ports = ['weather', 'hmr', 'ballonet', 'helium', 'adam', 'ebox']
     if not all(key in json_data for key in required_ports):
@@ -183,11 +203,12 @@ def update_config():
         int(json_data['adam']),
         int(json_data['ebox'])
     ]
-    return jsonify({
-        "message": "Configuration updated successfully",
-        "ip": host,
-        "ports": ports
-    })
+    # return jsonify({
+    #     "message": "Configuration updated successfully",
+    #     "ip": host,
+    #     "ports": ports
+    # })
+    emit('response', {"message": "Configuration updated successfully", "ip": host, "ports": ports}, broadcast=True)
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    socketio.run(app, host='127.0.0.1', port=5001, debug=False)

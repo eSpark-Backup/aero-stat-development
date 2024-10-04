@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import Header from './components/New-Components/Header';
 import Home from './components/New-Components/Home';
 import { ThemeContext } from './ThemeHandler';
-import { fetchDataUtil } from './utils';
+import { fetchDataUtil, updateConfigUtil } from './utils';
 import { formatDateTime, processData, processDataArray } from './Js_parsing';
 import { time } from 'highcharts';
 
@@ -54,20 +54,18 @@ function App() {
   }, [theme, isThemeLoaded]);
 
   const fetchData = async () => {
-    try {
-      const results = await fetchDataUtil();
-      // console.log(results);
+    fetchDataUtil((data) => {
       const parsedResponses = {
-        weather: results.port_data.port_4002 || lastPerfectResponses.current.weather,
-        digitalCompass: results.port_data.port_4003 || lastPerfectResponses.current.digitalCompass,
-        ballonet: results.port_data.port_4004 || lastPerfectResponses.current.ballonet,
-        helium: results.port_data.port_4005 || lastPerfectResponses.current.helium,
-        adams: results.port_data.port_4006 || lastPerfectResponses.current.adams,
-        ebox: results.port_data.port_4007 || lastPerfectResponses.current.ebox,
+        weather: data.port_data.port_4002 || lastPerfectResponses.current.weather,
+        digitalCompass: data.port_data.port_4003 || lastPerfectResponses.current.digitalCompass,
+        ballonet: data.port_data.port_4004 || lastPerfectResponses.current.ballonet,
+        helium: data.port_data.port_4005 || lastPerfectResponses.current.helium,
+        adams: data.port_data.port_4006 || lastPerfectResponses.current.adams,
+        ebox: data.port_data.port_4007 || lastPerfectResponses.current.ebox,
         time: formatDateTime(),
-        loading: results?.connection_status
+        loading: data?.connection_status
       };
-      // console.log(parsedResponses);
+      // console.log("AP DATAAAAAAAAAAAAAAAAAAAAAAA",data);
       lastPerfectResponses.current = {
         ...lastPerfectResponses.current,
         weather: parsedResponses.weather,
@@ -77,17 +75,15 @@ function App() {
         adams: parsedResponses.adams,
         ebox: parsedResponses.ebox,
       };
-      if (Object.keys(results).length > 0) {
+      if (Object.keys(data).length > 0) {
         setIsLoading(0);
       }
       else {
         setIsLoading(2);
       }
+      // console.log("HUHUHUHUHUHUHUUUUUUUUUUUUUUUUUUUUUUUUU",parsedResponses);
       setResponses(parsedResponses);
-    } catch (error) {
-      setIsLoading(2);
-      console.error("Error in fetchData:", error);
-    }
+    });
   };
 
   useEffect(() => {
@@ -134,20 +130,11 @@ function App() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/update-config", {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json"
-        },
-        body: JSON.stringify(form),
-      })
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Form successfully posted:");
-        setOpenModal(false);
-        setStartFetchData(true);
-        setErrorValues([]);
-      }
+      const result = await updateConfigUtil(form);
+      console.log("Form successfully posted:",result);
+      setOpenModal(false);
+      setStartFetchData(true);
+      setErrorValues([]);
     } catch (error) {
       console.log("Error in form posting:", error);
       setOpenModal(false);

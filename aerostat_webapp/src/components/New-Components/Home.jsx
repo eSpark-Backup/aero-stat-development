@@ -17,7 +17,7 @@ import HighchartsMore from "highcharts/highcharts-more";
 import HighchartsGauge from "highcharts/modules/solid-gauge";
 import { confluenceGaugeOptions, pressureGaugeOptions, windGaugeOptions } from '../../constant'
 import { ThemeContext } from '../../ThemeHandler'
-import { useWindowWidth, fetchDataUtil } from '../../utils'
+import { useWindowWidth, sendDeviceCommands } from '../../utils'
 import Modal from '../Modal'
 import { formatDateTime } from '../../Js_parsing'
 
@@ -92,27 +92,15 @@ const Home = ({
             FansLight.Lights = "@01DO13\r";
         }
         if (sendData) {
-            fetch('http://localhost:5000/send-device-commands', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(FansLight),
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    setSendData(false);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            sendDeviceCommands(FansLight, (response) => {
+                console.log('Handled response:', response);
+            });
+            setSendData(false);
         }
 
     }, [fan1, fan2, strobe, position]);
 
     useEffect(() => {
-        // console.log(response)
     }, [response])
 
     return (

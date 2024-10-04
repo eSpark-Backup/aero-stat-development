@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5001');
 
 export const useWindowWidth = () => {
   const [width, setWidth] = useState(window.innerWidth);
@@ -32,15 +35,42 @@ export function calculateSkyLandPercentage(pitch) {
   };
 }
 
-// Fetching Data
-export const fetchDataUtil = async () => {
-  try {
-    const response = await fetch('http://localhost:5000/get-port-data');
-    const data = await response.json();
-    // console.log(data);
-    return data;
-  } catch (error) {
-    console.error('Error in fetchDataUtil:', error);
-    return {};
-  }
+// Fetch data using Socket.IO
+export const fetchDataUtil = (callback) => {
+  socket.emit('get-port-data');
+
+  socket.on('response', (data) => {
+    console.log('Data received from server:', data);
+    callback(data);
+  });
+};
+
+// Update configuration using Socket.IO
+export const updateConfigUtil = (form) => {
+  socket.emit('update-config', form);
+
+  return new Promise((resolve, reject) => {
+    socket.on('response', (data) => {
+      console.log('Config update response:', data);
+      resolve(data);
+    });
+    
+    socket.on('error', (error) => {
+      console.error('Error updating config:', error);
+      reject(error);
+    });
+  });
+};
+
+// Send device commands (Fans and Lights) using Socket.IO
+export const sendDeviceCommands = (FansLight, callback) => {
+  socket.emit('send-device-commands', FansLight);
+
+  socket.once('response', (data) => {
+    console.log('Command response:', data);
+    
+    if (callback) {
+      callback(data);
+    }
+  });
 };
