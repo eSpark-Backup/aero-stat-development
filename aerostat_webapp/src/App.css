@@ -2099,6 +2099,7 @@ input[type=number] {
 .modal-input.dark input {
     background: linear-gradient(180deg, #000000 0%, #282801 100%);
     border: 1px solid #E4E4E4;
+    color: white !important;
 }
 
 @media screen and (max-width: 768px) {
