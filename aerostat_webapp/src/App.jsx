@@ -247,6 +247,18 @@ function App() {
 
     const fileInput = document.getElementById("fileInput");
     if (fileInput) fileInput.value = "";
+
+    let tempRes = {
+      adams: { MaxTension: 700, Tension: 10 },
+      ballonet: { BalPressure: 0.071 },
+      digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
+      ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
+      helium: { HelPressure: 0.398 },
+      weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 },
+      time: formatDateTime()
+    }
+
+    setResponses(tempRes);
   };
 
 
