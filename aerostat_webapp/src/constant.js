@@ -45,7 +45,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData, size) => 
                 rotation: 'auto',
                 style: {
 
-                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C'
+                    color: theme === 'light' ? '#1B1A1A' : '#4260FF'
                 }
             },
             title: {
@@ -249,7 +249,7 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
                 rotation: 'auto',
                 style: {
                     fontSize: size === 200 ? "8px" : "12px",
-                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C'
+                    color: theme === 'light' ? '#1B1A1A' : '#4260FF'
                 }
             },
             title: {

@@ -270,7 +270,7 @@ const Home = ({
                                         <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress" style={{ backgroundColor: !fetchingStart || !isLoading || isLoading === "Disconnected" ? "red" : "" }}></div>
                                         </div>
-                                        <button onClick={handleOpenModal} className={!playBtn && StopBtn && fwdBtn || !playBtn && !fwdBtn && StopBtn ? "disable" : ""}>Config</button>
+                                        <button onClick={handleOpenModal} className={!playBtn && StopBtn && fwdBtn || !playBtn && !fwdBtn && StopBtn ? "disable" : ""}>Configure</button>
 
                                     </div>
                                     <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>

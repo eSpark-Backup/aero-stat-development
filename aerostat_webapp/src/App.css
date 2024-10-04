@@ -58,7 +58,7 @@ input[type=number] {
 
 .watermark-light {
     opacity: 0.1;
-    background-image: url('./assets/watermark.svg');
+    background-image: url('./assets/watermark-light.svg');
 }
 
 .watermark-dark {
@@ -89,6 +89,7 @@ input[type=number] {
     justify-content: center;
     align-items: center;
     padding: 30px 0px;
+    width: 380px !important;
 }
 
 .logo-light {
@@ -98,18 +99,16 @@ input[type=number] {
 }
 
 .logo-dark {
-    width: 380px;
     background: linear-gradient(180deg, #000000 0%, #202000 100%);
     /* box-shadow: -7px -7px 25px 0px #121940 inset; */
-
 }
 
-.logo img {
+/* .logo img {
     width: 232px;
     height: 82px;
     position: relative;
     top: 4px;
-}
+} */
 
 .header-details {
     width: 88%;
@@ -229,7 +228,7 @@ input[type=number] {
 }
 
 .colon-light {
-    background-color: var(--main-light-bg-color);
+    background-color: #8DA6BB;
     box-shadow: 2px 0px 2.8px 0px #ABC2D4, -2px 0px 2.8px 0px #FFFFFF;
 }
 
@@ -643,7 +642,7 @@ input[type=number] {
 }
 
 .config-details>h1 {
-    color: #4C4C4C;
+    color: #ffffff;
     font-size: 15px;
     font-weight: 600;
 }
@@ -700,7 +699,7 @@ input[type=number] {
 }
 
 .config-info-dark>p {
-    color: #6AA9E4;
+    color: #ffffff;
 }
 
 .config-info>p {
@@ -752,6 +751,7 @@ input[type=number] {
 .file-name-box-dark {
     background: linear-gradient(180deg, #000000 0%, #282801 100%);
     border: 1px solid #E4E4E4;
+    color: white !important;
 }
 
 .button-groups {
@@ -2144,6 +2144,20 @@ input[type=number] {
 }
 
 /* ///Modal/// */
+
+
+@media screen and (min-width:2000px) {
+
+    .pitch-box-content,
+    .heading-box-content {
+        justify-content: space-evenly;
+    }
+
+    .heading-box,
+    .heading-box2 {
+        width: 47%;
+    }
+}
 
 .input-err,
 .input-err:focus {
