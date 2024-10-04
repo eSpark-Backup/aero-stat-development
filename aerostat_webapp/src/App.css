@@ -642,9 +642,13 @@ input[type=number] {
 }
 
 .config-details>h1 {
-    color: #ffffff;
+    /* color: #ffffff; */
     font-size: 15px;
     font-weight: 600;
+}
+
+.config-details-dark {
+    color: white;
 }
 
 .config-details-items {
@@ -1199,6 +1203,7 @@ input[type=number] {
     display: flex;
     flex-direction: column;
     row-gap: 5px;
+    align-items: center;
 }
 
 .chart-value-light h2 {
@@ -1410,12 +1415,13 @@ input[type=number] {
     }
 
     .logo {
-        width: 98%;
+        width: 95% !important;
         margin: auto auto;
     }
 
     .logo img {
         width: 90%;
+        height: 70px;
     }
 
     .header-details {
@@ -1853,7 +1859,10 @@ input[type=number] {
 
     .charts-data-box-light,
     .charts-data-box2-light,
-    .charts-data-box3-light {
+    .charts-data-box3-light,
+    .charts-data-box-dark,
+    .charts-data-box2-dark,
+    .charts-data-box3-dark {
         width: 80% !important;
         height: 70px !important;
     }
@@ -1879,7 +1888,7 @@ input[type=number] {
     }
 
     .box-values>p {
-        font-size: 12px !important;
+        font-size: 10px !important;
     }
 
     .chart-value p {
