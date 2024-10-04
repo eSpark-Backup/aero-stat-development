@@ -134,7 +134,7 @@ const Home = ({
                                     <NewCompass size={getCompassSize()} needle1={response?.weather?.heading} needle2={response?.weather?.windAngle} />
                                     <div className='weather-station-chips'>
                                         <StatusChip color={"blue"} description={"Wind Angle"} />
-                                        <StatusChip color={"red"} description={"Aerostats Heading"} />
+                                        <StatusChip color={"red"} description={"Aerostat Heading"} />
                                     </div>
                                 </div>
                             </ChildCard>
@@ -161,7 +161,7 @@ const Home = ({
                                 <p>Fan 2 <span>(Right direction)</span></p>
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
                             </div>
-                            <h2>Lights Control</h2>
+                            <h2>Light Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Strobe Control</p>
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
