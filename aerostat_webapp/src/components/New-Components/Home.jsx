@@ -342,17 +342,17 @@ const Home = ({
                                     </div>
                                     <div className="button-groups">
                                         <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
-                                            <button className={`upper-part ${!playBtn ? "disable" : ""}`} onClick={HandlePlay}>
+                                            <button className={`upper-part ${!playBtn ? "disable" : ""}`} disabled={!playBtn} onClick={HandlePlay}>
                                                 <img src={play} alt="" />
                                             </button>
                                         </div>
                                         <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
-                                            <button className={`upper-part ${!fwdBtn ? "disable" : ""}`} onClick={HandleForward}>
+                                            <button className={`upper-part ${!fwdBtn ? "disable" : ""}`} disabled={!fwdBtn} onClick={HandleForward}>
                                                 <img src={forward} alt="" />
                                             </button>
                                         </div>
                                         <div className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"}`}>
-                                            <button className={`upper-part ${!StopBtn ? "disable" : ""}`} onClick={HandleStop}>
+                                            <button className={`upper-part ${!StopBtn ? "disable" : ""}`} disabled={!StopBtn} onClick={HandleStop}>
                                                 <img src={stop} alt="" />
                                             </button>
                                         </div>
