@@ -3,8 +3,8 @@ import logging
 from datetime import datetime
 
 # Constants
-MAX_LOG_FILE_SIZE = 5 * 1024 * 1024  # Example: Max file size is 5 MB
-LOG_DIR_PATH = os.path.expanduser("~/logs")  # Log directory path in the user's home directory
+MAX_LOG_FILE_SIZE = 5 * 1024 * 1024
+LOG_DIR_PATH = os.path.expanduser("~/logs")
 DATE_TIME_FORMAT = "%d%m%Y_%H-%M-%S"
 log_file_path = None
 
@@ -23,15 +23,6 @@ def create_log_file():
     file_name = f"{get_current_datetime()}.txt"
     log_file_path = os.path.join(LOG_DIR_PATH, file_name)
     
-    # Set up logging configuration
-    # logging.basicConfig(
-    #     filename=log_file_path,
-    #     filemode='a',  # Append to the file
-    #     format="%(asctime)s - %(message)s",
-    #     datefmt=DATE_TIME_FORMAT,
-    #     level=logging.DEBUG
-    # )
-    
     print(f"Log file created: {log_file_path}")
     return log_file_path
 
@@ -40,7 +31,7 @@ def check_file_size():
     global log_file_path
     if os.path.getsize(log_file_path) >= MAX_LOG_FILE_SIZE:
         logging.shutdown()
-        create_log_file()  # Create a new log file if the size exceeds the limit
+        create_log_file()
 
 # Log a message to the file
 def log_message(message):

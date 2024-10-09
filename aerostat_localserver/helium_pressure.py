@@ -1,4 +1,3 @@
-
 from log_file import log_message
 
 def helium_data(nmea_data):
@@ -6,23 +5,29 @@ def helium_data(nmea_data):
         'HelPressure': None
     }
     m_msgStr = ""
-    msgs_list = nmea_data.strip().split('=')
-    if len(msgs_list) > 1:
-        header = msgs_list[0].strip()
+    
+    # Split the data by \r to process each individual message
+    packets = nmea_data.strip().split('\r')
+    
+    for packet in packets:
+        msgs_list = packet.strip().split('=')
+        if len(msgs_list) > 1:
+            header = msgs_list[0].strip()
 
-        if header == "#01CP":
-            pressure = msgs_list[1].strip()  # Extract pressure value
-            try:
-                pressure_value = float(pressure)
-                if pressure_value is not None:  # Check if pressure_value is not NaN
+            if header == "#01CP":
+                pressure = msgs_list[1].strip()  # Extract pressure value
+                try:
+                    pressure_value = float(pressure)
                     # Round to three decimal places
                     pressure_value = round(pressure_value, 3)
                     parsed_data['HelPressure'] = pressure_value
-                    m_msgStr +=  "Helium Pressure: " + pressure
-            except ValueError:
-                # Handle cases where conversion to float fails
-                pass
-    if len(m_msgStr) != 0:
-        log_message(m_msgStr)
-        
+                    m_msgStr += "Helium Pressure: " + str(pressure_value) + "\n"
+                except ValueError:
+                    log_message(f"Error converting pressure value '{pressure}' to float.")
+                    continue  # Skip to the next packet if conversion fails
+
+    # Log the message if any data was parsed
+    if m_msgStr:
+        log_message(m_msgStr.strip())
+
     return parsed_data

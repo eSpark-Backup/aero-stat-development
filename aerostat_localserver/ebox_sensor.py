@@ -37,4 +37,4 @@ def e_box_sensor_data(nmea_data):
     if len(m_msgStr) != 0:
         log_message(m_msgStr)
 
-    return parsed_data
+    # return parsed_data

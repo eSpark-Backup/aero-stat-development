@@ -8,7 +8,7 @@ import { ThemeContext } from "../ThemeHandler";
 import Modal from "./Modal";
 import Compass from "./compass";
 import RollMeter from "./RollMeter";
-import { fetchDataUtil, weatherstationData, digitalCompassData, ballonetSensorData, heliumSensorData, adamsData, eBoxData } from "../utils";
+import { fetchDataUtil } from "../utils";
 import { formatDateTime, processData, processDataArray } from "../Js_parsing";
 
 HighchartsMore(Highcharts);
@@ -46,12 +46,12 @@ const Home2 = () => {
     try {
       const results = await fetchDataUtil();
       const parsedResponses = {
-        weather: results.port_4002,
-        digitalCompass: results.port_4003,
-        ballonet: results.port_4004,
-        helium: results.port_4005,
-        adams: results.port_4006,
-        ebox: results.port_4007,
+        weather: weatherdata,
+        digitalCompass: digitalCompassdata,
+        ballonet: ballonetSensordata,
+        helium: heliumSensordata,
+        adams: adamsdata,
+        ebox: eBoxdata,
         time: formatDateTime()
       };
 
@@ -66,7 +66,7 @@ const Home2 = () => {
   useEffect(() => {
     if (!startFetchingFromFile) {
       fetchData();
-      const interval = setInterval(fetchData, 3500);
+      const interval = setInterval(fetchData, 1000);
       return () => clearInterval(interval);
     }
   }, [startFetchingFromFile]);
