@@ -22,7 +22,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 # Initially, host and ports are empty and need to be set via /update-config
 host = None
 ports = []
-target_port = 4008  # Default target port for fan and lights command
+target_port = 4006  # Default target port for fan and lights command
 data_packets = []
 sockets={}
 connection_status = {}
@@ -122,9 +122,9 @@ def handle_get_port_data():
                 elif(port == 4006):
                     response["port_data"][f"port_{port}"] = adams_sensor_data(data)
                     print(f"Tension Value data received from port {port}:{response["port_data"][f"port_{port}"]}")
-                elif(port == 4008):
-                    response["port_data"][f"port_{port}"] = e_box_sensor_data(data)
-                    print(f"Internal Temp & Buttons data received from port {port}:{response["port_data"][f"port_{port}"]}")
+                elif(port == 4007):
+                    e_box_sensor_data(data)
+                    # print(f"Internal Temp & Buttons data received from port {port}:{response["port_data"][f"port_{port}"]}")
         emit('response', response, broadcast=True)
     else:
         emit('response', {"connection_status": "Disconnected"}, broadcast=True)
@@ -139,9 +139,9 @@ def connect_and_send_to_port(command):
             sock.connect((host, target_port))
             print(f"Connected to {host}:{target_port}")
             sock.sendall(command.encode())
-            response_data = sock.recv(1024)
-            print(f"Response from port {target_port}: {response_data.decode('utf-8')}")
-            return response_data.decode('utf-8')
+            # response_data = sock.recv(1024)
+            # print(f"Response from port {target_port}: {response_data.decode('utf-8')}")
+            # return response_data.decode('utf-8')
     except socket.error as e:
         print(f"Error on port {target_port}: {e}")
         return None
@@ -174,7 +174,7 @@ def handle_send_device_commands(json_data):
         else:
             lights_response = "No Lights command provided"
 
-        emit('response', {"FansResponse": fans_response, "LightsResponse": lights_response}, broadcast=True)
+        emit('response', {"Button Status": "Updated"}, broadcast=True)
     else:
         emit('response', {"connection_status": "Disconnected"}, broadcast=True)
 
