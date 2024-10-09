@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import logo from "../../assets/logo.svg"
 import logowhite from "../../assets/logo-white.svg"
 import { ThemeContext } from '../../ThemeHandler';
@@ -7,13 +7,36 @@ import { formatDateTime } from '../../Js_parsing';
 const Header = ({ time, fileFetching }) => {
     const { theme } = useContext(ThemeContext);
 
-    const dateString = time ? time : formatDateTime();
-    const date = new Date(dateString);
+    const [currTime, setTime] = useState(time ? time : formatDateTime());
+
+    const date = new Date(currTime);
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const day = date.toLocaleDateString('en-US', options);
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const seconds = date.getSeconds().toString().padStart(2, '0');
+
+    const FetchTime = () => {
+        setTime(formatDateTime());
+    }
+
+    useEffect(() => {
+        if (time) {
+            setTime(time);
+        }
+    }, [time]);
+
+    useEffect(() => {
+        if (!fileFetching) {
+            const interval = setInterval(FetchTime, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [fileFetching]);
+
+    useEffect(() => {
+        console.log(currTime);
+    }, [currTime]);
+    
     return (
         <>
             <div className='header'>

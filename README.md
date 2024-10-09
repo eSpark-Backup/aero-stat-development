@@ -48,3 +48,7 @@ Follow the prompts to complete the installation.
 Open Command Prompt (search for cmd in the Start menu).
 Run python --version to check the Python version.
 Run pip --version to check if pip is installed.
+
+## GCS ANYDESK:
+ID: 1122996002
+Pass: alfaops123

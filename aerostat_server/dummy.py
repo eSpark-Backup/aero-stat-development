@@ -101,18 +101,21 @@ def handle_client(conn, addr, port):
             response = f"#01CP={state_4005['value']:.2f}\r\n"
             conn.sendall(response.encode('utf-8'))
             print(f"Sent data to {addr} on port {port}: {response}")
+            threading.Event().wait(3)
 
         # For other ports, send predefined data
         elif port in data_dict:
             conn.sendall(data_dict[port])
             print(f"Sent data to {addr} on port {port}")
+            threading.Event().wait(3)
         else:
             print(f"No data configured for port {port}")
         
     except socket.error as e:
         print(f"Error handling client on port {port}: {e}")
-    finally:
-        conn.close()
+    # finally:
+    #     conn.close()
+    #     print(f"Connection closed for {addr} on port {port}")
 
 # Function to set up a server socket and listen for connections
 def start_server(port):

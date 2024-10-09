@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 
-const socket = io('http://alfaops.local:5000');
+let socket;  // Initialize the socket outside of the component to prevent re-creation
 
+// Utility for handling window width
 export const useWindowWidth = () => {
   const [width, setWidth] = useState(window.innerWidth);
 
@@ -35,10 +36,23 @@ export function calculateSkyLandPercentage(pitch) {
   };
 }
 
+// Initialize the socket only once
+export const initializeSocket = () => {
+  if (!socket) {
+    socket = io('http://alfaops.local:5000', {
+      autoConnect: false,  // Prevent auto connection
+      reconnection: false  // Disable automatic reconnection
+    });
+  }
+};
+
 // Fetch data using Socket.IO
 export const fetchDataUtil = (callback) => {
-  socket.emit('get-port-data');
+  if (!socket.connected) {
+    socket.connect();  // Manually connect the socket if not connected
+  }
 
+  socket.emit('get-port-data');
   socket.on('response', (data) => {
     console.log('Data received from server:', data);
     callback(data);
@@ -47,16 +61,18 @@ export const fetchDataUtil = (callback) => {
 
 // Update configuration using Socket.IO
 export const updateConfigUtil = (form) => {
-  socket.emit('update-config', form);
+  if (!socket.connected) {
+    socket.connect();  // Manually connect the socket if not connected
+  }
 
   return new Promise((resolve, reject) => {
+    socket.emit('update-config', form);
+
     socket.on('response', (data) => {
-      // console.log('Config update response:', data);
-      resolve(data);  
+      resolve(data);
     });
-    
+
     socket.on('error', (error) => {
-      console.error('Error updating config:', error);
       reject(error);
     });
   });
@@ -64,13 +80,23 @@ export const updateConfigUtil = (form) => {
 
 // Send device commands (Fans and Lights) using Socket.IO
 export const sendDeviceCommands = (FansLight, callback) => {
+  if (!socket.connected) {
+    socket.connect();  // Manually connect the socket if not connected
+  }
+
   socket.emit('send-device-commands', FansLight);
 
   socket.once('response', (data) => {
-    // console.log('Command response:', data);
-    
     if (callback) {
       callback(data);
     }
   });
+};
+
+// Disconnect function
+export const disconnectSocket = () => {
+  if (socket && socket.connected) {
+    socket.disconnect();  // Disconnect the socket
+    console.log('Socket disconnected');
+  }
 };

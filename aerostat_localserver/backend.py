@@ -1,5 +1,7 @@
+import time
 import socket
 import platform
+import threading
 import subprocess
 from flask_socketio import SocketIO, emit # type: ignore
 from log_file import create_log_file, setup_log_directory
@@ -14,13 +16,17 @@ from zeroconf import Zeroconf, ServiceInfo # type: ignore
 from flask import Flask, jsonify, request  # type: ignore
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Initially, host and ports are empty and need to be set via /update-config
 host = None
 ports = []
-target_port = 4007  # Default target port for fan and lights command
+target_port = 4008  # Default target port for fan and lights command
 data_packets = []
+sockets={}
+connection_status = {}
+TENSION_REQ_MSG = "#01\r"
 
 setup_log_directory()
 create_log_file()
@@ -49,27 +55,45 @@ def check_host_reachable(ip_address):
     
 # Function to connect to specific port and fetch data
 def connect_to_port(port):
-    global data_packets
+    global data_packets, connection_status, sockets
     if not host or not ports:
         return "Host and ports are not configured", 500
 
+    if port not in connection_status:
+        connection_status[port] = False
+    if port not in sockets:
+        sockets[port] = None
+
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.settimeout(2)
+        if connection_status[port] and sockets[port]:
+            print(f"Listening to {host}:{port}")
+            if port == 4006:
+                sockets[port].sendall(TENSION_REQ_MSG.encode('utf-8'))
+            data = sockets[port].recv(1024)
+            print(f"Data: {data}")
+            return data.decode('utf-8')
+        
+        else:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(0.2)
             sock.connect((host, port))
             print(f"Connected to {host}:{port}")
-            sock.sendall(b'Hello Server')
+            connection_status[port] = True
+            sockets[port] = sock
+            if port == 4006:
+                sock.sendall(TENSION_REQ_MSG.encode('utf-8'))
             data = sock.recv(1024)
+            print(f"Data: {data}")
             return data.decode('utf-8')
 
-    except socket.timeout:
-        print(f"Connection timed out on port {port}")
+    except (socket.timeout,socket.error) as e:
+        print(f"Connection timed out on port {port}:{e}")
+        connection_status[port] = False
+        if sockets[port]:
+            sockets[port].close()
+            sockets[port] = None
         return None
-
-    except socket.error as e:
-        print(f"Error on port {port}: {e}")
-        return None
-
+    
 @socketio.on('get-port-data')
 def handle_get_port_data():
     response = {"connection_status": "Disconnected", "port_data": {}}
@@ -98,7 +122,7 @@ def handle_get_port_data():
                 elif(port == 4006):
                     response["port_data"][f"port_{port}"] = adams_sensor_data(data)
                     print(f"Tension Value data received from port {port}:{response["port_data"][f"port_{port}"]}")
-                elif(port == 4007):
+                elif(port == 4008):
                     response["port_data"][f"port_{port}"] = e_box_sensor_data(data)
                     print(f"Internal Temp & Buttons data received from port {port}:{response["port_data"][f"port_{port}"]}")
         emit('response', response, broadcast=True)
@@ -179,7 +203,7 @@ def handle_update_config(json_data):
         int(json_data['adam']),
         int(json_data['ebox'])
     ]
-    
+
     emit('response', {"message": "Configuration updated successfully", "ip": host, "ports": ports}, broadcast=True)
 
 def start_mdns_service():
