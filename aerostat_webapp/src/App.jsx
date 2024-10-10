@@ -120,39 +120,39 @@ function App() {
             ? lastPerfectResponses.current.adams.Tension
             : data.port_data.port_4006.Tension,
         },
-        ebox: {
-          InternalTemp: isInvalidValue(data?.port_data?.port_4007?.InternalTemp)
-            ? lastPerfectResponses.current.ebox.InternalTemp
-            : data.port_data.port_4007.InternalTemp,
+        // ebox: {
+        //   InternalTemp: isInvalidValue(data?.port_data?.port_4007?.InternalTemp)
+        //     ? lastPerfectResponses.current.ebox.InternalTemp
+        //     : data.port_data.port_4007.InternalTemp,
 
-          fan1: isInvalidValue(data?.port_data?.port_4007?.fan1) ||
-            (typeof data?.port_data?.port_4007?.fan1 === 'string' &&
-              data?.port_data?.port_4007?.fan1.toLowerCase() !== "on" &&
-              data?.port_data?.port_4007?.fan1.toLowerCase() !== "off")
-            ? lastPerfectResponses.current.ebox.fan1
-            : data.port_data.port_4007.fan1,
+        //   fan1: isInvalidValue(data?.port_data?.port_4007?.fan1) ||
+        //     (typeof data?.port_data?.port_4007?.fan1 === 'string' &&
+        //       data?.port_data?.port_4007?.fan1.toLowerCase() !== "on" &&
+        //       data?.port_data?.port_4007?.fan1.toLowerCase() !== "off")
+        //     ? lastPerfectResponses.current.ebox.fan1
+        //     : data.port_data.port_4007.fan1,
 
-          fan2: isInvalidValue(data?.port_data?.port_4007?.fan2) ||
-            (typeof data?.port_data?.port_4007?.fan2 === 'string' &&
-              data?.port_data?.port_4007?.fan2.toLowerCase() !== "on" &&
-              data?.port_data?.port_4007?.fan2.toLowerCase() !== "off")
-            ? lastPerfectResponses.current.ebox.fan2
-            : data.port_data.port_4007.fan2,
+        //   fan2: isInvalidValue(data?.port_data?.port_4007?.fan2) ||
+        //     (typeof data?.port_data?.port_4007?.fan2 === 'string' &&
+        //       data?.port_data?.port_4007?.fan2.toLowerCase() !== "on" &&
+        //       data?.port_data?.port_4007?.fan2.toLowerCase() !== "off")
+        //     ? lastPerfectResponses.current.ebox.fan2
+        //     : data.port_data.port_4007.fan2,
 
-          position: isInvalidValue(data?.port_data?.port_4007?.position) ||
-            (typeof data?.port_data?.port_4007?.position === 'string' &&
-              data?.port_data?.port_4007?.position.toLowerCase() !== "1" &&
-              data?.port_data?.port_4007?.position.toLowerCase() !== "0")
-            ? lastPerfectResponses.current.ebox.position
-            : data.port_data.port_4007.position,
+        //   position: isInvalidValue(data?.port_data?.port_4007?.position) ||
+        //     (typeof data?.port_data?.port_4007?.position === 'string' &&
+        //       data?.port_data?.port_4007?.position.toLowerCase() !== "1" &&
+        //       data?.port_data?.port_4007?.position.toLowerCase() !== "0")
+        //     ? lastPerfectResponses.current.ebox.position
+        //     : data.port_data.port_4007.position,
 
-          strobe: isInvalidValue(data?.port_data?.port_4007?.strobe) ||
-            (typeof data?.port_data?.port_4007?.strobe === 'string' &&
-              data?.port_data?.port_4007?.strobe.toLowerCase() !== "on" &&
-              data?.port_data?.port_4007?.strobe.toLowerCase() !== "off")
-            ? lastPerfectResponses.current.ebox.strobe
-            : data.port_data.port_4007.strobe,
-        },
+        //   strobe: isInvalidValue(data?.port_data?.port_4007?.strobe) ||
+        //     (typeof data?.port_data?.port_4007?.strobe === 'string' &&
+        //       data?.port_data?.port_4007?.strobe.toLowerCase() !== "on" &&
+        //       data?.port_data?.port_4007?.strobe.toLowerCase() !== "off")
+        //     ? lastPerfectResponses.current.ebox.strobe
+        //     : data.port_data.port_4007.strobe,
+        // },
         time: formatDateTime(),
         loading: data?.connection_status
       };

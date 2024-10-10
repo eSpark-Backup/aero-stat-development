@@ -34,10 +34,10 @@ const Home = ({
     const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
     // const [openModal, setOpenModal] = useState(false);
 
-    const [fan1, setFan1] = useState(response?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
-    const [fan2, setFan2] = useState(response?.ebox?.fan2 === "ON" ? "Continuous" : "Pressured");
-    const [position, setPosition] = useState(response?.ebox?.position === "1" ? "Continuous" : "Off");
-    const [strobe, setStrobe] = useState(response?.ebox?.strobe === "ON" ? "Continuous" : "Off");
+    const [fan1, setFan1] = useState("Continuous");
+    const [fan2, setFan2] = useState("Pressured");
+    const [position, setPosition] = useState("Continuous");
+    const [strobe, setStrobe] = useState("Off");
     const [sendData, setSendData] = useState(false);
 
     const handleChange = (name, value) => {
@@ -95,15 +95,14 @@ const Home = ({
             setSendData(false);
         }
 
-    }, [fan1, fan2, strobe, position]);
+    }, [fan1, fan2, strobe, position]); 
 
-    useEffect(() => {
-        setFan1(response?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
-        setFan2(response?.ebox?.fan2 === "ON" ? "Continuous" : "Pressured");
-        setStrobe(response?.ebox?.strobe === "ON" ? "Continuous" : "Off");
-        setPosition(response?.ebox?.position === "1" ? "Continuous" : "Off");
-        // console.log(response)
-    }, [response])
+    // useEffect(() => {
+    //     setFan1(response?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
+    //     setFan2(response?.ebox?.fan2 === "ON" ? "Continuous" : "Pressured");
+    //     setStrobe(response?.ebox?.strobe === "ON" ? "Continuous" : "Off");
+    //     setPosition(response?.ebox?.position === "1" ? "Continuous" : "Off")
+    // }, [response])
 
     return (
         <>
