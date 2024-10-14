@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import Header from './components/New-Components/Header';
 import Home from './components/New-Components/Home';
 import { ThemeContext } from './ThemeHandler';
-import { fetchDataUtil, updateConfigUtil, initializeSocket } from './utils';
+import { fetchDataUtil, updateConfigUtil } from './utils';
 import { formatDateTime, processData, processDataArray } from './Js_parsing';
 import { time } from 'highcharts';
 
@@ -38,7 +38,6 @@ function App() {
 
 
   useEffect(() => {
-    initializeSocket();
     const savedTheme = window.localStorage.getItem('theme') || 'light';
     document.documentElement.style.setProperty('--main-bg-color',
       savedTheme === 'light' ? 'var(--main-light-bg-color)' : 'var(--main-dark-bg-color)'
@@ -63,27 +62,25 @@ function App() {
       isNaN(value)
     );
   };
-  
+
   const fetchData = async () => {
-    fetchDataUtil((data) => {
+    const data = await fetchDataUtil();
+
+    if (data) {
       const parsedResponses = {
         weather: {
           airTemp: isInvalidValue(data?.port_data?.port_4002?.airTemp)
             ? lastPerfectResponses.current.weather.airTemp
             : data.port_data.port_4002.airTemp,
-
           baroPres: isInvalidValue(data?.port_data?.port_4002?.baroPres)
             ? lastPerfectResponses.current.weather.baroPres
             : data.port_data.port_4002.baroPres,
-
           heading: isInvalidValue(data?.port_data?.port_4002?.heading)
             ? lastPerfectResponses.current.weather.heading
             : data.port_data.port_4002.heading,
-
           windAngle: isInvalidValue(data?.port_data?.port_4002?.windAngle)
             ? lastPerfectResponses.current.weather.windAngle
             : data.port_data.port_4002.windAngle,
-
           windSpeed: isInvalidValue(data?.port_data?.port_4002?.windSpeed)
             ? lastPerfectResponses.current.weather.windSpeed
             : data.port_data.port_4002.windSpeed,
@@ -92,11 +89,9 @@ function App() {
           Magheading: isInvalidValue(data?.port_data?.port_4003?.Magheading)
             ? lastPerfectResponses.current.digitalCompass.Magheading
             : data.port_data.port_4003.Magheading,
-
           Pitch: isInvalidValue(data?.port_data?.port_4003?.Pitch)
             ? lastPerfectResponses.current.digitalCompass.Pitch
             : data.port_data.port_4003.Pitch,
-
           Roll: isInvalidValue(data?.port_data?.port_4003?.Roll)
             ? lastPerfectResponses.current.digitalCompass.Roll
             : data.port_data.port_4003.Roll,
@@ -115,48 +110,49 @@ function App() {
           MaxTension: isInvalidValue(data?.port_data?.port_4006?.MaxTension)
             ? lastPerfectResponses.current.adams.MaxTension
             : data.port_data.port_4006.MaxTension,
-
           Tension: isInvalidValue(data?.port_data?.port_4006?.Tension)
             ? lastPerfectResponses.current.adams.Tension
             : data.port_data.port_4006.Tension,
         },
-        ebox: {
-          InternalTemp: isInvalidValue(data?.port_data?.port_4007?.InternalTemp)
-            ? lastPerfectResponses.current.ebox.InternalTemp
-            : data.port_data.port_4007.InternalTemp,
+        // ebox: {
+        //   InternalTemp: isInvalidValue(data?.port_data?.port_4007?.InternalTemp)
+        //     ? lastPerfectResponses.current.ebox.InternalTemp
+        //     : data.port_data.port_4007.InternalTemp,
 
-          fan1: isInvalidValue(data?.port_data?.port_4007?.fan1) ||
-            (typeof data?.port_data?.port_4007?.fan1 === 'string' &&
-              data?.port_data?.port_4007?.fan1.toLowerCase() !== "on" &&
-              data?.port_data?.port_4007?.fan1.toLowerCase() !== "off")
-            ? lastPerfectResponses.current.ebox.fan1
-            : data.port_data.port_4007.fan1,
+        //   fan1: isInvalidValue(data?.port_data?.port_4007?.fan1) ||
+        //     (typeof data?.port_data?.port_4007?.fan1 === 'string' &&
+        //       data?.port_data?.port_4007?.fan1.toLowerCase() !== "on" &&
+        //       data?.port_data?.port_4007?.fan1.toLowerCase() !== "off")
+        //     ? lastPerfectResponses.current.ebox.fan1
+        //     : data.port_data.port_4007.fan1,
 
-          fan2: isInvalidValue(data?.port_data?.port_4007?.fan2) ||
-            (typeof data?.port_data?.port_4007?.fan2 === 'string' &&
-              data?.port_data?.port_4007?.fan2.toLowerCase() !== "on" &&
-              data?.port_data?.port_4007?.fan2.toLowerCase() !== "off")
-            ? lastPerfectResponses.current.ebox.fan2
-            : data.port_data.port_4007.fan2,
+        //   fan2: isInvalidValue(data?.port_data?.port_4007?.fan2) ||
+        //     (typeof data?.port_data?.port_4007?.fan2 === 'string' &&
+        //       data?.port_data?.port_4007?.fan2.toLowerCase() !== "on" &&
+        //       data?.port_data?.port_4007?.fan2.toLowerCase() !== "off")
+        //     ? lastPerfectResponses.current.ebox.fan2
+        //     : data.port_data.port_4007.fan2,
 
-          position: isInvalidValue(data?.port_data?.port_4007?.position) ||
-            (typeof data?.port_data?.port_4007?.position === 'string' &&
-              data?.port_data?.port_4007?.position.toLowerCase() !== "1" &&
-              data?.port_data?.port_4007?.position.toLowerCase() !== "0")
-            ? lastPerfectResponses.current.ebox.position
-            : data.port_data.port_4007.position,
+        //   position: isInvalidValue(data?.port_data?.port_4007?.position) ||
+        //     (typeof data?.port_data?.port_4007?.position === 'string' &&
+        //       data?.port_data?.port_4007?.position.toLowerCase() !== "1" &&
+        //       data?.port_data?.port_4007?.position.toLowerCase() !== "0")
+        //     ? lastPerfectResponses.current.ebox.position
+        //     : data.port_data.port_4007.position,
 
-          strobe: isInvalidValue(data?.port_data?.port_4007?.strobe) ||
-            (typeof data?.port_data?.port_4007?.strobe === 'string' &&
-              data?.port_data?.port_4007?.strobe.toLowerCase() !== "on" &&
-              data?.port_data?.port_4007?.strobe.toLowerCase() !== "off")
-            ? lastPerfectResponses.current.ebox.strobe
-            : data.port_data.port_4007.strobe,
-        },
+        //   strobe: isInvalidValue(data?.port_data?.port_4007?.strobe) ||
+        //     (typeof data?.port_data?.port_4007?.strobe === 'string' &&
+        //       data?.port_data?.port_4007?.strobe.toLowerCase() !== "on" &&
+        //       data?.port_data?.port_4007?.strobe.toLowerCase() !== "off")
+        //     ? lastPerfectResponses.current.ebox.strobe
+        //     : data.port_data.port_4007.strobe,
+        // },
         time: formatDateTime(),
-        loading: data?.connection_status
+        loading: data?.connection_status,
       };
-      console.log("AP DATAAAAAAAAAAAAAAAAAAAAAAA",data);
+
+      console.log("AP DATA:", data);
+
       lastPerfectResponses.current = {
         ...lastPerfectResponses.current,
         weather: parsedResponses.weather,
@@ -164,17 +160,14 @@ function App() {
         ballonet: parsedResponses.ballonet,
         helium: parsedResponses.helium,
         adams: parsedResponses.adams,
-        ebox: parsedResponses.ebox,
+        // ebox: parsedResponses.ebox,
       };
-      if (Object.keys(data).length > 0) {
-        setIsLoading(0);
-      }
-      else {
-        setIsLoading(2);
-      }
-      //console.log("Parsed Responses",parsedResponses);
+
+      setIsLoading(Object.keys(data).length > 0 ? 0 : 2);
       setResponses(parsedResponses);
-    });
+    } else {
+      setIsLoading(2);
+    }
   };
 
   useEffect(() => {
