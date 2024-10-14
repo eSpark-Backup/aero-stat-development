@@ -60,7 +60,7 @@ export function calculateSkyLandPercentage(pitch) {
 // };
 export const fetchDataUtil = async () => {
   try {
-    const response = await fetch("url");
+    const response = await fetch("http://localhost:8080/get-port-data");
     if (!response.ok) {
       throw new Error(`Error in getting data: ${response.status}`);
     }
@@ -94,8 +94,9 @@ export const fetchDataUtil = async () => {
 
 export const updateConfigUtil = async (form) => {
   try {
-    const response = await fetch("url", {
+    const response = await fetch("http://localhost:8080/update-config", {
       method: "POST",
+      // mode: 'cors',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -128,8 +129,9 @@ export const updateConfigUtil = async (form) => {
 // };
 export const sendDeviceCommands = async (FansLight) => {
   try {
-    const response = await fetch("url", {
+    const response = await fetch("http://localhost:8080/send-device-commands", {
       method: "POST",
+      // mode: 'cors',
       headers: {
         'Content-Type': 'application/json'
 
