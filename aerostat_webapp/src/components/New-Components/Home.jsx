@@ -89,13 +89,13 @@ const Home = ({
             FansLight.Lights = "@01DO13\r";
         }
         if (sendData) {
-            sendDeviceCommands(FansLight, (response) => {
-                // console.log('Handled response:', response);
+            sendDeviceCommands(FansLight).then((response) => {
+                console.log('Response from device commands:', response);
             });
             setSendData(false);
         }
 
-    }, [fan1, fan2, strobe, position]); 
+    }, [fan1, fan2, strobe, position]);
 
     // useEffect(() => {
     //     setFan1(response?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");

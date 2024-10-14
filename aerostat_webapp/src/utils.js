@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import io from 'socket.io-client';
 
-let socket;  // Initialize the socket outside of the component to prevent re-creation
+let socket;
 
-// Utility for handling window width
+
 export const useWindowWidth = () => {
   const [width, setWidth] = useState(window.innerWidth);
 
@@ -36,67 +36,121 @@ export function calculateSkyLandPercentage(pitch) {
   };
 }
 
-// Initialize the socket only once
-export const initializeSocket = () => {
-  if (!socket) {
-    socket = io('http://alfaops.local:5000', {
-      autoConnect: false,  // Prevent auto connection
-      reconnection: false  // Disable automatic reconnection
-    });
-  }
-};
 
-// Fetch data using Socket.IO
-export const fetchDataUtil = (callback) => {
-  if (!socket.connected) {
-    socket.connect();  // Manually connect the socket if not connected
-  }
+// export const initializeSocket = () => {
+//   if (!socket) {
+//     socket = io('http://alfaops.local:5000', {
+//       autoConnect: false,
+//       reconnection: false
+//     });
+//   }
+// };
 
-  socket.emit('get-port-data');
-  socket.on('response', (data) => {
-    console.log('Data received from server:', data);
-    callback(data);
-  });
-};
 
-// Update configuration using Socket.IO
-export const updateConfigUtil = (form) => {
-  if (!socket.connected) {
-    socket.connect();  // Manually connect the socket if not connected
-  }
+// export const fetchDataUtil = (callback) => {
+//   if (!socket.connected) {
+//     socket.connect();
+//   }
 
-  return new Promise((resolve, reject) => {
-    socket.emit('update-config', form);
-
-    socket.on('response', (data) => {
-      resolve(data);
-    });
-
-    socket.on('error', (error) => {
-      reject(error);
-    });
-  });
-};
-
-// Send device commands (Fans and Lights) using Socket.IO
-export const sendDeviceCommands = (FansLight, callback) => {
-  if (!socket.connected) {
-    socket.connect();  // Manually connect the socket if not connected
-  }
-
-  socket.emit('send-device-commands', FansLight);
-
-  socket.once('response', (data) => {
-    if (callback) {
-      callback(data);
+//   socket.emit('get-port-data');
+//   socket.on('response', (data) => {
+//     console.log('Data received from server:', data);
+//     callback(data);
+//   });
+// };
+export const fetchDataUtil = async () => {
+  try {
+    const response = await fetch("url");
+    if (!response.ok) {
+      throw new Error(`Error in getting data: ${response.status}`);
     }
-  });
-};
-
-// Disconnect function
-export const disconnectSocket = () => {
-  if (socket && socket.connected) {
-    socket.disconnect();  // Disconnect the socket
-    console.log('Socket disconnected');
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("Error in getting data:", error);
+    return null;
   }
 };
+
+
+
+// export const updateConfigUtil = (form) => {
+//   if (!socket.connected) {
+//     socket.connect();
+//   }
+
+//   return new Promise((resolve, reject) => {
+//     socket.emit('update-config', form);
+
+//     socket.on('response', (data) => {
+//       resolve(data);
+//     });
+
+//     socket.on('error', (error) => {
+//       reject(error);
+//     });
+//   });
+// };
+
+export const updateConfigUtil = async (form) => {
+  try {
+    const response = await fetch("url", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(form)
+    });
+    if (!response.ok) {
+      throw new Error(`Error in posting form: ${response.status}`);
+    }
+    const result = await response.json()
+    return result
+  } catch (error) {
+    console.log("Error in posting form:", error);
+    return null;
+  }
+};
+
+
+// export const sendDeviceCommands = (FansLight, callback) => {
+//   if (!socket.connected) {
+//     socket.connect();
+//   }
+
+//   socket.emit('send-device-commands', FansLight);
+
+//   socket.once('response', (data) => {
+//     if (callback) {
+//       callback(data);
+//     }
+//   });
+// };
+export const sendDeviceCommands = async (FansLight) => {
+  try {
+    const response = await fetch("url", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+
+      },
+      body: JSON.stringify(FansLight)
+    })
+    if (!response.ok) {
+      throw new Error(`Error in posting Fans Light: ${response.status}`);
+    }
+    const result = await response.json()
+    return result
+  } catch (error) {
+    console.log("Error in posting Fans Light:", error);
+    return null;
+  }
+};
+
+
+// export const disconnectSocket = () => {
+//   if (socket && socket.connected) {
+//     socket.disconnect();
+//     console.log('Socket disconnected');
+//   }
+// };
