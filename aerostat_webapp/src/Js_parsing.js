@@ -84,7 +84,7 @@ export function processDataArray(dataArray, currentResult = null) {
 
                 const [key, value] = pair.split(':').map(item => item.trim());
 
-                const numericValue = parseFloat(value);
+                const numericValue = parseFloat(value).toFixed(2);
 
 
                 if (key === 'Pitch' || key === 'Roll') {

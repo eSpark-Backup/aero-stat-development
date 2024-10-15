@@ -33,9 +33,9 @@ const Header = ({ time, fileFetching }) => {
         }
     }, [fileFetching]);
 
-    useEffect(() => {
-        console.log(currTime);
-    }, [currTime]);
+    // useEffect(() => {
+    //     console.log(currTime);
+    // }, [currTime]);
     
     return (
         <>

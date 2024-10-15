@@ -1,7 +1,8 @@
 #include <algorithm>
 #include <cctype>
 #include "util.h"
-// #include <string>
+#include <iomanip>
+#include <sstream>
 
 std::string strip(const std::string& str) {
     auto start = str.begin();
@@ -16,3 +17,8 @@ std::string strip(const std::string& str) {
 
     return std::string(start, end + 1);
 }
+
+// Function to format a float to a string with 2 decimal places
+// float formatFloat(float value) {
+//     return std:: round(value * 100.0f) / 100.0f; // Round to 2 decimal places
+// }

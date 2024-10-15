@@ -5,13 +5,13 @@
 #include <sstream>
 
 struct ParsedData_AS {
-    double Tension = 0.0;
-    double MaxTension = 0.0;
+    float Tension = 0.0;
+    float MaxTension = 0.0;
 
     std::string toString() const {
         std::ostringstream oss;
-        oss << "Heading: " << Tension
-            << ", Barometric Pressure: " << MaxTension;
+        oss << "Tension: " << Tension
+            << ", Max Tension: " << MaxTension;
         return oss.str();
     }
 };

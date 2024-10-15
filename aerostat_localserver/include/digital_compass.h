@@ -5,9 +5,9 @@
 #include <sstream>
 
 struct ParsedData_DC {
-    double Magheading = 0.0;
-    double Pitch = 0.0;
-    double Roll = 0.0;
+    float Magheading;
+    float Pitch;
+    float Roll;
 
     // Convert ParsedData to string
     std::string toString() const {

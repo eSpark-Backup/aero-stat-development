@@ -89,13 +89,22 @@ const Home = ({
             FansLight.Lights = "@01DO13\r";
         }
         if (sendData) {
-            sendDeviceCommands(FansLight).then((response) => {
-                console.log('Response from device commands:', response);
-            });
-            setSendData(false);
+            sendDeviceCommands(FansLight)
+                .then((response) => {
+                    const result = response?.ButtonResponse.split(",");
+                    setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
+                    setFan2(result[3].toLowerCase() === "off" ? "Pressured" : "Continuous");
+                    setStrobe(result[4].toLowerCase() === "off" ? "Off" : "Continuous");
+                    setPosition(result[5].toLowerCase()?.startsWith("1") ? "Continuous" : "Off");
+                })
+                .catch((error) => {
+                    console.error('Error sending device commands:', error);
+                })
+                .finally(() => setSendData(false));
         }
 
-    }, [fan1, fan2, strobe, position]);
+
+    }, [sendData, fan1, fan2, strobe, position]);
 
     // useEffect(() => {
     //     setFan1(response?.ebox?.fan1 === "ON" ? "Continuous" : "Pressured");
@@ -143,7 +152,7 @@ const Home = ({
                         <div className='wind-speed-card'>
                             <HighchartsReact
                                 highcharts={Highcharts}
-                                options={windGaugeOptions(theme, 0, 70, [response?.weather?.windSpeed], getChartSize())}
+                                options={windGaugeOptions(theme, 0, 70, [Number(response?.weather?.windSpeed)], getChartSize())}
                             />
                             <ChartsData position={"between"} description1={"Air Temp (C):"} value1={response?.weather?.airTemp} description2={"Baro Press (inHg):"} value2={response?.weather?.baroPres} graphValue={response?.weather?.windSpeed}
                                 graphName={"Wind Speed"} />
@@ -221,14 +230,14 @@ const Home = ({
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [response?.helium?.HelPressure], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [Number(response?.helium?.HelPressure)], getChartSize())}
                                         />
                                         <ChartsData position={"around"} graphValue={response?.helium?.HelPressure} graphName={"Hull Helium"} />
                                     </div>
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [response?.ballonet?.BalPressure], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [Number(response?.ballonet?.BalPressure)], getChartSize())}
                                         />
                                         <ChartsData position={"around"} graphValue={response?.ballonet?.BalPressure} graphName={"Ballonet Air"} />
                                     </div>
@@ -242,7 +251,7 @@ const Home = ({
                                     <div className='confluence-graph'>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={confluenceGaugeOptions(theme, 0, 700, [response?.adams?.Tension], getChartSize())}
+                                            options={confluenceGaugeOptions(theme, 0, 700, [Number(response?.adams?.Tension)], getChartSize())}
                                         />
                                         <ChartsData position={"center"} graphName={"Current Tension"} graphValue={response?.adams?.Tension} />
                                     </div>

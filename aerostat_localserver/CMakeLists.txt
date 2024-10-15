@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project(HTTPServer)
 
 # Specify the C++ standard
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include_directories(
@@ -22,3 +22,9 @@ add_executable(TEST main.cpp ${SOURCES})
 # Include the httplib directory if needed (optional)
 # Include directories can be adjusted based on your setup
 include_directories(${CMAKE_SOURCE_DIR})
+
+
+# Link socket libraries for Windows
+if(WIN32)
+    target_link_libraries(TEST PRIVATE wsock32 ws2_32)
+endif()

@@ -3,23 +3,26 @@
 
 #include <optional>
 #include <sstream>
+#include <iomanip>
 
 struct ParsedData {
-    double heading = 0.0;
-    double baroPres = 0.0;
-    double airTemp = 0.0;
-    double windAngle = 0.0;
-    double windSpeed = 0.0;
+    float heading;
+    float barometricPressure;
+    float airTemperature;
+    float windAngle;
+    float windSpeed;
 
-    // Convert ParsedData to string
     std::string toString() const {
         std::ostringstream oss;
-        oss << "Heading: " << heading
-            << ", Barometric Pressure: " << baroPres
-            << ", Air Temperature: " << airTemp
+        oss << std::fixed << std::setprecision(2);  // Set precision to 2 decimal places
+
+        oss << "Heading: " << heading 
+            << ", Barometric Pressure: " << barometricPressure
+            << ", Air Temperature: " << airTemperature
             << ", Wind Angle: " << windAngle
             << ", Wind Speed: " << windSpeed;
-        return oss.str();
+
+        return oss.str();  // Return the formatted string
     }
 };
 

@@ -5,7 +5,7 @@
 #include <sstream>
 
 struct ParsedData_HP {
-    double HelPressure = 0.0;
+    float HelPressure;
 
     std::string toString() const {
         std::ostringstream oss;

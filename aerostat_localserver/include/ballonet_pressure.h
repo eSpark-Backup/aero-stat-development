@@ -5,7 +5,7 @@
 #include <sstream>
 
 struct ParsedData_BP {
-    double BalPressure = 0.0;
+    float BalPressure;
     
     std::string toString() const {
         std::ostringstream oss;

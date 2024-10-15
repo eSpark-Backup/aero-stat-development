@@ -1,4 +1,5 @@
 #include <map>
+#include "util.h"
 #include <string>
 #include <vector>
 #include <cstdlib>
@@ -42,27 +43,24 @@ void continuous_port_connection();
 void ping_host() {
     bool reachable = false;
     while (true) {
-        if (reachable) {
-            connect_flag =true;
-            if (connect_flag) {
-                std::cout << "Host reachable, starting port connections..." << std::endl;
-                std::thread(continuous_port_connection).detach();  // Start the connection thread
-            }
+        bool reachable = check_host_reachable(host);
+
+        // Update connect_flag based on reachability
+        connect_flag = reachable;
+        if (connect_flag) {
+            std::cout << "Host reachable, starting port connections..." << std::endl;
+            std::thread(continuous_port_connection).detach();  // Start the connection thread
         } else {
-            reachable =check_host_reachable(host);
-            connect_flag = false;
-            if (!connect_flag) {
-                std::cout << "Host unreachable, disconnecting..." << std::endl;
-                // Optionally, close all sockets here
-                for (auto &socket_pair : sockets) {
-                    if (socket_pair.second != INVALID_SOCKET) {
-                        closesocket(socket_pair.second);
-                        socket_pair.second = INVALID_SOCKET;
-                    }
+            std::cout << "Host unreachable, disconnecting..." << std::endl;
+            // Optionally, close all sockets here
+            for (auto &socket_pair : sockets) {
+                if (socket_pair.second != INVALID_SOCKET) {
+                    closesocket(socket_pair.second);
+                    socket_pair.second = INVALID_SOCKET;
                 }
             }
         }
-        Sleep(50); // Check every 5 seconds
+        Sleep(1000); // Check every 5 seconds
     }
 }
 
@@ -111,11 +109,10 @@ std::string connect_to_port(int port) {
             int bytesReceived = recv(sockets[port], buffer, sizeof(buffer), 0);
 
             if (bytesReceived > 0) {
-                port_flag =true;
                 std::cout << "Data: " << buffer << std::endl;
+                // port_flag =true;
                 return std::string(buffer, bytesReceived);
             } else {
-                port_flag =false;
                 std::cerr << "Connection lost to " << host << ":" << port << std::endl;
                 connection_status[port] = false;
                 closesocket(sockets[port]);
@@ -128,7 +125,7 @@ std::string connect_to_port(int port) {
                 return "";
             }
 
-            int timeout = 10;
+            int timeout = 1000;
             setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
 
             sockaddr_in serverAddress;
@@ -137,10 +134,9 @@ std::string connect_to_port(int port) {
             inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
 
             if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
-                port_flag = false;
                 std::cerr << "Connection failed to " << host << ":" << port << "\n";
                 closesocket(sock);
-                Sleep(10);
+                Sleep(1000);
                 return "";
             }
 
@@ -155,7 +151,7 @@ std::string connect_to_port(int port) {
             char buffer[1024] = {0};
             int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
             if (bytesReceived > 0) {
-                port_flag =true;
+                // port_flag = true;
                 std::cout << "Data: " << buffer << std::endl;
                 return std::string(buffer, bytesReceived);
             }
@@ -180,35 +176,69 @@ void continuous_port_connection() {
     AdamsSensor as;
 
     while (connect_flag) {
-        for (int port : ports) {
-            if (port >= 4002 && port <= 4006)
-            {
-                std::string data = connect_to_port(port);
-                if (!data.empty()) {
-                    std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
-                    switch (port) {
-                        case 4002:
-                            port_data["port_" + std::to_string(port)] = ws.readWeatherSData(data).toString();
+        // if(!port_flag)
+        // {
+            for (int port : ports) {
+                if (port >= 4002 && port <= 4006)
+                {
+                    std::string data = connect_to_port(port);
+                    if (!data.empty()) {
+                        std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
+                        switch (port) {
+                            case 4002: {
+                            ParsedData ws_data = ws.readWeatherSData(data);
+                            json weather_json;
+                            weather_json["heading"] = ws_data.heading;
+                            weather_json["baroPres"] = ws_data.barometricPressure;
+                            weather_json["airTemp"] = ws_data.airTemperature;
+                            weather_json["windAngle"] = ws_data.windAngle;
+                            weather_json["windSpeed"] = ws_data.windSpeed;
+                            
+                            port_data["port_" + std::to_string(port)] = weather_json;
                             break;
-                        case 4003:
-                            port_data["port_" + std::to_string(port)] = dc.readDigitalCompassData(data).toString();
+                        }
+                        case 4003: {
+                            ParsedData_DC dc_data = dc.readDigitalCompassData(data);
+                            json compass_json;
+                            compass_json["Magheading"] = dc_data.Magheading;
+                            compass_json["Pitch"] = dc_data.Pitch;
+                            compass_json["Roll"] = dc_data.Roll;
+                            port_data["port_" + std::to_string(port)] = compass_json;
                             break;
-                        case 4004:
-                            port_data["port_" + std::to_string(port)] = bp.readBalPressureData(data).toString();
+                        }
+                        case 4004: {
+                            ParsedData_BP bp_data = bp.readBalPressureData(data);
+                            json pressure_json;
+                            pressure_json["BalPressure"] = bp_data.BalPressure;
+                            port_data["port_" + std::to_string(port)] = pressure_json;
                             break;
-                        case 4005:
-                            port_data["port_" + std::to_string(port)] = hp.readHelPressureData(data).toString();
+                        }
+                        case 4005: {
+                            ParsedData_HP hp_data = hp.readHelPressureData(data);
+                            json helium_pressure_json;
+                            helium_pressure_json["HelPressure"] = hp_data.HelPressure;
+                            port_data["port_" + std::to_string(port)] = helium_pressure_json;
                             break;
-                        case 4006:
-                            port_data["port_" + std::to_string(port)] = as.readAdamsSensorData(data).toString();
+                        }
+                        case 4006: {
+                            ParsedData_AS as_data = as.readAdamsSensorData(data);
+                            json adams_sensor_json;
+                            adams_sensor_json["Tension"] = as_data.Tension;
+                            adams_sensor_json["MaxTension"] = as_data.MaxTension;
+                            port_data["port_" + std::to_string(port)] = adams_sensor_json;
                             break;
+                        }
                         default:
                             break;
+                        }
                     }
                 }
             }
-        }
-        Sleep(1);  // Avoid overloading the CPU, adjust as needed
+        // }
+        // else{
+        //     port_data = nullptr;
+        // }
+        Sleep(100);  // Avoid overloading the CPU, adjust as needed
     }
 }
 
@@ -230,12 +260,10 @@ std::string connect_and_send_to_port(const std::string &command) {
         inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
 
         if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
-            port_flag = false;
             std::cerr << "Connection failed to " << host << ":" << target_port << "\n";
             closesocket(sock);
             return "Connection failed";
         }
-        port_flag =true;
         std::cout << "Connected to " << host << ":" << target_port << std::endl;
         send(sock, command.c_str(), command.size(), 0);
         
@@ -288,9 +316,6 @@ void handle_device_commands(const std::string &command) {
 
 // Handler for sending device commands
 void handle_send_device_commands(const json &json_data, httplib::Response &res) {
-    // res.set_header("Access-Control-Allow-Origin", "http://192.168.18.41:8080");  // Allow all origins
-    // res.set_header("Access-Control-Allow-Methods", "GET, POST"); // Allowed methods
-    // res.set_header("Access-Control-Allow-Headers", "Content-Type");
     if (host.empty()) {
         res.status = 500;
         res.set_content(R"({"error": "Host is not configured"})", "application/json");
@@ -335,42 +360,33 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
                     << state_4007["field4"] << "\r\n";
 
     json response_json;
-    response_json["Button Response"] = response_stream.str();
+    response_json["ButtonResponse"] = response_stream.str();
 
     res.set_content(response_json.dump(), "application/json");
 }
 
 // Handler for get-port-data
 void handle_get_port_data(httplib::Response &res) {
-    // res.set_header("Access-Control-Allow-Origin", "http://192.168.18.41:8080");  // Allow all origins
-    // res.set_header("Access-Control-Allow-Methods", "GET, POST"); // Allowed methods
-    // res.set_header("Access-Control-Allow-Headers", "Content-Type");
-
     json get_response_json;
     get_response_json["connection_status"] = connect_flag ? "Connected" : "Disconnected";
 
-    if(!port_flag)
-    {
-        get_response_json["port_data"] = NULL;
-        res.set_content(get_response_json.dump(), "application/json");
-        return;
-    }
-    
     if (host.empty()) {
         res.status = 500;
         res.set_content(R"({"error": "Host is not configured"})", "application/json");
         return;
     }
-
     std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
-    get_response_json["port_data"] = port_data;
+
+    if (port_data.empty()) {
+        get_response_json["port_data"] = nullptr;
+        // port_flag = false;
+    } else {
+        get_response_json["port_data"] = port_data;
+    }
     res.set_content(get_response_json.dump(), "application/json");
 }
 
 void handle_update_config(const json &json_data, httplib::Response &res) {
-    // res.set_header("Access-Control-Allow-Origin", "http://192.168.18.41:8080");  // Allow all origins
-    // res.set_header("Access-Control-Allow-Methods", "GET, POST"); // Allowed methods
-    // res.set_header("Access-Control-Allow-Headers", "Content-Type");
     // Validate incoming JSON data
     if (json_data.is_null()) {
         res.status = 400;
@@ -414,16 +430,16 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
     res.set_content(response_json.dump(), "application/json");
 }
 
-// void set_cors_headers(httplib::Response &res) {
-//     res.set_header("Access-Control-Allow-Origin", "http://192.168.18.41:8080");  // Allow all origins or specify your frontend IP/URL
-//     res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");  // Allowed methods
-//     res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");  // Allowed headers
-// }
+void set_cors_headers(httplib::Response &res) {
+    res.set_header("Access-Control-Allow-Origin", "http://localhost:8080");  // Allow all origins or specify your frontend IP/URL
+    res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");  // Allowed methods
+    res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");  // Allowed headers
+}
 
-// void handle_options_request(httplib::Response &res) {
-//     res.status = 204;  // No Content for OPTIONS requests
-//     set_cors_headers(res);
-// }
+void handle_options_request(httplib::Response &res) {
+    res.status = 204;  // No Content for OPTIONS requests
+    set_cors_headers(res);
+}
 
 int main() {
     WSADATA wsaData;
@@ -438,11 +454,12 @@ int main() {
     httplib::Server svr;
 
     svr.Get("/get-port-data", [](const httplib::Request &, httplib::Response &res) {
-        // set_cors_headers(res);
+        set_cors_headers(res);
         handle_get_port_data(res);
     });
 
     svr.Post("/update-config", [](const httplib::Request &req, httplib::Response &res) {
+        set_cors_headers(res);
         try {
             auto json_data = json::parse(req.body);
             handle_update_config(json_data, res);
@@ -456,6 +473,7 @@ int main() {
     });
 
     svr.Post("/send-device-commands", [](const httplib::Request &req, httplib::Response &res) {
+        set_cors_headers(res);
         try {
             auto json_data = json::parse(req.body);
             handle_send_device_commands(json_data, res);
@@ -468,15 +486,14 @@ int main() {
         }
     });
 
+    // Handle OPTIONS requests for preflight
+    svr.Options(".*", [](const httplib::Request &, httplib::Response &res) {
+        handle_options_request(res);  // Respond with CORS headers
+    });
 
-    std::cout << "Server is running on http://192.168.18.41:8080" << std::endl;
-    svr.listen("localhost", 8080);
+    std::cout << "Server is running on http://localhost:5000" << std::endl;
+    svr.listen("localhost", 5000);
 
     WSACleanup();
     return 0;
 }
-
-    // Handle OPTIONS requests for preflight
-    // svr.Options(".*", [](const httplib::Request &, httplib::Response &res) {
-    //     handle_options_request(res);  // Respond with CORS headers
-    // });

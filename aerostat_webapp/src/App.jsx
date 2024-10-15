@@ -71,48 +71,48 @@ function App() {
         weather: {
           airTemp: isInvalidValue(data?.port_data?.port_4002?.airTemp)
             ? lastPerfectResponses.current.weather.airTemp
-            : data.port_data.port_4002.airTemp,
+            : data.port_data.port_4002.airTemp.toFixed(2),
           baroPres: isInvalidValue(data?.port_data?.port_4002?.baroPres)
             ? lastPerfectResponses.current.weather.baroPres
-            : data.port_data.port_4002.baroPres,
+            : data.port_data.port_4002.baroPres.toFixed(2),
           heading: isInvalidValue(data?.port_data?.port_4002?.heading)
             ? lastPerfectResponses.current.weather.heading
-            : data.port_data.port_4002.heading,
+            : data.port_data.port_4002.heading.toFixed(2),
           windAngle: isInvalidValue(data?.port_data?.port_4002?.windAngle)
             ? lastPerfectResponses.current.weather.windAngle
-            : data.port_data.port_4002.windAngle,
+            : data.port_data.port_4002.windAngle.toFixed(2),
           windSpeed: isInvalidValue(data?.port_data?.port_4002?.windSpeed)
             ? lastPerfectResponses.current.weather.windSpeed
-            : data.port_data.port_4002.windSpeed,
+            : data.port_data.port_4002.windSpeed.toFixed(2),
         },
         digitalCompass: {
           Magheading: isInvalidValue(data?.port_data?.port_4003?.Magheading)
             ? lastPerfectResponses.current.digitalCompass.Magheading
-            : data.port_data.port_4003.Magheading,
+            : data.port_data.port_4003.Magheading.toFixed(2),
           Pitch: isInvalidValue(data?.port_data?.port_4003?.Pitch)
             ? lastPerfectResponses.current.digitalCompass.Pitch
-            : data.port_data.port_4003.Pitch,
+            : data.port_data.port_4003.Pitch.toFixed(2),
           Roll: isInvalidValue(data?.port_data?.port_4003?.Roll)
             ? lastPerfectResponses.current.digitalCompass.Roll
-            : data.port_data.port_4003.Roll,
+            : data.port_data.port_4003.Roll.toFixed(2),
         },
         ballonet: {
           BalPressure: isInvalidValue(data?.port_data?.port_4004?.BalPressure)
             ? lastPerfectResponses.current.ballonet.BalPressure
-            : data.port_data.port_4004.BalPressure,
+            : data.port_data.port_4004.BalPressure.toFixed(2),
         },
         helium: {
           HelPressure: isInvalidValue(data?.port_data?.port_4005?.HelPressure)
             ? lastPerfectResponses.current.helium.HelPressure
-            : data.port_data.port_4005.HelPressure,
+            : data.port_data.port_4005.HelPressure.toFixed(2),
         },
         adams: {
           MaxTension: isInvalidValue(data?.port_data?.port_4006?.MaxTension)
             ? lastPerfectResponses.current.adams.MaxTension
-            : data.port_data.port_4006.MaxTension,
+            : data.port_data.port_4006.MaxTension.toFixed(2),
           Tension: isInvalidValue(data?.port_data?.port_4006?.Tension)
             ? lastPerfectResponses.current.adams.Tension
-            : data.port_data.port_4006.Tension,
+            : data.port_data.port_4006.Tension.toFixed(),
         },
         // ebox: {
         //   InternalTemp: isInvalidValue(data?.port_data?.port_4007?.InternalTemp)
@@ -151,8 +151,6 @@ function App() {
         loading: data?.connection_status,
       };
 
-      console.log("AP DATA:", data);
-
       lastPerfectResponses.current = {
         ...lastPerfectResponses.current,
         weather: parsedResponses.weather,
@@ -172,10 +170,14 @@ function App() {
 
   useEffect(() => {
     if (!startFetchingFromFile && startFetchData) {
-      const interval = setInterval(fetchData, 1000);
+      const interval = setInterval(fetchData, 200);
       return () => clearInterval(interval);
     }
   }, [startFetchingFromFile, startFetchData]);
+
+  // useEffect(() => {
+  //   console.log(responses)
+  // }, [responses])
 
 
   const [form, setForm] = useState({
@@ -216,13 +218,27 @@ function App() {
 
     // console.log("After Checking", form);
 
+    const newForm = {
+      ip: form?.ip,
+      weather: Number(form?.weather),
+      hmr: Number(form?.hmr),
+      ballonet: Number(form?.ballonet),
+      helium: Number(form?.helium),
+      adam: Number(form?.adam),
+      ebox: Number(form?.ebox)
+    }
+
     try {
       // console.log("In try")
       setStartFetchData(true);
       setOpenModal(false);
       setStartFetchingFromFile(false);
       setErrorValues([]);
-      const result = await updateConfigUtil(form);
+      const result = await updateConfigUtil(newForm);
+      if (!result) {
+        setStartFetchingFromFile(false);
+        setStartFetchData(false);
+      }
       console.log("Form successfully posted:", result);
     } catch (error) {
       console.log("In catch")

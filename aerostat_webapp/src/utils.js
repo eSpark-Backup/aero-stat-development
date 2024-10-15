@@ -60,7 +60,7 @@ export function calculateSkyLandPercentage(pitch) {
 // };
 export const fetchDataUtil = async () => {
   try {
-    const response = await fetch("http://localhost:8080/get-port-data");
+    const response = await fetch("http://localhost:5000/get-port-data");
     if (!response.ok) {
       throw new Error(`Error in getting data: ${response.status}`);
     }
@@ -94,7 +94,8 @@ export const fetchDataUtil = async () => {
 
 export const updateConfigUtil = async (form) => {
   try {
-    const response = await fetch("http://localhost:8080/update-config", {
+    console.log("IN TRY")
+    const response = await fetch("http://localhost:5000/update-config", {
       method: "POST",
       // mode: 'cors',
       headers: {
@@ -103,13 +104,14 @@ export const updateConfigUtil = async (form) => {
       body: JSON.stringify(form)
     });
     if (!response.ok) {
-      throw new Error(`Error in posting form: ${response.status}`);
+      throw new Error(`Error in posting form 1: ${response.status}`);
     }
     const result = await response.json()
+    console.log(result)
     return result
   } catch (error) {
-    console.log("Error in posting form:", error);
-    return null;
+    console.log("Error in posting form2: ", error);
+    return;
   }
 };
 
@@ -129,7 +131,7 @@ export const updateConfigUtil = async (form) => {
 // };
 export const sendDeviceCommands = async (FansLight) => {
   try {
-    const response = await fetch("http://localhost:8080/send-device-commands", {
+    const response = await fetch("http://localhost:5000/send-device-commands", {
       method: "POST",
       // mode: 'cors',
       headers: {
