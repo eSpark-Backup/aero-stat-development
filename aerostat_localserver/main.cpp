@@ -21,6 +21,7 @@ std::string host;
 std::vector<int> ports;
 int target_port = 4006;
 bool connect_flag =false;
+bool port_flag =false;
 std::mutex port_data_mutex;  // Mutex for thread safety
 std::string TENSION_REQ_MSG = "#01\r";
 
@@ -42,16 +43,16 @@ void ping_host() {
     bool reachable = false;
     while (true) {
         if (reachable) {
-            if (!connect_flag) {
+            connect_flag =true;
+            if (connect_flag) {
                 std::cout << "Host reachable, starting port connections..." << std::endl;
-                connect_flag = true;
                 std::thread(continuous_port_connection).detach();  // Start the connection thread
             }
         } else {
             reachable =check_host_reachable(host);
-            if (connect_flag) {
+            connect_flag = false;
+            if (!connect_flag) {
                 std::cout << "Host unreachable, disconnecting..." << std::endl;
-                connect_flag = false;
                 // Optionally, close all sockets here
                 for (auto &socket_pair : sockets) {
                     if (socket_pair.second != INVALID_SOCKET) {
@@ -61,7 +62,7 @@ void ping_host() {
                 }
             }
         }
-        Sleep(500); // Check every 5 seconds
+        Sleep(50); // Check every 5 seconds
     }
 }
 
@@ -80,12 +81,10 @@ bool check_host_reachable(const std::string &ip_address) {
             return true;
         } else {
             std::cout << "Host " << ip_address << " is unreachable." << std::endl;
-            connect_flag = false;
             return false;
         }
     } catch (const std::exception &e) {
         std::cerr << "Error occurred while pinging " << ip_address << ": " << e.what() << std::endl;
-        connect_flag=false;
         return false;
     }
 }
@@ -94,6 +93,7 @@ bool check_host_reachable(const std::string &ip_address) {
 std::string connect_to_port(int port) {
     if (connection_status.find(port) == connection_status.end()) {
         connection_status[port] = false;
+
     }
     if (sockets.find(port) == sockets.end()) {
         sockets[port] = INVALID_SOCKET;
@@ -111,9 +111,11 @@ std::string connect_to_port(int port) {
             int bytesReceived = recv(sockets[port], buffer, sizeof(buffer), 0);
 
             if (bytesReceived > 0) {
+                port_flag =true;
                 std::cout << "Data: " << buffer << std::endl;
                 return std::string(buffer, bytesReceived);
             } else {
+                port_flag =false;
                 std::cerr << "Connection lost to " << host << ":" << port << std::endl;
                 connection_status[port] = false;
                 closesocket(sockets[port]);
@@ -126,7 +128,7 @@ std::string connect_to_port(int port) {
                 return "";
             }
 
-            int timeout = 5000;
+            int timeout = 10;
             setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
 
             sockaddr_in serverAddress;
@@ -135,9 +137,10 @@ std::string connect_to_port(int port) {
             inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
 
             if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
+                port_flag = false;
                 std::cerr << "Connection failed to " << host << ":" << port << "\n";
                 closesocket(sock);
-                Sleep(2000);
+                Sleep(10);
                 return "";
             }
 
@@ -152,6 +155,7 @@ std::string connect_to_port(int port) {
             char buffer[1024] = {0};
             int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
             if (bytesReceived > 0) {
+                port_flag =true;
                 std::cout << "Data: " << buffer << std::endl;
                 return std::string(buffer, bytesReceived);
             }
@@ -226,11 +230,12 @@ std::string connect_and_send_to_port(const std::string &command) {
         inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
 
         if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
+            port_flag = false;
             std::cerr << "Connection failed to " << host << ":" << target_port << "\n";
             closesocket(sock);
             return "Connection failed";
         }
-
+        port_flag =true;
         std::cout << "Connected to " << host << ":" << target_port << std::endl;
         send(sock, command.c_str(), command.size(), 0);
         
@@ -343,6 +348,13 @@ void handle_get_port_data(httplib::Response &res) {
 
     json get_response_json;
     get_response_json["connection_status"] = connect_flag ? "Connected" : "Disconnected";
+
+    if(!port_flag)
+    {
+        get_response_json["port_data"] = NULL;
+        res.set_content(get_response_json.dump(), "application/json");
+        return;
+    }
     
     if (host.empty()) {
         res.status = 500;
@@ -350,10 +362,8 @@ void handle_get_port_data(httplib::Response &res) {
         return;
     }
 
-    {
-        std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
-        get_response_json["port_data"] = port_data;
-    }
+    std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
+    get_response_json["port_data"] = port_data;
     res.set_content(get_response_json.dump(), "application/json");
 }
 
@@ -365,14 +375,12 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
     if (json_data.is_null()) {
         res.status = 400;
         res.set_content(R"({"error": "No JSON data received"})", "application/json");
-        connect_flag =false;
         return;
     }
 
     if (!json_data.contains("ip")) {
         res.status = 400;
         res.set_content(R"({"error": "IP address is required"})", "application/json");
-        connect_flag =false;
         return;
     }
 
@@ -381,7 +389,6 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
         if (!json_data.contains(port)) {
             res.status = 400;
             res.set_content(R"({"error": "All port configurations are required"})", "application/json");
-            connect_flag =false;
             return;
         }
     }
@@ -397,7 +404,7 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
         json_data["ebox"].get<int>()
     };
 
-     std::thread(ping_host).detach();
+    std::thread(ping_host).detach();
 
     // Respond with success message
     json response_json;
@@ -424,7 +431,7 @@ int main() {
         std::cerr << "WSAStartup failed." << std::endl;
         return 1;
     }
-    
+
     setup_log_directory();
     create_log_file();
 
