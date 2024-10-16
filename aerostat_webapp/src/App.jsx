@@ -16,6 +16,11 @@ function App() {
     ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
     helium: { HelPressure: 0.398 },
     weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 },
+    port_4002: "Disconnected",
+    port_4003: "Disconnected",
+    port_4004: "Disconnected",
+    port_4005: "Disconnected",
+    port_4006: "Disconnected",
   });
 
   const { theme } = useContext(ThemeContext);
@@ -149,7 +154,14 @@ function App() {
         // },
         time: formatDateTime(),
         loading: data?.connection_status,
+        port_4002: data?.port_data?.port_4002?.connectionstatus ? data?.port_data?.port_4002?.connectionstatus : lastPerfectResponses?.current?.port_4002,
+        port_4003: data?.port_data?.port_4003?.connectionstatus ? data?.port_data?.port_4003?.connectionstatus : lastPerfectResponses?.current?.port_4003,
+        port_4004: data?.port_data?.port_4004?.connectionstatus ? data?.port_data?.port_4004?.connectionstatus : lastPerfectResponses?.current?.port_4004,
+        port_4005: data?.port_data?.port_4005?.connectionstatus ? data?.port_data?.port_4005?.connectionstatus : lastPerfectResponses?.current?.port_4005,
+        port_4006: data?.port_data?.port_4006?.connectionstatus ? data?.port_data?.port_4006?.connectionstatus : lastPerfectResponses?.current?.port_4006,
       };
+
+      console.log(data)
 
       lastPerfectResponses.current = {
         ...lastPerfectResponses.current,
