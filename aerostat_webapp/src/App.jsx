@@ -154,11 +154,11 @@ function App() {
         // },
         time: formatDateTime(),
         loading: data?.connection_status,
-        port_4002: data?.port_data?.port_4002?.connectionstatus ? data?.port_data?.port_4002?.connectionstatus : lastPerfectResponses?.current?.port_4002,
-        port_4003: data?.port_data?.port_4003?.connectionstatus ? data?.port_data?.port_4003?.connectionstatus : lastPerfectResponses?.current?.port_4003,
-        port_4004: data?.port_data?.port_4004?.connectionstatus ? data?.port_data?.port_4004?.connectionstatus : lastPerfectResponses?.current?.port_4004,
-        port_4005: data?.port_data?.port_4005?.connectionstatus ? data?.port_data?.port_4005?.connectionstatus : lastPerfectResponses?.current?.port_4005,
-        port_4006: data?.port_data?.port_4006?.connectionstatus ? data?.port_data?.port_4006?.connectionstatus : lastPerfectResponses?.current?.port_4006,
+        port_4002: data?.port_data?.port_4002?.connectionstatus ? data?.port_data?.port_4002?.connectionstatus : "Disconnected",
+        port_4003: data?.port_data?.port_4003?.connectionstatus ? data?.port_data?.port_4003?.connectionstatus : "Disconnected",
+        port_4004: data?.port_data?.port_4004?.connectionstatus ? data?.port_data?.port_4004?.connectionstatus : "Disconnected",
+        port_4005: data?.port_data?.port_4005?.connectionstatus ? data?.port_data?.port_4005?.connectionstatus : "Disconnected",
+        port_4006: data?.port_data?.port_4006?.connectionstatus ? data?.port_data?.port_4006?.connectionstatus : "Disconnected",
       };
 
       console.log(data)
@@ -176,7 +176,16 @@ function App() {
       setIsLoading(Object.keys(data).length > 0 ? 0 : 2);
       setResponses(parsedResponses);
     } else {
-      setIsLoading(2);
+      setResponses({
+        ...lastPerfectResponses.current,
+        time: formatDateTime(),
+        port_4002: "Disconnected",
+        port_4003: "Disconnected",
+        port_4004: "Disconnected",
+        port_4005: "Disconnected",
+        port_4006: "Disconnected",
+        loading: "Disconnected"
+      });
     }
   };
 

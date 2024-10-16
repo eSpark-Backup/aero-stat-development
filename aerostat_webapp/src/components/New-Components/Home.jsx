@@ -106,9 +106,9 @@ const Home = ({
 
     }, [sendData, fan1, fan2, strobe, position]);
 
-    // useEffect(() => {
-    //     console.log(response)
-    // }, [response])
+    useEffect(() => {
+        console.log(response)
+    }, [response])
 
     return (
         <>
@@ -282,7 +282,6 @@ const Home = ({
                                         <h1>Details</h1>
                                         <div className={`config-details-items ${theme === "light" ? "config-details-items-light" : "config-details-items-dark"}`}>
                                             <div>
-                                                {/* {!fetchingStart ? "Disconnected" : isLoading ? isLoading : "Disconnected"} */}
                                                 <p>GCS Address</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
                                                     <p style={{ color: !fetchingStart ? "red" : isLoading?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.ip}</p>
@@ -291,31 +290,31 @@ const Home = ({
                                             <div>
                                                 <p>Weather Station Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p style={{ color: response?.port_4002?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.weather}</p>
+                                                    <p style={{ color: !fetchingStart ? "red" : response?.port_4002?.toLowerCase() === "connected" && isLoading?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.weather}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>HMR Port  </p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p style={{ color: response?.port_4003?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.hmr}</p>
+                                                    <p style={{ color: !fetchingStart ? "red" : response?.port_4003?.toLowerCase() === "connected" && isLoading?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.hmr}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Ballonet Pressure Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p style={{ color: response?.port_4004?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.ballonet}</p>
+                                                    <p style={{ color: !fetchingStart ? "red" : response?.port_4004?.toLowerCase() === "connected" && isLoading?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.ballonet}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>Helium Pressure Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p style={{ color: response?.port_4005?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.helium}</p>
+                                                    <p style={{ color: !fetchingStart ? "red" : response?.port_4005?.toLowerCase() === "connected" && isLoading?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.helium}</p>
                                                 </div>
                                             </div>
                                             <div>
                                                 <p>ADAM Port</p>
                                                 <div className={`config-info ${theme === "light" ? "config-info-light" : "config-info-dark"}`}>
-                                                    <p style={{ color: response?.port_4006?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.adam}</p>
+                                                    <p style={{ color: !fetchingStart ? "red" : response?.port_4006?.toLowerCase() === "connected" && isLoading?.toLowerCase() === "connected" ? "green" : "red" }}>{form?.adam}</p>
                                                 </div>
                                             </div>
                                             <div>
