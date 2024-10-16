@@ -36,8 +36,7 @@ const Home = ({
 
     const [fan1, setFan1] = useState("Continuous");
     const [fan2, setFan2] = useState("Pressured");
-    const [position, setPosition] = useState("Continuous");
-    const [strobe, setStrobe] = useState("Off");
+    const [light, setLight] = useState("Off");
     const [sendData, setSendData] = useState(false);
 
     const handleChange = (name, value) => {
@@ -51,12 +50,8 @@ const Home = ({
                     setFan2(value);
                     setSendData(true);
                     break;
-                case 'position':
-                    setPosition(value);
-                    setSendData(true);
-                    break;
-                case 'strobe':
-                    setStrobe(value);
+                case 'light':
+                    setLight(value);
                     setSendData(true);
                     break;
                 default:
@@ -79,14 +74,20 @@ const Home = ({
         } else if (fan1 === "Pressured" && fan2 === "Pressured") {
             FansLight.Fans = "@01DO03\r";
         }
-        if (strobe === "Continuous" && position === "Continuous") {
-            FansLight.Lights = "@01DO10\r";
-        } else if (strobe === "Continuous" && position === "Off") {
+        // if (strobe === "Continuous" && position === "Continuous") {
+        //     FansLight.Lights = "@01DO10\r";
+        // } else if (strobe === "Continuous" && position === "Off") {
+        //     FansLight.Lights = "@01DO12\r";
+        // } else if (strobe === "Off" && position === "Continuous") {
+        //     FansLight.Lights = "@01DO11\r";
+        // } else if (strobe === "Off" && position === "Off") {
+        //     FansLight.Lights = "@01DO13\r";
+        // }
+        if (light === "Off") {
             FansLight.Lights = "@01DO12\r";
-        } else if (strobe === "Off" && position === "Continuous") {
+        }
+        else if (light === "Continuous") {
             FansLight.Lights = "@01DO11\r";
-        } else if (strobe === "Off" && position === "Off") {
-            FansLight.Lights = "@01DO13\r";
         }
         if (sendData) {
             sendDeviceCommands(FansLight)
@@ -94,8 +95,8 @@ const Home = ({
                     const result = response?.ButtonResponse.split(",");
                     setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
                     setFan2(result[3].toLowerCase() === "off" ? "Pressured" : "Continuous");
-                    setStrobe(result[4].toLowerCase() === "off" ? "Off" : "Continuous");
-                    setPosition(result[5].toLowerCase()?.startsWith("1") ? "Continuous" : "Off");
+                    setStrobe(result[4].toLowerCase().startsWith("off") ? "Off" : "Continuous");
+                    // setPosition(result[5].toLowerCase()?.startsWith("1") ? "Continuous" : "Off");
                 })
                 .catch((error) => {
                     console.error('Error sending device commands:', error);
@@ -104,7 +105,7 @@ const Home = ({
         }
 
 
-    }, [sendData, fan1, fan2, strobe, position]);
+    }, [sendData, fan1, fan2, light]);
 
     useEffect(() => {
         console.log(response)
@@ -157,7 +158,7 @@ const Home = ({
                     </MainCard>
                     <MainCard title={"Controls"}>
                         <div className={`controls-box ${theme === "light" ? "controls-box-light" : "controls-box-dark"}`}>
-                            <h2>Fan Control</h2>
+                            <h2 style={{ textAlign: "center" }}>Fan Control</h2>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 1 <span>(Left direction)</span></p>
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan1" option1={"Continuous"} option2={"Pressured"} selectedOption={fan1} />
@@ -166,14 +167,14 @@ const Home = ({
                                 <p>Fan 2 <span>(Right direction)</span></p>
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
                             </div>
-                            <h2>Light Control</h2>
-                            <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
+                            <h2 style={{ textAlign: "center" }}>Strobe & Position Control</h2>
+                            {/* <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Strobe Control</p>
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
-                            </div>
+                            </div> */}
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
-                                <p>Position Control</p>
-                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="position" option1={"Continuous"} option2={"Off"} selectedOption={position} />
+                                {/* <p>Strobe & Position Control</p> */}
+                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="light" option1={"Continuous"} option2={"Off"} selectedOption={light} />
                             </div>
                         </div>
                     </MainCard>

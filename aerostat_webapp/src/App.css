@@ -295,7 +295,7 @@ input[type=number] {
     width: 100%;
     display: flex;
     flex-direction: column;
-    row-gap: 20px;
+    row-gap: 14px;
     padding: 10px 15px;
 }
 
@@ -316,6 +316,8 @@ input[type=number] {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-direction: column;
+    row-gap: 11px;
 }
 
 .fan-box>p {
@@ -1745,7 +1747,7 @@ input[type=number] {
     }
 
     .log-box-content {
-        row-gap: 42px;
+        row-gap: 20px;
     }
 }
 
@@ -1899,6 +1901,14 @@ input[type=number] {
 
     .wind-speed-card {
         padding-bottom: 0px !important;
+    }
+
+
+}
+
+@media only screen and (min-width: 1280px) and (max-width: 1360px) {
+    .controls-box{
+        row-gap: 25px;
     }
 }
 
