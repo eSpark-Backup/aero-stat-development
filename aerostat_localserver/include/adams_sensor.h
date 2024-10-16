@@ -8,6 +8,7 @@
 #define MAX_TENSION 1
 
 struct ParsedData_AS {
+    std::string status;
     float Tension;
     float MaxTension;
     uint8_t flag;

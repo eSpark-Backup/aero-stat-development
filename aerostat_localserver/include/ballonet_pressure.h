@@ -7,6 +7,7 @@
 #define BALPRES_OFFSET 0
 
 struct ParsedData_BP {
+    std::string status;
     float BalPressure;
     uint8_t flag;
     
