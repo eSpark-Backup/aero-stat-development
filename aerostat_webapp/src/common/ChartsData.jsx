@@ -37,12 +37,12 @@ const ChartsData = ({ position, description1, description2, value1, value2, grap
                 position === "around"
                 &&
                 <div className={`charts-data-around ${theme === "light" ? "charts-data-around-light" : "charts-data-around-dark"}`}>
-                    <p>-ve side</p>
+                    {/* <p>-ve side</p> */}
                     <div>
                         <h2>{graphValue}</h2>
                         <p>{graphName}</p>
                     </div>
-                    <p>+ve side</p>
+                    {/* <p>+ve side</p> */}
                 </div>
             }
             {

@@ -149,9 +149,9 @@ const Home = ({
                         <div className='wind-speed-card'>
                             <HighchartsReact
                                 highcharts={Highcharts}
-                                options={windGaugeOptions(theme, 0, 70, [Number(response?.weather?.windSpeed)], getChartSize())}
+                                options={windGaugeOptions(theme, 0, 70, [parseFloat(response?.weather?.windSpeed) > 0 ? parseFloat(response?.weather?.windSpeed) : 0], getChartSize())}
                             />
-                            <ChartsData position={"between"} description1={"Air Temp (C):"} value1={response?.weather?.airTemp} description2={"Baro Press (inHg):"} value2={response?.weather?.baroPres} graphValue={response?.weather?.windSpeed}
+                            <ChartsData position={"between"} description1={"Air Temp (C):"} value1={parseFloat(response?.weather?.airTemp).toFixed(2)} description2={"Baro Press (inHg):"} value2={parseFloat(response?.weather?.baroPres).toFixed(2)} graphValue={parseFloat(response?.weather?.windSpeed).toFixed(2)}
                                 graphName={"Wind Speed"} />
                         </div>
                     </MainCard>
@@ -202,7 +202,7 @@ const Home = ({
                             <div className="heading-box">
                                 <ChildCard>
                                     <div className="heading-box-content">
-                                        <ChartChip name={"Heading"} value={response?.digitalCompass?.Magheading} />
+                                        <ChartChip name={"Heading"} value={parseFloat(response?.digitalCompass?.Magheading).toFixed(2)} />
                                         <NewCompass size={getCompassSize()} needle1={response?.digitalCompass?.Magheading} />
                                     </div>
                                 </ChildCard>
@@ -211,8 +211,8 @@ const Home = ({
                                 <ChildCard>
                                     <div className="pitch-box-content">
                                         <div className='pitch-roll-chips'>
-                                            <ChartChip name={"Roll:"} value={response?.digitalCompass?.Roll} />
-                                            <ChartChip name={"Pitch:"} value={response?.digitalCompass?.Pitch} />
+                                            <ChartChip name={"Roll:"} value={parseFloat(response?.digitalCompass?.Roll).toFixed(2)} />
+                                            <ChartChip name={"Pitch:"} value={parseFloat(response?.digitalCompass?.Pitch).toFixed(2)} />
                                         </div>
                                         <NewRollMeter roll={response?.digitalCompass?.Roll} pitch={response?.digitalCompass?.Pitch} />
                                     </div>
@@ -227,16 +227,16 @@ const Home = ({
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [Number(response?.helium?.HelPressure)], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [parseFloat(response?.helium?.HelPressure) > 0 ? parseFloat(response?.helium?.HelPressure) : 0], getChartSize())}
                                         />
-                                        <ChartsData position={"around"} graphValue={response?.helium?.HelPressure} graphName={"Hull Helium"} />
+                                        <ChartsData position={"around"} graphValue={parseFloat(response?.helium?.HelPressure).toFixed(2)} graphName={"Hull Helium"} />
                                     </div>
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [Number(response?.ballonet?.BalPressure)], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [parseFloat(response?.ballonet?.BalPressure) > 0 ? parseFloat(response?.ballonet?.BalPressure) : 0], getChartSize())}
                                         />
-                                        <ChartsData position={"around"} graphValue={response?.ballonet?.BalPressure} graphName={"Ballonet Air"} />
+                                        <ChartsData position={"around"} graphValue={parseFloat(response?.ballonet?.BalPressure).toFixed(2)} graphName={"Ballonet Air"} />
                                     </div>
                                 </div>
                             </MainCard>
@@ -244,13 +244,13 @@ const Home = ({
                         <div className="confluence-box">
                             <MainCard title={"Confluence Point Tension"}>
                                 <div className="confluence-box-content">
-                                    <ChartChip name={"Max Tension"} value={response?.adams?.MaxTension} />
+                                    <ChartChip name={"Max Tension"} value={parseFloat(response?.adams?.MaxTension).toFixed(2)} />
                                     <div className='confluence-graph'>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={confluenceGaugeOptions(theme, 0, 700, [Number(response?.adams?.Tension)], getChartSize())}
+                                            options={confluenceGaugeOptions(theme, 0, 700, [parseFloat(response?.adams?.Tension) > 0 ? parseFloat(response?.adams?.Tension) : 0], getChartSize())}
                                         />
-                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={response?.adams?.Tension} />
+                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={parseFloat(response?.adams?.Tension).toFixed(2)} />
                                     </div>
                                 </div>
                             </MainCard>
@@ -261,19 +261,22 @@ const Home = ({
                             <MainCard title={"Radio Link"}>
                                 <div className='radio-box-content'>
                                     <div className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"}`}>
+                                        {/* <div style={{display:"flex", flexDirection:"column", rowGap:"20px"}}> */}
                                         <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
-                                            <p>RF Link:</p>
-                                            <StatusChip color={"green"} description={"Connected"} />
-                                        </div>
-                                        <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
-                                            <div className="progress"></div>
-                                        </div>
-                                        <div className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
-                                            <p>Tether Link:</p>
+                                            {/* <p>Tether Link:</p> */}
+                                            <p>Coms Status:</p>
                                             <StatusChip color={"green"} description={!fetchingStart ? "Disconnected" : isLoading ? isLoading : "Disconnected"} />
                                         </div>
                                         <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress" style={{ backgroundColor: !fetchingStart || !isLoading || isLoading === "Disconnected" ? "red" : "" }}></div>
+                                        </div>
+                                        {/* </div> */}
+                                        <div style={{ display: "none" }} className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
+                                            <p>RF Link:</p>
+                                            <StatusChip color={"green"} description={"Connected"} />
+                                        </div>
+                                        <div style={{ display: "none" }} className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
+                                            <div className="progress"></div>
                                         </div>
                                         <button onClick={handleOpenModal} className={!playBtn && StopBtn && fwdBtn || !playBtn && !fwdBtn && StopBtn ? "disable" : ""}>Configure</button>
 

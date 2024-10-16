@@ -35,7 +35,7 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                 <div className={`center-main-circle ${theme === "light" ? "center-main-circle-light" : "center-main-circle-dark"}`}>
                     <div className={`center-circle ${theme === "light" ? "center-circle-light" : "center-circle-dark"}`}>
                         <span style={{ color: theme === "light" && needle2 ? "#F30102" : theme === "dark" && needle2 ? "#F30102" : !needle2 && theme === "light" ? "#47515C" : "#F8F8F8" }}>
-                            <p style={{ fontWeight: "700", fontSize: "18px" }}>{needleRotation}°</p>
+                            <p style={{ fontWeight: "700", fontSize: "18px" }}>{Number(needleRotation)?.toFixed(2)}°</p>
                         </span>
                         {
                             !needle2 && <span className={`direction ${theme === "light" ? "direction-light" : "direction-dark"}`}>
@@ -44,7 +44,7 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                         }
                         {
                             needle2 && <span className="degree2" style={{ color: "#4260FF" }}>
-                                <p>{needleRotation2}°</p>
+                                <p>{Number(needleRotation2)?.toFixed(2)}°</p>
                             </span>
                         }
                     </div>

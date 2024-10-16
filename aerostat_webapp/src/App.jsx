@@ -10,12 +10,12 @@ import { time } from 'highcharts';
 function App() {
 
   const lastPerfectResponses = useRef({
-    adams: { MaxTension: 700, Tension: 10 },
-    ballonet: { BalPressure: 0.071 },
-    digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
-    ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
-    helium: { HelPressure: 0.398 },
-    weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 },
+    adams: { MaxTension: parseFloat(700).toFixed(2), Tension: parseFloat(10).toFixed(2) },
+    ballonet: { BalPressure: parseFloat(0.071).toFixed(2) },
+    digitalCompass: { Magheading: parseFloat(240.1).toFixed(2), Pitch: parseFloat(0).toFixed(2), Roll: parseFloat(0).toFixed(2) },
+    ebox: { InternalTemp: parseFloat(25.5).toFixed(2), fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
+    helium: { HelPressure: parseFloat(0.398).toFixed(2) },
+    weather: { airTemp: parseFloat(18.8).toFixed(2), baroPres: parseFloat(29.3).toFixed(29.3), heading: parseFloat(128).toFixed(2), windAngle: parseFloat(158.4).toFixed(2), windSpeed: parseFloat(70).toFixed(2) },
     port_4002: "Disconnected",
     port_4003: "Disconnected",
     port_4004: "Disconnected",
@@ -76,48 +76,48 @@ function App() {
         weather: {
           airTemp: isInvalidValue(data?.port_data?.port_4002?.airTemp)
             ? lastPerfectResponses.current.weather.airTemp
-            : data.port_data.port_4002.airTemp.toFixed(2),
+            : parseFloat(data.port_data.port_4002.airTemp).toFixed(2),
           baroPres: isInvalidValue(data?.port_data?.port_4002?.baroPres)
             ? lastPerfectResponses.current.weather.baroPres
-            : data.port_data.port_4002.baroPres.toFixed(2),
+            : parseFloat(data.port_data.port_4002.baroPres).toFixed(2),
           heading: isInvalidValue(data?.port_data?.port_4002?.heading)
             ? lastPerfectResponses.current.weather.heading
-            : data.port_data.port_4002.heading.toFixed(2),
+            : parseFloat(data.port_data.port_4002.heading).toFixed(2),
           windAngle: isInvalidValue(data?.port_data?.port_4002?.windAngle)
             ? lastPerfectResponses.current.weather.windAngle
-            : data.port_data.port_4002.windAngle.toFixed(2),
+            : parseFloat(data.port_data.port_4002.windAngle).toFixed(2),
           windSpeed: isInvalidValue(data?.port_data?.port_4002?.windSpeed)
             ? lastPerfectResponses.current.weather.windSpeed
-            : data.port_data.port_4002.windSpeed.toFixed(2),
+            : parseFloat(data.port_data.port_4002.windSpeed).toFixed(2),
         },
         digitalCompass: {
           Magheading: isInvalidValue(data?.port_data?.port_4003?.Magheading)
             ? lastPerfectResponses.current.digitalCompass.Magheading
-            : data.port_data.port_4003.Magheading.toFixed(2),
+            : parseFloat(data.port_data.port_4003.Magheading).toFixed(2),
           Pitch: isInvalidValue(data?.port_data?.port_4003?.Pitch)
             ? lastPerfectResponses.current.digitalCompass.Pitch
-            : data.port_data.port_4003.Pitch.toFixed(2),
+            : parseFloat(data.port_data.port_4003.Pitch).toFixed(2),
           Roll: isInvalidValue(data?.port_data?.port_4003?.Roll)
             ? lastPerfectResponses.current.digitalCompass.Roll
-            : data.port_data.port_4003.Roll.toFixed(2),
+            : parseFloat(data.port_data.port_4003.Roll).toFixed(2),
         },
         ballonet: {
           BalPressure: isInvalidValue(data?.port_data?.port_4004?.BalPressure)
             ? lastPerfectResponses.current.ballonet.BalPressure
-            : data.port_data.port_4004.BalPressure.toFixed(2),
+            : parseFloat(data.port_data.port_4004.BalPressure).toFixed(2),
         },
         helium: {
           HelPressure: isInvalidValue(data?.port_data?.port_4005?.HelPressure)
             ? lastPerfectResponses.current.helium.HelPressure
-            : data.port_data.port_4005.HelPressure.toFixed(2),
+            : parseFloat(data.port_data.port_4005.HelPressure).toFixed(2),
         },
         adams: {
           MaxTension: isInvalidValue(data?.port_data?.port_4006?.MaxTension)
             ? lastPerfectResponses.current.adams.MaxTension
-            : data.port_data.port_4006.MaxTension.toFixed(2),
+            : parseFloat(data.port_data.port_4006.MaxTension).toFixed(2),
           Tension: isInvalidValue(data?.port_data?.port_4006?.Tension)
             ? lastPerfectResponses.current.adams.Tension
-            : data.port_data.port_4006.Tension.toFixed(),
+            : parseFloat(data.port_data.port_4006.Tension).toFixed(2),
         },
         // ebox: {
         //   InternalTemp: isInvalidValue(data?.port_data?.port_4007?.InternalTemp)

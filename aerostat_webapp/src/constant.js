@@ -77,7 +77,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData, size) => 
             name: '',
             data: seriesData,
             tooltip: {
-                valueSuffix: ' km/h',
+                valueSuffix: '',
             },
             dial: {
                 radius: '80%',
@@ -182,7 +182,7 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData, size
             name: '',
             data: seriesData,
             tooltip: {
-                valueSuffix: ' km/h',
+                valueSuffix: ' inWG',
             },
             dial: {
                 radius: '80%',
@@ -287,7 +287,7 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
             name: '',
             data: seriesData,
             tooltip: {
-                valueSuffix: ' km/h',
+                valueSuffix: '',
             },
             dial: {
                 radius: '80%',
