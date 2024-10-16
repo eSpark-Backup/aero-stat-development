@@ -11,9 +11,8 @@
 #define WINDANGLE_OFFSET 3
 #define WINDSPEED_OFFSET 4
 
-// flag |= 1<< HEADING_OFFSET;
-
 struct ParsedData {
+    std::string status;
     float heading;
     float barometricPressure;
     float airTemperature;

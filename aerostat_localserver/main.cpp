@@ -24,8 +24,8 @@ std::string host;
 std::vector<int> ports;
 int target_port = 4006;
 bool connect_flag =false;
-bool connect_thread_flag =false;
 bool port_flag =false;
+bool connect_thread_flag =false;
 std::mutex port_data_mutex;  // Mutex for thread safety
 std::string TENSION_REQ_MSG = "#01\r";
 
@@ -104,29 +104,37 @@ std::string connect_to_port(int port) {
     }
 
     try {
-        if (connection_status[port] && sockets[port] != INVALID_SOCKET) {
+        if (connection_status[port] && sockets[port] != INVALID_SOCKET) 
+        {
             std::cout << "Listening to " << host << ":" << port << std::endl;
-
-            if (port == 4006) {
+            if (port == 4006)
+            {
                 send(sockets[port], TENSION_REQ_MSG.c_str(), TENSION_REQ_MSG.size(), 0);
             }
 
             char buffer[1024] = {0};
             int bytesReceived = recv(sockets[port], buffer, sizeof(buffer), 0);
-
-            if (bytesReceived > 0) {
+            if (bytesReceived > 0)
+            {
                 std::cout << "Data: " << buffer << std::endl;
                 return std::string(buffer, bytesReceived);
-            } else {
-                std::cerr << "Connection lost to " << host << ":" << port << std::endl;
+            } 
+            else
+            {
+                std::cerr << "Connection Timed out to " << host << ":" << port << std::endl;
                 connection_status[port] = false;
+                port_flag = false;
                 closesocket(sockets[port]);
                 sockets[port] = INVALID_SOCKET;
             }
-        } else {
+        }
+        else
+        {
             SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-            if (sock == INVALID_SOCKET) {
+            if (sock == INVALID_SOCKET)
+            {
                 std::cerr << "Socket creation failed\n";
+                port_flag = false;
                 return "";
             }
 
@@ -138,33 +146,42 @@ std::string connect_to_port(int port) {
             serverAddress.sin_port = htons(port);
             inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
 
-            if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
-                std::cerr << "Connection failed to " << host << ":" << port << "\n";
+            if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR)
+            {
+                std::cerr << "Connection Timed out to " << host << ":" << port << "\n";
+                port_flag = false;
                 closesocket(sock);
                 Sleep(1000);
                 return "";
+            }
+            else
+            {
+                port_flag = true;
             }
 
             std::cout << "Connected to " << host << ":" << port << std::endl;
             connection_status[port] = true;
             sockets[port] = sock;
 
-            if (port == 4006) {
+            if (port == 4006)
+            {
                 send(sock, TENSION_REQ_MSG.c_str(), TENSION_REQ_MSG.size(), 0);
             }
-
             char buffer[1024] = {0};
             int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
-            if (bytesReceived > 0) {
-                // port_flag = true;
+            if (bytesReceived > 0)
+            {
                 std::cout << "Data: " << buffer << std::endl;
                 return std::string(buffer, bytesReceived);
             }
         }
-    } catch (...) {
+    } catch (...) 
+    {
         std::cerr << "Exception in connecting to port " << port << std::endl;
         connection_status[port] = false;
-        if (sockets[port] != INVALID_SOCKET) {
+        port_flag = false;
+        if (sockets[port] != INVALID_SOCKET)
+        {
             closesocket(sockets[port]);
             sockets[port] = INVALID_SOCKET;
         }
@@ -192,6 +209,8 @@ void continuous_port_connection() {
                         case 4002: {
                         ParsedData ws_data = ws.readWeatherSData(data);
                         json weather_json;
+                        ws_data.status = port_flag ? "Connected" : "Disconnected";
+                        weather_json["connectionstatus"] = ws_data.status;
                         if(OFFSET(HEADING_OFFSET) & ws_data.flag)
                         {
                             weather_json["heading"] = ws_data.heading;
@@ -416,7 +435,6 @@ void handle_get_port_data(httplib::Response &res) {
 
     if (port_data.empty()) {
         get_response_json["port_data"] = nullptr;
-        // port_flag = false;
     } else {
         get_response_json["port_data"] = port_data;
     }
