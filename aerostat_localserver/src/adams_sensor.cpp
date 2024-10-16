@@ -33,6 +33,8 @@ ParsedData_AS AdamsSensor::readAdamsSensorData(const std::string& nmeaData) {
             try {
                 double tension_value = std::stod(tension_str);  // Convert to float
                 if (!std::isnan(tension_value)) {  // Ensure valid value
+                    parsedData.flag |= 1<< TENSION;
+                    parsedData.flag |= 1<< MAX_TENSION;
                     tension_value = (tension_value * 271.0279) / 9.8;  // Apply conversion
                     tension_value = std::round(tension_value * 10.0) / 10.0;  // Round to 1 decimal
 

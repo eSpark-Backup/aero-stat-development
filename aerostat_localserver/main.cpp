@@ -16,12 +16,15 @@
 #include "helium_pressure.h"
 #include "ballonet_pressure.h"
 
+#define OFFSET(x)    1 << x
+
 using json = nlohmann::json;
 json port_data;
 std::string host;
 std::vector<int> ports;
 int target_port = 4006;
 bool connect_flag =false;
+bool connect_thread_flag =false;
 bool port_flag =false;
 std::mutex port_data_mutex;  // Mutex for thread safety
 std::string TENSION_REQ_MSG = "#01\r";
@@ -49,7 +52,10 @@ void ping_host() {
         connect_flag = reachable;
         if (connect_flag) {
             std::cout << "Host reachable, starting port connections..." << std::endl;
-            std::thread(continuous_port_connection).detach();  // Start the connection thread
+            if(!connect_thread_flag)
+            {
+                std::thread(continuous_port_connection).detach();  // Start the connection thread
+            }
         } else {
             std::cout << "Host unreachable, disconnecting..." << std::endl;
             // Optionally, close all sockets here
@@ -110,7 +116,6 @@ std::string connect_to_port(int port) {
 
             if (bytesReceived > 0) {
                 std::cout << "Data: " << buffer << std::endl;
-                // port_flag =true;
                 return std::string(buffer, bytesReceived);
             } else {
                 std::cerr << "Connection lost to " << host << ":" << port << std::endl;
@@ -176,70 +181,102 @@ void continuous_port_connection() {
     AdamsSensor as;
 
     while (connect_flag) {
-        // if(!port_flag)
-        // {
-            for (int port : ports) {
-                if (port >= 4002 && port <= 4006)
-                {
-                    std::string data = connect_to_port(port);
-                    if (!data.empty()) {
-                        std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
-                        switch (port) {
-                            case 4002: {
-                            ParsedData ws_data = ws.readWeatherSData(data);
-                            json weather_json;
+        connect_thread_flag=true;
+        for (int port : ports) {
+            if (port >= 4002 && port <= 4006)
+            {
+                std::string data = connect_to_port(port);
+                if (!data.empty()) {
+                    std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
+                    switch (port) {
+                        case 4002: {
+                        ParsedData ws_data = ws.readWeatherSData(data);
+                        json weather_json;
+                        if(OFFSET(HEADING_OFFSET) & ws_data.flag)
+                        {
                             weather_json["heading"] = ws_data.heading;
+                        }
+                        if(OFFSET(BAROPRES_OFFSET) & ws_data.flag)
+                        {
                             weather_json["baroPres"] = ws_data.barometricPressure;
+                        }
+                        if(OFFSET(AIRTEMP_OFFSET) & ws_data.flag)
+                        {
                             weather_json["airTemp"] = ws_data.airTemperature;
+                        }
+                        if(OFFSET(WINDANGLE_OFFSET) & ws_data.flag)
+                        {
                             weather_json["windAngle"] = ws_data.windAngle;
+                        }
+                        if(OFFSET(WINDSPEED_OFFSET) & ws_data.flag)
+                        {
                             weather_json["windSpeed"] = ws_data.windSpeed;
-                            
-                            port_data["port_" + std::to_string(port)] = weather_json;
-                            break;
                         }
-                        case 4003: {
-                            ParsedData_DC dc_data = dc.readDigitalCompassData(data);
-                            json compass_json;
+                        
+                        port_data["port_" + std::to_string(port)] = weather_json;
+                        break;
+                    }
+                    case 4003: {
+                        ParsedData_DC dc_data = dc.readDigitalCompassData(data);
+                        json compass_json;
+                        if(OFFSET(MAGHEADING_OFFSET) & dc_data.flag)
+                        {
                             compass_json["Magheading"] = dc_data.Magheading;
+                        }
+                        if(OFFSET(PITCH_OFFSET) & dc_data.flag)
+                        {
                             compass_json["Pitch"] = dc_data.Pitch;
+                        }
+                        if(OFFSET(ROLL_OFFSET) & dc_data.flag)
+                        {
                             compass_json["Roll"] = dc_data.Roll;
-                            port_data["port_" + std::to_string(port)] = compass_json;
-                            break;
                         }
-                        case 4004: {
-                            ParsedData_BP bp_data = bp.readBalPressureData(data);
-                            json pressure_json;
+                        port_data["port_" + std::to_string(port)] = compass_json;
+                        break;
+                    }
+                    case 4004: {
+                        ParsedData_BP bp_data = bp.readBalPressureData(data);
+                        json pressure_json;
+                        if(OFFSET(BALPRES_OFFSET) & bp_data.flag)
+                        {
                             pressure_json["BalPressure"] = bp_data.BalPressure;
-                            port_data["port_" + std::to_string(port)] = pressure_json;
-                            break;
                         }
-                        case 4005: {
-                            ParsedData_HP hp_data = hp.readHelPressureData(data);
-                            json helium_pressure_json;
+                        port_data["port_" + std::to_string(port)] = pressure_json;
+                        break;
+                    }
+                    case 4005: {
+                        ParsedData_HP hp_data = hp.readHelPressureData(data);
+                        json helium_pressure_json;
+                        if(OFFSET(HELPRES_OFFSET) & hp_data.flag)
+                        {
                             helium_pressure_json["HelPressure"] = hp_data.HelPressure;
-                            port_data["port_" + std::to_string(port)] = helium_pressure_json;
-                            break;
                         }
-                        case 4006: {
-                            ParsedData_AS as_data = as.readAdamsSensorData(data);
-                            json adams_sensor_json;
+                        port_data["port_" + std::to_string(port)] = helium_pressure_json;
+                        break;
+                    }
+                    case 4006: {
+                        ParsedData_AS as_data = as.readAdamsSensorData(data);
+                        json adams_sensor_json;
+                        if(OFFSET(TENSION) & as_data.flag)
+                        {
                             adams_sensor_json["Tension"] = as_data.Tension;
+                        }
+                        if(OFFSET(MAX_TENSION) & as_data.flag)
+                        {
                             adams_sensor_json["MaxTension"] = as_data.MaxTension;
-                            port_data["port_" + std::to_string(port)] = adams_sensor_json;
-                            break;
                         }
-                        default:
-                            break;
-                        }
+                        port_data["port_" + std::to_string(port)] = adams_sensor_json;
+                        break;
+                    }
+                    default:
+                        break;
                     }
                 }
             }
-        // }
-        // else{
-        //     port_data = nullptr;
-        // }
-        Sleep(100);  // Avoid overloading the CPU, adjust as needed
+        }
+        Sleep(200);  // Avoid overloading the CPU, adjust as needed
     }
+    connect_thread_flag = false;
 }
 
 std::string connect_and_send_to_port(const std::string &command) {

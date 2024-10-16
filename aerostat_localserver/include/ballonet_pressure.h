@@ -4,8 +4,11 @@
 #include <optional>
 #include <sstream>
 
+#define BALPRES_OFFSET 0
+
 struct ParsedData_BP {
     float BalPressure;
+    uint8_t flag;
     
     std::string toString() const {
         std::ostringstream oss;

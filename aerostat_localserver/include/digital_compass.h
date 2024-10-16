@@ -4,10 +4,15 @@
 #include <optional>
 #include <sstream>
 
+#define MAGHEADING_OFFSET 0
+#define PITCH_OFFSET 1
+#define ROLL_OFFSET 2
+
 struct ParsedData_DC {
     float Magheading;
     float Pitch;
     float Roll;
+    uint8_t flag;
 
     // Convert ParsedData to string
     std::string toString() const {

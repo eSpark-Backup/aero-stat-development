@@ -35,6 +35,7 @@ ParsedData_HP HelPressure::readHelPressureData(const std::string& nmeaData){
                 std::string pressureStr = strip(msgsList[1]);  // Extract pressure value
                 try {
                     double pressureValue = std::stod(pressureStr);
+                    parsedData.flag |= 1<< HELPRES_OFFSET;
                     // Round to three decimal places
                     pressureValue = std::round(pressureValue * 1000.0) / 1000.0;
                     parsedData.HelPressure = pressureValue;

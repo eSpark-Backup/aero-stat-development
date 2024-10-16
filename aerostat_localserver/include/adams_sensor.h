@@ -4,9 +4,13 @@
 #include <optional>
 #include <sstream>
 
+#define TENSION 0
+#define MAX_TENSION 1
+
 struct ParsedData_AS {
-    float Tension = 0.0;
-    float MaxTension = 0.0;
+    float Tension;
+    float MaxTension;
+    uint8_t flag;
 
     std::string toString() const {
         std::ostringstream oss;

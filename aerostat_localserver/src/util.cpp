@@ -19,6 +19,6 @@ std::string strip(const std::string& str) {
 }
 
 // Function to format a float to a string with 2 decimal places
-// float formatFloat(float value) {
-//     return std:: round(value * 100.0f) / 100.0f; // Round to 2 decimal places
-// }
+float formatFloat(float value) {
+    return std::ceil(value * 100.0) / 100.0;; // Round to 2 decimal places
+}

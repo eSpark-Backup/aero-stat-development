@@ -5,12 +5,21 @@
 #include <sstream>
 #include <iomanip>
 
+#define HEADING_OFFSET 0
+#define BAROPRES_OFFSET 1
+#define AIRTEMP_OFFSET 2
+#define WINDANGLE_OFFSET 3
+#define WINDSPEED_OFFSET 4
+
+// flag |= 1<< HEADING_OFFSET;
+
 struct ParsedData {
     float heading;
     float barometricPressure;
     float airTemperature;
     float windAngle;
     float windSpeed;
+    uint8_t flag;
 
     std::string toString() const {
         std::ostringstream oss;

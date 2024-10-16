@@ -39,6 +39,9 @@ ParsedData_DC DigitalCompass::readDigitalCompassData(const std::string& nmeaData
                     double rollV = std::stod(strip(msgData[5]));
 
                     if (!std::isnan(headingV) && !std::isnan(pitchV) && !std::isnan(rollV)) {
+                        parsedData.flag |= 1<< MAGHEADING_OFFSET;
+                        parsedData.flag |= 1<< PITCH_OFFSET;
+                        parsedData.flag |= 1<< ROLL_OFFSET;
                         parsedData.Magheading = headingV;
                         parsedData.Pitch = pitchV;
                         parsedData.Roll = rollV;

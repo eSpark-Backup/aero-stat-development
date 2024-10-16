@@ -35,7 +35,8 @@ ParsedData WeatherStation::readWeatherSData(const std::string& nmeaData) {
                 try {
                     headingV = std::stod(msgData[1]);
                     if (!std::isnan(headingV)) {
-                        // headingV = formatFloat(headingV);
+                        parsedData.flag |= 1<< HEADING_OFFSET;
+                        headingV = formatFloat(headingV);
                         parsedData.heading = headingV;
                         m_msgStr += "Aerostat Heading: " + std::to_string(headingV) + "\t";
                     }
@@ -57,8 +58,10 @@ ParsedData WeatherStation::readWeatherSData(const std::string& nmeaData) {
                 } catch (...) {}
 
                 if (baroOk && airOk) {
-                    // baroPres = formatFloat(baroPres);
-                    // airTemp = formatFloat(airTemp);
+                    baroPres = formatFloat(baroPres);
+                    airTemp = formatFloat(airTemp);
+                    parsedData.flag |= 1<< BAROPRES_OFFSET;
+                    parsedData.flag |= 1<< AIRTEMP_OFFSET;
                     parsedData.barometricPressure = baroPres;
                     parsedData.airTemperature = airTemp;
 
@@ -84,8 +87,10 @@ ParsedData WeatherStation::readWeatherSData(const std::string& nmeaData) {
                 } catch (...) {}
 
                 if (dirOk && speedOk) {
-                    // windDirection = formatFloat(windDirection);
-                    // windSpeed = formatFloat(windSpeed);
+                    windDirection = formatFloat(windDirection);
+                    windSpeed = formatFloat(windSpeed);
+                    parsedData.flag |= 1<< WINDANGLE_OFFSET;
+                    parsedData.flag |= 1<< WINDSPEED_OFFSET;
                     parsedData.windAngle = windDirection;
                     parsedData.windSpeed = windSpeed;
 
