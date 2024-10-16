@@ -26,9 +26,10 @@ int target_port = 4006;
 bool connect_flag =false;
 bool port_flag =false;
 bool connect_thread_flag =false;
-std::mutex port_data_mutex;  // Mutex for thread safety
+std::mutex port_data_mutex;
 std::string TENSION_REQ_MSG = "#01\r";
-
+std::string fans_command = "";
+std::string lights_command = "";
 std::map<int, bool> connection_status;
 std::map<int, SOCKET> sockets;
 const std::string data_4007_template = "@A01,25.5,{0},{1},{2},{3}\r\n";
@@ -36,7 +37,7 @@ std::unordered_map<std::string, std::string> state_4007 = {
     {"field1", "ON"},   // First field
     {"field2", "ON"},   // Second field
     {"field3", "OFF"},  // Third field
-    {"field4", "1"}     // Fourth field
+    // {"field4", "1"}     // Fourth field
 };
 
 bool check_host_reachable(const std::string &ip_address);
@@ -301,7 +302,7 @@ void continuous_port_connection() {
                 }
             }
         }
-        Sleep(200);  // Avoid overloading the CPU, adjust as needed
+        Sleep(200);
     }
     connect_thread_flag = false;
 }
@@ -329,15 +330,18 @@ std::string connect_and_send_to_port(const std::string &command) {
             return "Connection failed";
         }
         std::cout << "Connected to " << host << ":" << target_port << std::endl;
+        // std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << command << std::endl;
+        // std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << command.c_str() << std::endl;
         send(sock, command.c_str(), command.size(), 0);
         
         // Optionally receive a response (uncomment if needed)
-        // char buffer[1024] = {0};
-        // int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
-        // closesocket(sock);
+        char buffer[1024] = {0};
+        int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
+        closesocket(sock);
         // return std::string(buffer, bytesReceived);
 
-        closesocket(sock);
+        // std::cout << "Command sent successfully: " << buffer << std::endl;
+        // closesocket(sock);
         return "Command sent successfully";
     } catch (const std::exception &e) {
         std::cerr << "Error on port " << target_port << ": " << e.what() << std::endl;
@@ -349,7 +353,6 @@ void handle_device_commands(const std::string &command) {
     if (command.substr(0, 5) == "@01DO") {
         std::string command_type = command.substr(5, 2);
         
-        // Update states based on the command type
         if (command_type == "00") {
             state_4007["field1"] = "ON";
             state_4007["field2"] = "ON";
@@ -362,19 +365,22 @@ void handle_device_commands(const std::string &command) {
         } else if (command_type == "03") {
             state_4007["field1"] = "OFF";
             state_4007["field2"] = "OFF";
-        } else if (command_type == "10") {
-            state_4007["field3"] = "ON";
-            state_4007["field4"] = "1";
-        } else if (command_type == "11") {
-            state_4007["field3"] = "OFF";
-            state_4007["field4"] = "1";
-        } else if (command_type == "12") {
-            state_4007["field3"] = "ON";
-            state_4007["field4"] = "0";
-        } else if (command_type == "13") {
-            state_4007["field3"] = "OFF";
-            state_4007["field4"] = "0";
         }
+        // else if (command_type == "10") {
+        //     state_4007["field3"] = "ON";
+        //     state_4007["field4"] = "1";
+        // } 
+        else if (command_type == "11") {
+            state_4007["field3"] = "ON";
+            // state_4007["field4"] = "1";
+        } else if (command_type == "12") {
+            state_4007["field3"] = "OFF";
+            // state_4007["field4"] = "0";
+        }
+        // else if (command_type == "13") {
+        //     state_4007["field3"] = "OFF";
+        //     state_4007["field4"] = "0";
+        // }
     }
 }
 
@@ -397,22 +403,28 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
         return;
     }
 
-    std::string fans_command = json_data.value("Fans", "");
-    std::string lights_command = json_data.value("Lights", "");
+    std::string fans_command_new = json_data.value("Fans", "");
+    std::string lights_command_new = json_data.value("Lights", "");
 
-    if (fans_command.empty() && lights_command.empty()) {
+    if (fans_command_new.empty() && lights_command_new.empty()) {
         res.status = 400;
         res.set_content(R"({"error": "No valid commands provided"})", "application/json");
         return;
     }
 
     std::string fans_response = "No Fans command provided";
-    if (!fans_command.empty()) {
+    std::cout << "FANS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << fans_command_new << std::endl;
+    if (!fans_command_new.empty() && fans_command != fans_command_new) {
+        fans_command = fans_command_new;
+        connect_and_send_to_port(fans_command);
         handle_device_commands(fans_command);
     }
 
     std::string lights_response = "No Lights command provided";
-    if (!lights_command.empty()) {
+    std::cout << "LIGHTSS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << lights_command_new << std::endl;
+    if (!lights_command_new.empty() && lights_command != lights_command_new) {
+        lights_command = lights_command_new;
+        connect_and_send_to_port(lights_command);
         handle_device_commands(lights_command);
     }
 
@@ -420,12 +432,12 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
     response_stream << "@A01,25.5,"
                     << state_4007["field1"] << ","
                     << state_4007["field2"] << ","
-                    << state_4007["field3"] << ","
-                    << state_4007["field4"] << "\r\n";
+                    << state_4007["field3"] << "\r\n";
+                    // << state_4007["field4"] << "\r\n";
+
 
     json response_json;
     response_json["ButtonResponse"] = response_stream.str();
-
     res.set_content(response_json.dump(), "application/json");
 }
 
@@ -439,7 +451,7 @@ void handle_get_port_data(httplib::Response &res) {
         res.set_content(R"({"error": "Host is not configured"})", "application/json");
         return;
     }
-    std::lock_guard<std::mutex> lock(port_data_mutex);  // Thread-safe access to port_data
+    std::lock_guard<std::mutex> lock(port_data_mutex);
 
     if (port_data.empty()) {
         get_response_json["port_data"] = nullptr;
@@ -450,7 +462,6 @@ void handle_get_port_data(httplib::Response &res) {
 }
 
 void handle_update_config(const json &json_data, httplib::Response &res) {
-    // Validate incoming JSON data
     if (json_data.is_null()) {
         res.status = 400;
         res.set_content(R"({"error": "No JSON data received"})", "application/json");
@@ -472,7 +483,6 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
         }
     }
 
-    // Update host and ports
     host = json_data["ip"].get<std::string>();
     ports = {
         json_data["weather"].get<int>(),
@@ -485,7 +495,6 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
 
     std::thread(ping_host).detach();
 
-    // Respond with success message
     json response_json;
     response_json["message"] = "Configuration updated successfully";
     response_json["ip"] = host;
@@ -500,7 +509,7 @@ void set_cors_headers(httplib::Response &res) {
 }
 
 void handle_options_request(httplib::Response &res) {
-    res.status = 204;  // No Content for OPTIONS requests
+    res.status = 204;
     set_cors_headers(res);
 }
 
@@ -549,9 +558,8 @@ int main() {
         }
     });
 
-    // Handle OPTIONS requests for preflight
     svr.Options(".*", [](const httplib::Request &, httplib::Response &res) {
-        handle_options_request(res);  // Respond with CORS headers
+        handle_options_request(res);
     });
 
     std::cout << "Server is running on http://localhost:5000" << std::endl;

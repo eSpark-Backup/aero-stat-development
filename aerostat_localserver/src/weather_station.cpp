@@ -28,6 +28,8 @@ ParsedData WeatherStation::readWeatherSData(const std::string& nmeaData) {
 
         if (msgData.empty()) continue;
         const std::string& msgHeader = msgData[0];
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(2);
 
         if (msgHeader == "$HCHDT") {
             if (msgData.size() > 1) {
@@ -38,13 +40,15 @@ ParsedData WeatherStation::readWeatherSData(const std::string& nmeaData) {
                         parsedData.flag |= 1<< HEADING_OFFSET;
                         headingV = formatFloat(headingV);
                         parsedData.heading = headingV;
-                        m_msgStr += "Aerostat Heading: " + std::to_string(headingV) + "\t";
+                        oss.str ("");
+                        oss << std::fixed << std::setprecision(2) << headingV;
+                        m_msgStr = "Aerostat Heading: " + oss.str() + "\t";
                     }
                 } catch (...) {}
             }
         } else if (msgHeader == "$WIMDA") {
             if (msgData.size() > 5) {
-                float baroPres, airTemp;
+                double baroPres, airTemp;
                 bool baroOk = false, airOk = false;
 
                 try {
@@ -66,9 +70,13 @@ ParsedData WeatherStation::readWeatherSData(const std::string& nmeaData) {
                     parsedData.airTemperature = airTemp;
 
                     // Format to 2 decimal places
-                    std::ostringstream oss;
-                    oss << std::fixed << std::setprecision(2);
-                    m_msgStr += "Air Temp: " + oss.str() + std::to_string(airTemp) + "\tBaro Pres: " + oss.str() + std::to_string(baroPres) + "\t";
+                    oss.str(""); // Clear the stream
+                    oss << std::fixed << std::setprecision(2) << airTemp;
+                    m_msgStr += "Air Temp: " + oss.str() + "\t";
+
+                    oss.str(""); // Clear the stream for the next value
+                    oss << std::fixed << std::setprecision(2) << baroPres;
+                    m_msgStr += "Baro Pres: " + oss.str() + "\t";
                 }
             }
         } else if (msgHeader == "$WIMWV") {
@@ -95,9 +103,13 @@ ParsedData WeatherStation::readWeatherSData(const std::string& nmeaData) {
                     parsedData.windSpeed = windSpeed;
 
                     // Format to 2 decimal places
-                    std::ostringstream oss;
-                    oss << std::fixed << std::setprecision(2);
-                    m_msgStr += "Wind Angle: " + oss.str() + std::to_string(windDirection) + "\tWind Speed: " + oss.str() + std::to_string(windSpeed) + "\t";
+                    oss.str(""); // Clear the stream
+                    oss << std::fixed << std::setprecision(2) << windDirection;
+                    m_msgStr += "Wind Angle: " + oss.str() + "\t";
+
+                    oss.str(""); // Clear the stream for the next value
+                    oss << std::fixed << std::setprecision(2) << windSpeed;
+                    m_msgStr += "Wind Speed: " + oss.str() + "\t";
                 }
             }
         }

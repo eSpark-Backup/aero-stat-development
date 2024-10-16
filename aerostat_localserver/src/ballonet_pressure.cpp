@@ -2,6 +2,7 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include <iomanip>
 #include <sstream>
 #include "log_file.h"
 #include "ballonet_pressure.h"
@@ -30,6 +31,8 @@ ParsedData_BP BalPressure::readBalPressureData(const std::string& nmeaData){
 
         if (msgsList.size() > 1) {
             std::string header = strip(msgsList[0]);
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(2);
 
             if (header == "#01CP") {  // Check for the "#01CP" header
                 std::string pressureStr = strip(msgsList[1]);  // Extract pressure value
@@ -40,7 +43,9 @@ ParsedData_BP BalPressure::readBalPressureData(const std::string& nmeaData){
                     pressureValue = std::round(pressureValue * 1000.0) / 1000.0;
                     parsedData.BalPressure = pressureValue;
 
-                    m_msgStr += "Ballonet Pressure: " + std::to_string(pressureValue);
+                    oss.str("");
+                    oss << std::fixed << std::setprecision(2) << pressureValue;
+                    m_msgStr += "Ballonet Pressure: " + oss.str() + "\t";
                 } catch (...) {
                     // Handle parsing errors silently
                 }

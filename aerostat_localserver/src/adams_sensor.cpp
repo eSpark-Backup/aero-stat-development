@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <iomanip>
 #include "log_file.h"
 #include "adams_sensor.h"
 
@@ -28,7 +29,9 @@ ParsedData_AS AdamsSensor::readAdamsSensorData(const std::string& nmeaData) {
 
         // Strip and check if the packet starts with '>'
         if (!packet.empty() && packet[0] == '>') {
-            std::string tension_str = strip(packet.substr(1)); // Extract after '>'
+            std::string tension_str = strip(packet.substr(1));
+            std::ostringstream oss;
+            oss << std::fixed << std::setprecision(2);
             
             try {
                 double tension_value = std::stod(tension_str);  // Convert to float
@@ -42,11 +45,16 @@ ParsedData_AS AdamsSensor::readAdamsSensorData(const std::string& nmeaData) {
                     if (tension_value > max_tension) {
                         max_tension = tension_value;
                     }
-
                     parsedData.Tension = tension_value;
                     parsedData.MaxTension = max_tension;
+                    
+                    oss.str("");
+                    oss << std::fixed << std::setprecision(2) << tension_value;
+                    m_msgStr += "Tension: " + oss.str() + "\t";
 
-                    m_msgStr += "Tension: " + std::to_string(tension_value) + "\tMax Tension: " + std::to_string(max_tension);
+                    oss.str("");
+                    oss << std::fixed << std::setprecision(2) << max_tension;
+                    m_msgStr += "Max Tension: " + oss.str() + "\t";
                 }
             } catch (...) {
                 // Handle parsing errors silently
