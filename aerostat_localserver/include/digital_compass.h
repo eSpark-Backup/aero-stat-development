@@ -9,6 +9,7 @@
 #define ROLL_OFFSET 2
 
 struct ParsedData_DC {
+    std::string status;
     float Magheading;
     float Pitch;
     float Roll;

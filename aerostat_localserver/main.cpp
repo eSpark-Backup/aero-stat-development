@@ -238,6 +238,8 @@ void continuous_port_connection() {
                     case 4003: {
                         ParsedData_DC dc_data = dc.readDigitalCompassData(data);
                         json compass_json;
+                        dc_data.status = port_flag ? "Connected" : "Disconnected";
+                        compass_json["connectionstatus"] = dc_data.status;
                         if(OFFSET(MAGHEADING_OFFSET) & dc_data.flag)
                         {
                             compass_json["Magheading"] = dc_data.Magheading;
@@ -256,6 +258,8 @@ void continuous_port_connection() {
                     case 4004: {
                         ParsedData_BP bp_data = bp.readBalPressureData(data);
                         json pressure_json;
+                        bp_data.status = port_flag ? "Connected" : "Disconnected";
+                        pressure_json["connectionstatus"] = bp_data.status;
                         if(OFFSET(BALPRES_OFFSET) & bp_data.flag)
                         {
                             pressure_json["BalPressure"] = bp_data.BalPressure;
@@ -266,6 +270,8 @@ void continuous_port_connection() {
                     case 4005: {
                         ParsedData_HP hp_data = hp.readHelPressureData(data);
                         json helium_pressure_json;
+                        hp_data.status = port_flag ? "Connected" : "Disconnected";
+                        helium_pressure_json["connectionstatus"] = hp_data.status;
                         if(OFFSET(HELPRES_OFFSET) & hp_data.flag)
                         {
                             helium_pressure_json["HelPressure"] = hp_data.HelPressure;
@@ -276,6 +282,8 @@ void continuous_port_connection() {
                     case 4006: {
                         ParsedData_AS as_data = as.readAdamsSensorData(data);
                         json adams_sensor_json;
+                        as_data.status = port_flag ? "Connected" : "Disconnected";
+                        adams_sensor_json["connectionstatus"] = as_data.status;
                         if(OFFSET(TENSION) & as_data.flag)
                         {
                             adams_sensor_json["Tension"] = as_data.Tension;

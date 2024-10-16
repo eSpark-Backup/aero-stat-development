@@ -7,6 +7,7 @@
 #define HELPRES_OFFSET 0
 
 struct ParsedData_HP {
+    std::string status;
     float HelPressure;
     uint8_t flag;
 
