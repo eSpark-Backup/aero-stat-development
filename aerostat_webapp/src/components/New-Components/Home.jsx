@@ -150,7 +150,7 @@ const Home = ({
                         <div className='wind-speed-card'>
                             <HighchartsReact
                                 highcharts={Highcharts}
-                                options={windGaugeOptions(theme, 0, 70, [parseFloat(response?.weather?.windSpeed) > 0 ? parseFloat(response?.weather?.windSpeed) : 0], getChartSize())}
+                                options={windGaugeOptions(theme, 0, 70, [parseFloat(response?.weather?.windSpeed) > 70 ? 70 : parseFloat(response?.weather?.windSpeed) < 0 ? 0 : parseFloat(response?.weather?.windSpeed)], getChartSize())}
                             />
                             <ChartsData position={"between"} description1={"Air Temp (C):"} value1={parseFloat(response?.weather?.airTemp).toFixed(2)} description2={"Baro Press (inHg):"} value2={parseFloat(response?.weather?.baroPres).toFixed(2)} graphValue={parseFloat(response?.weather?.windSpeed).toFixed(2)}
                                 graphName={"Wind Speed"} />
@@ -228,14 +228,14 @@ const Home = ({
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [parseFloat(response?.helium?.HelPressure) > 0 ? parseFloat(response?.helium?.HelPressure) : 0], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [parseFloat(response?.helium?.HelPressure) > 6 ? 6 : parseFloat(response?.helium?.HelPressure) < 0 ? 0 : parseFloat(response?.helium?.HelPressure)], getChartSize())}
                                         />
                                         <ChartsData position={"around"} graphValue={parseFloat(response?.helium?.HelPressure).toFixed(2)} graphName={"Hull Helium"} />
                                     </div>
                                     <div>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={pressureGaugeOptions(theme, 0, 6, [parseFloat(response?.ballonet?.BalPressure) > 0 ? parseFloat(response?.ballonet?.BalPressure) : 0], getChartSize())}
+                                            options={pressureGaugeOptions(theme, 0, 6, [parseFloat(response?.ballonet?.BalPressure) > 6 ? 6 : parseFloat(response?.ballonet?.BalPressure) < 0 ? 0 : parseFloat(response?.ballonet?.BalPressure)], getChartSize())}
                                         />
                                         <ChartsData position={"around"} graphValue={parseFloat(response?.ballonet?.BalPressure).toFixed(2)} graphName={"Ballonet Air"} />
                                     </div>
@@ -249,7 +249,7 @@ const Home = ({
                                     <div className='confluence-graph'>
                                         <HighchartsReact
                                             highcharts={Highcharts}
-                                            options={confluenceGaugeOptions(theme, 0, 700, [parseFloat(response?.adams?.Tension) > 0 ? parseFloat(response?.adams?.Tension) : 0], getChartSize())}
+                                            options={confluenceGaugeOptions(theme, 0, 700, [parseFloat(response?.adams?.Tension) > 700 ? 700 : parseFloat(response?.adams?.Tension) < 0 ? 0 : parseFloat(response?.adams?.Tension)], getChartSize())}
                                         />
                                         <ChartsData position={"center"} graphName={"Current Tension"} graphValue={parseFloat(response?.adams?.Tension).toFixed(2)} />
                                     </div>

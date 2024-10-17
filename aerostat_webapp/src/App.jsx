@@ -191,7 +191,7 @@ function App() {
 
   useEffect(() => {
     if (!startFetchingFromFile && startFetchData) {
-      const interval = setInterval(fetchData, 200);
+      const interval = setInterval(fetchData, 500);
       return () => clearInterval(interval);
     }
   }, [startFetchingFromFile, startFetchData]);
