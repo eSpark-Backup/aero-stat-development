@@ -35,7 +35,7 @@ const Home = ({
     // const [openModal, setOpenModal] = useState(false);
 
     const [fan1, setFan1] = useState("Continuous");
-    const [fan2, setFan2] = useState("Pressured");
+    const [fan2, setFan2] = useState("Off");
     const [light, setLight] = useState("Off");
     const [sendData, setSendData] = useState(false);
 
@@ -67,11 +67,11 @@ const Home = ({
         };
         if (fan1 === "Continuous" && fan2 === "Continuous") {
             FansLight.Fans = "@01DO00\r";
-        } else if (fan1 === "Continuous" && fan2 === "Pressured") {
+        } else if (fan1 === "Continuous" && fan2 === "Off") {
             FansLight.Fans = "@01DO02\r";
         } else if (fan1 === "Pressured" && fan2 === "Continuous") {
             FansLight.Fans = "@01DO01\r";
-        } else if (fan1 === "Pressured" && fan2 === "Pressured") {
+        } else if (fan1 === "Pressured" && fan2 === "Off") {
             FansLight.Fans = "@01DO03\r";
         }
         // if (strobe === "Continuous" && position === "Continuous") {
@@ -86,7 +86,7 @@ const Home = ({
         if (light === "Off") {
             FansLight.Lights = "@01DO12\r";
         }
-        else if (light === "Continuous") {
+        else if (light === "On") {
             FansLight.Lights = "@01DO11\r";
         }
         if (sendData) {
@@ -94,8 +94,8 @@ const Home = ({
                 .then((response) => {
                     const result = response?.ButtonResponse.split(",");
                     setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
-                    setFan2(result[3].toLowerCase() === "off" ? "Pressured" : "Continuous");
-                    setStrobe(result[4].toLowerCase().startsWith("off") ? "Off" : "Continuous");
+                    setFan2(result[3].toLowerCase() === "off" ? "Off" : "Continuous");
+                    setLight(result[4].toLowerCase().startsWith("off") ? "Off" : "On");
                     // setPosition(result[5].toLowerCase()?.startsWith("1") ? "Continuous" : "Off");
                 })
                 .catch((error) => {
@@ -165,7 +165,7 @@ const Home = ({
                             </div>
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Fan 2 <span>(Right direction)</span></p>
-                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Pressured"} selectedOption={fan2} />
+                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Off"} selectedOption={fan2} />
                             </div>
                             <h2 style={{ textAlign: "center" }}>Strobe & Position Control</h2>
                             {/* <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
@@ -174,7 +174,7 @@ const Home = ({
                             </div> */}
                             <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 {/* <p>Strobe & Position Control</p> */}
-                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="light" option1={"Continuous"} option2={"Off"} selectedOption={light} />
+                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="light" option1={"On"} option2={"Off"} selectedOption={light} />
                             </div>
                         </div>
                     </MainCard>
@@ -268,9 +268,9 @@ const Home = ({
                                             <p>Coms Status:</p>
                                             <StatusChip color={"green"} description={!fetchingStart ? "Disconnected" : isLoading ? isLoading : "Disconnected"} />
                                         </div>
-                                        <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
+                                        {/* <div className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress" style={{ backgroundColor: !fetchingStart || !isLoading || isLoading === "Disconnected" ? "red" : "" }}></div>
-                                        </div>
+                                        </div> */}
                                         {/* </div> */}
                                         <div style={{ display: "none" }} className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"}`}>
                                             <p>RF Link:</p>
