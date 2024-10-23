@@ -10,7 +10,8 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses:
+          actions/checkout@v4
 
           # Check if the current branch is FE
       - name: Check for correct branch
@@ -39,13 +40,26 @@ jobs:
         run: |
           zip -r frontend-source-code.zip aerostat_webapp/
 
-      # Create GitHub Release
+          # Run semantic-release to generate the new release version
+      - name: Run Semantic Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract the version from semantic-release output
+      - name: Get release version
+        id: get_release_version
+        run: |
+          VERSION=$(npx semantic-release --dry-run | grep "The next release version is" | sed 's/^.*is \(.*\)$/\1/')
+          echo "::set-output name=VERSION::$VERSION"
+
+      # Create GitHub Release with Semantic Release Version
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ github.sha }}
-          release_name: Release v${{ github.sha }}
+          tag_name: v${{ steps.get_release_version.outputs.VERSION }}
+          release_name: Release v${{ steps.get_release_version.outputs.VERSION }}
           assets: frontend-source-code.zip
