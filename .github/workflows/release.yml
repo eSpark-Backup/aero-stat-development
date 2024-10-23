@@ -14,7 +14,7 @@ jobs:
 
           # Check if the current branch is FE
       - name: Check for correct branch
-        if: github.ref != 'refs/heads/FE'
+      - if: github.ref != 'refs/heads/FE'
       - run: |
           echo "This action can only be run on the 'FE' branch."
           exit 1
@@ -42,7 +42,7 @@ jobs:
       # Create GitHub Release
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+      - uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
