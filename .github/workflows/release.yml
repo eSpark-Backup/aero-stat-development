@@ -25,6 +25,10 @@ jobs:
         with:
           node-version: "20"
 
+      # Install dependencies for the root package
+      - name: Install dependencies for Root
+        run: npm install
+
       - name: Install dependencies for Frontend
         run: |
           cd aerostat_webapp
