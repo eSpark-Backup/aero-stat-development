@@ -63,6 +63,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_release_version.outputs.VERSION }}
-          release_name: Release v${{ steps.get_release_version.outputs.VERSION }}
           assets: frontend-source-code.zip
