@@ -153,7 +153,7 @@ const Home = ({
                                 options={windGaugeOptions(theme, 0, 70, [parseFloat(response?.weather?.windSpeed) > 70 ? 70 : parseFloat(response?.weather?.windSpeed) < 0 ? 0 : parseFloat(response?.weather?.windSpeed)], getChartSize())}
                             />
                             <ChartsData position={"between"} description1={"Air Temp (C):"} value1={parseFloat(response?.weather?.airTemp).toFixed(2)} description2={"Baro Press (inHg):"} value2={parseFloat(response?.weather?.baroPres).toFixed(2)} graphValue={parseFloat(response?.weather?.windSpeed).toFixed(2)}
-                                graphName={"Wind Speed"} />
+                                graphName={"Wind Speed"} unit={"Knots"} />
                         </div>
                     </MainCard>
                     <MainCard title={"Controls"}>
@@ -167,7 +167,7 @@ const Home = ({
                                 <p>Fan 2 <span>(Right direction)</span></p>
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="fan2" option1={"Continuous"} option2={"Off"} selectedOption={fan2} />
                             </div>
-                            <h2 style={{ textAlign: "center" }}>Strobe & Position Control</h2>
+                            <h2 style={{ textAlign: "center" }}>Strobe Lights Control</h2>
                             {/* <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
                                 <p>Strobe Control</p>
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
@@ -203,7 +203,7 @@ const Home = ({
                             <div className="heading-box">
                                 <ChildCard>
                                     <div className="heading-box-content">
-                                        <ChartChip name={"Heading"} value={parseFloat(response?.digitalCompass?.Magheading).toFixed(2)} />
+                                        <ChartChip name={"Heading"} value={parseFloat(response?.digitalCompass?.Magheading).toFixed(2)} unit={"°"} />
                                         <NewCompass size={getCompassSize()} needle1={response?.digitalCompass?.Magheading} />
                                     </div>
                                 </ChildCard>
@@ -212,8 +212,8 @@ const Home = ({
                                 <ChildCard>
                                     <div className="pitch-box-content">
                                         <div className='pitch-roll-chips'>
-                                            <ChartChip name={"Roll:"} value={parseFloat(response?.digitalCompass?.Roll).toFixed(2)} />
-                                            <ChartChip name={"Pitch:"} value={parseFloat(response?.digitalCompass?.Pitch).toFixed(2)} />
+                                            <ChartChip name={"Roll:"} value={parseFloat(response?.digitalCompass?.Roll).toFixed(2)} unit={"°"} />
+                                            <ChartChip name={"Pitch:"} value={parseFloat(response?.digitalCompass?.Pitch).toFixed(2)} unit={"°"} />
                                         </div>
                                         <NewRollMeter roll={response?.digitalCompass?.Roll} pitch={response?.digitalCompass?.Pitch} />
                                     </div>
@@ -245,13 +245,13 @@ const Home = ({
                         <div className="confluence-box">
                             <MainCard title={"Confluence Point Tension"}>
                                 <div className="confluence-box-content">
-                                    <ChartChip name={"Max Tension"} value={parseFloat(response?.adams?.MaxTension).toFixed(2)} />
+                                    <ChartChip name={"Max Tension"} value={parseFloat(response?.adams?.MaxTension).toFixed(2)} unit={"kg"} />
                                     <div className='confluence-graph'>
                                         <HighchartsReact
                                             highcharts={Highcharts}
                                             options={confluenceGaugeOptions(theme, 0, 700, [parseFloat(response?.adams?.Tension) > 700 ? 700 : parseFloat(response?.adams?.Tension) < 0 ? 0 : parseFloat(response?.adams?.Tension)], getChartSize())}
                                         />
-                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={parseFloat(response?.adams?.Tension).toFixed(2)} />
+                                        <ChartsData position={"center"} graphName={"Current Tension"} graphValue={parseFloat(response?.adams?.Tension).toFixed(2)} unit={"Kg"} />
                                     </div>
                                 </div>
                             </MainCard>
