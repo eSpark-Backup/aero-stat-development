@@ -35,7 +35,7 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                 <div className={`center-main-circle ${theme === "light" ? "center-main-circle-light" : "center-main-circle-dark"}`}>
                     <div className={`center-circle ${theme === "light" ? "center-circle-light" : "center-circle-dark"}`}>
                         <span style={{ color: theme === "light" && needle2 ? "#F30102" : theme === "dark" && needle2 ? "#F30102" : !needle2 && theme === "light" ? "#47515C" : "#F8F8F8" }}>
-                            <p>{needleRotation}°</p>
+                            <p style={{ fontWeight: "700", fontSize: "18px" }}>{Number(needleRotation)?.toFixed(2)}°</p>
                         </span>
                         {
                             !needle2 && <span className={`direction ${theme === "light" ? "direction-light" : "direction-dark"}`}>
@@ -44,7 +44,7 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                         }
                         {
                             needle2 && <span className="degree2" style={{ color: "#4260FF" }}>
-                                <p>{needleRotation2}°</p>
+                                <p>{Number(needleRotation2)?.toFixed(2)}°</p>
                             </span>
                         }
                     </div>
@@ -93,7 +93,7 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                         </div>
                     ))}
                     <div className="direction-label" style={{ transform: 'rotate(6.5deg) translateY(-118px)' }}>
-                        <p style={{ transform: size ? 'rotate(-8.5deg) translateX(5px) translateY(10px)' : 'rotate(-8.5deg) translateX(8px)', fontSize: size ? "18px" : "24px", fontWeight: "500", color: "#F60000" }}>N</p>
+                        <p style={{ transform: size ? 'rotate(-8.5deg) translateX(7px) translateY(7px)' : 'rotate(-8.5deg) translateX(12px)', fontSize: size ? "18px" : "24px", fontWeight: "500", color: "#F60000" }}>N</p>
                     </div>
                     <div className="direction-label" style={{ transform: 'rotate(90deg) translateY(-128px)' }}>
                         <p style={{ fontSize: size ? "18px" : "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF", transform: size ? "rotate(-90deg) translate(-13px, 5px)" : "rotate(-90deg)" }}>E</p>
@@ -101,7 +101,7 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                     <div className="direction-label" style={{ transform: 'rotate(180deg) translateY(-118px)' }}>
                         <p style={{ transform: size ? "translateX(2px) translateY(7px)" : "translateX(3px)", fontSize: size ? "18px" : "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF" }}>S</p>
                     </div>
-                    <div className="direction-label" style={{ transform: size ? 'rotate(270deg) translateY(-125px) translateX(-5px)' : 'rotate(270deg) translateY(-138px) translateX(-2px)', fontSize: size ? "18px" : "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF" }}>
+                    <div className="direction-label" style={{ transform: size ? 'rotate(270deg) translateY(-129px) translateX(-5px)' : 'rotate(270deg) translateY(-138px) translateX(-2px)', fontSize: size ? "18px" : "24px", fontWeight: "500", color: theme === "light" ? "#47515C" : "#FFFFFF" }}>
                         <p style={{ transform: "rotate(90deg)" }}>W</p>
                     </div>
                 </div>

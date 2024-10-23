@@ -8,7 +8,7 @@ import { ThemeContext } from "../ThemeHandler";
 import Modal from "./Modal";
 import Compass from "./compass";
 import RollMeter from "./RollMeter";
-import { fetchDataUtil, weatherstationData, digitalCompassData, ballonetSensorData, heliumSensorData, adamsData, eBoxData } from "../utils";
+import { fetchDataUtil } from "../utils";
 import { formatDateTime, processData, processDataArray } from "../Js_parsing";
 
 HighchartsMore(Highcharts);
@@ -45,13 +45,6 @@ const Home2 = () => {
   const fetchData = async () => {
     try {
       const results = await fetchDataUtil();
-      const weatherdata = weatherstationData(results.port_4002);
-      const digitalCompassdata = digitalCompassData(results.port_4003);
-      const ballonetSensordata = ballonetSensorData(results.port_4004);
-      const heliumSensordata = heliumSensorData(results.port_4005);
-      const adamsdata = adamsData(results.port_4006);
-      const eBoxdata = eBoxData(results.port_4007);
-
       const parsedResponses = {
         weather: weatherdata,
         digitalCompass: digitalCompassdata,

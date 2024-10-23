@@ -1,4 +1,7 @@
 import { useEffect } from "react";
+import close from "../assets/close.svg"
+import close2 from "../assets/close-dark.svg"
+
 
 const validateIpAddress = (ip) => {
   const ipRegex = /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
@@ -19,6 +22,15 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
       document.removeEventListener("click", handleOutsideClick);
     };
   }, [open, handleClose]);
+
+  useEffect(() => {
+    if (!open) {
+      document.body.style.overflow = "auto";
+    }
+    if (open) {
+      document.body.style.overflow = "hidden"
+    }
+  }, [open])
 
   const handleChange = (val, field) => {
     setForm((prev) => {
@@ -49,9 +61,16 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
   return (
     <div className={`modal-bg ${open ? "active" : ""}`}>
       <div className={`modal ${theme}`}>
-        <div className={`modal-header ${theme}`}>TCP/IP Configuration</div>
+        <div className={`modal-header ${theme}`}>
+          <div>
+            <p>Configuration</p>
+            <button onClick={handleClose}>
+              <img src={theme === "light" ? close : close2} alt="" />
+            </button>
+          </div>
+        </div>
         <div className="modal-body">
-          <div className="modal-input">
+          <div className={`modal-input ${theme}`}>
             <p className={`${theme}`}>GCS Address</p>
             <input
               placeholder="192.168.0.102"
@@ -61,7 +80,7 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
               onChange={(e) => handleChange(e.target.value, "ip")}
             />
           </div>
-          <div className="modal-input">
+          <div className={`modal-input ${theme}`}>
             <p className={`${theme}`}>Weather Station Port</p>
             <input
               placeholder="4002"
@@ -71,7 +90,7 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
               onChange={(e) => handleChange(e.target.value, "weather")}
             />
           </div>
-          <div className="modal-input">
+          <div className={`modal-input ${theme}`}>
             <p className={`${theme}`}>HMR Port</p>
             <input
               placeholder="4003"
@@ -81,7 +100,7 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
               onChange={(e) => handleChange(e.target.value, "hmr")}
             />
           </div>
-          <div className="modal-input">
+          <div className={`modal-input ${theme}`}>
             <p className={`${theme}`}>Ballonet Pressure Port</p>
             <input
               type="number"
@@ -91,7 +110,7 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
               onChange={(e) => handleChange(e.target.value, "ballonet")}
             />
           </div>
-          <div className="modal-input">
+          <div className={`modal-input ${theme}`}>
             <p className={`${theme}`}>Helium Pressure Port</p>
             <input
               type="number"
@@ -101,7 +120,7 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
               onChange={(e) => handleChange(e.target.value, "helium")}
             />
           </div>
-          <div className="modal-input">
+          <div className={`modal-input ${theme}`}>
             <p className={`${theme}`}>ADAM Port</p>
             <input
               type="number"
@@ -111,7 +130,7 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
               onChange={(e) => handleChange(e.target.value, "adam")}
             />
           </div>
-          <div className="modal-input">
+          <div className={`modal-input ${theme}`}>
             <p className={`${theme}`}>EBox Port</p>
             <input
               type="number"
@@ -121,13 +140,14 @@ const Modal = ({ open, handleClose, handleSubmit, form, setForm, theme, errorVal
               onChange={(e) => handleChange(e.target.value, "ebox")}
             />
           </div>
-          <div className="modal-btn-group">
-            <button className="outlined" onClick={handleClose}>
+          <div className={`modal-btn-group ${theme}`}>
+            {/* <button className="outlined" onClick={handleClose}>
               Close
             </button>
             <button className="contained" onClick={handleSubmit}>
               Save
-            </button>
+            </button> */}
+            <button onClick={handleSubmit}>Save</button>
           </div>
         </div>
       </div>

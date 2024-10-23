@@ -47,27 +47,12 @@ export function formatDateTime(dateString = new Date().toISOString()) {
 export function processDataArray(dataArray, currentResult = null) {
 
     let result = currentResult || {
-        weather: {
-            heading: 0,
-            windSpeed: 0,
-            windAngle: 0
-        },
-        digitalCompass: {
-            MagHeading: 0,
-            Pitch: 0,
-            Roll: 0
-        },
-        ballonet: {
-            BalPressure: 0
-        },
-        helium: {
-            HelPressure: 0
-        },
-        adams: {
-            Tension: 0,
-            MaxTension: 0
-        },
-        ebox: {},
+        adams: { MaxTension: 700, Tension: 10 },
+        ballonet: { BalPressure: 0.071 },
+        digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
+        ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
+        helium: { HelPressure: 0.398 },
+        weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 },
         time: ""
     };
 
@@ -99,7 +84,7 @@ export function processDataArray(dataArray, currentResult = null) {
 
                 const [key, value] = pair.split(':').map(item => item.trim());
 
-                const numericValue = parseFloat(value);
+                const numericValue = parseFloat(value).toFixed(2);
 
 
                 if (key === 'Pitch' || key === 'Roll') {

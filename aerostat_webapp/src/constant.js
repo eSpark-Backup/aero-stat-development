@@ -1,4 +1,4 @@
-export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], size) => {
+export const windGaugeOptions = (theme, min = 0, max = 70, seriesData, size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -45,7 +45,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], si
                 rotation: 'auto',
                 style: {
 
-                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C'
+                    color: theme === 'light' ? '#1B1A1A' : '#4260FF'
                 }
             },
             title: {
@@ -77,7 +77,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], si
             name: '',
             data: seriesData,
             tooltip: {
-                valueSuffix: ' km/h',
+                valueSuffix: '',
             },
             dial: {
                 radius: '80%',
@@ -97,7 +97,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData = [45], si
 
 
 
-export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [450], size) => {
+export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData, size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -140,11 +140,11 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
             minorTickInterval: null,
             lineWidth: 0.5,
             labels: {
-                distance: -15,
+                distance: size === 200 ? -13 : -15,
                 rotation: 'auto',
                 style: {
                     color: theme === 'light' ? '#1B1A1A' : '#1B1A1A',
-                    fontSize: '12px'
+                    fontSize: size === 200 ? '10px' : '12px'
                 }
             },
             title: {
@@ -182,7 +182,7 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
             name: '',
             data: seriesData,
             tooltip: {
-                valueSuffix: ' km/h',
+                valueSuffix: ' inWG',
             },
             dial: {
                 radius: '80%',
@@ -202,7 +202,7 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData = [45
 
 
 
-export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [350], size) => {
+export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, size) => {
     const needleValue = seriesData[0];
     return {
         chart: {
@@ -248,8 +248,8 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [
                 distance: -15,
                 rotation: 'auto',
                 style: {
-
-                    color: theme === 'light' ? '#1B1A1A' : '#AAAD9C'
+                    fontSize: size === 200 ? "8px" : "12px",
+                    color: theme === 'light' ? '#1B1A1A' : '#4260FF'
                 }
             },
             title: {
@@ -287,7 +287,7 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData = [
             name: '',
             data: seriesData,
             tooltip: {
-                valueSuffix: ' km/h',
+                valueSuffix: '',
             },
             dial: {
                 radius: '80%',
