@@ -1,5 +1,5 @@
 # Aerostat
-This repository will contain the latest project progress
+This repository will contain the latest project progress.
 
 ## STEPS TO BE FOLLOWED
 
