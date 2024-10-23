@@ -10,33 +10,33 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
           # Check if the current branch is FE
       - name: Check for correct branch
         if: github.ref != 'refs/heads/FE'
-        run: |
+      - run: |
           echo "This action can only be run on the 'FE' branch."
           exit 1
 
       # Frontend: Set up Node.js and install dependencies from aerostat_webapp
       - name: Set up Node.js for Frontend
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: 20
 
       - name: Install dependencies for Frontend
-        run: |
+      - run: |
           cd aerostat_webapp
           npm install
 
       - name: Build Frontend (Vite)
-        run: |
+      - run: |
           cd aerostat_webapp
           npm run build
 
       - name: Compress Frontend Source Code
-        run: |
+      - run: |
           zip -r frontend-source-code.zip aerostat_webapp/
 
       # Create GitHub Release
