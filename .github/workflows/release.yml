@@ -53,8 +53,8 @@ jobs:
       - name: Get release version
         id: get_release_version
         run: |
-          VERSION=$(npx semantic-release --dry-run | grep "The next release version is" | sed 's/^.*is \(.*\)$/\1/')
-          echo "::set-output name=VERSION::$VERSION"
+          VERSION=$(npx semantic-release --dry-run | grep "The next release version is" | awk '{print $NF}')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       # Create GitHub Release with Semantic Release Version
       - name: Create GitHub Release
@@ -63,6 +63,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{ steps.get_release_version.outputs.VERSION }}
-          release_name: Release v${{ steps.get_release_version.outputs.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           assets: frontend-source-code.zip
