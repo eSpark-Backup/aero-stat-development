@@ -17,6 +17,11 @@ state_4005 = {
     "increasing": True
 }
 
+state_4006 = {
+    "value": 0.0,  # Start value for port 4006
+    "increasing": True  # Track whether we are incrementing or decrementing
+}
+
 # Data to be sent to clients on each port
 data_dict = {
     4002: b"$HCHDT,128.0,T*22\r\n$WIMDA,29.2878,I,0.9918,B,18.8,C,,,,,,,,,,,,,,*36\r\n$WIMWV,158.4,R,1.9,N,A*23\r\n",
@@ -41,6 +46,16 @@ def update_dynamic_state(state):
             state["increasing"] = True
             state["value"] += 1
 
+def update_state_4006(state):
+    if state["increasing"]:
+        state["value"] += 50
+        if state["value"] >= 300:  # Set a threshold for switching to decrementing phase
+            state["increasing"] = False
+    else:
+        state["value"] -= 20
+        if state["value"] <= 0:  # Set a threshold for switching to incrementing phase
+            state["increasing"] = True
+
 # Function to handle client connections
 def handle_client(conn, addr, port):
     print(f"Connected by {addr} on port {port}")
@@ -57,6 +72,13 @@ def handle_client(conn, addr, port):
                 # Update and send dynamic value for port 4005
                 update_dynamic_state(state_4005)
                 response = f"#01CP={state_4005['value']:.2f}\r\n"
+                conn.sendall(response.encode('utf-8'))
+                print(f"Sent data to {addr} on port {port}: {response}")
+
+            elif port == 4006:
+                # Update the value by incrementing by 50 or decrementing by 20 for port 4006
+                update_state_4006(state_4006)
+                response = f">{state_4006['value']:.1f}\r\n"
                 conn.sendall(response.encode('utf-8'))
                 print(f"Sent data to {addr} on port {port}: {response}")
 
