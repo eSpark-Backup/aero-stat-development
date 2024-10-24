@@ -111,6 +111,7 @@ input[type=number] {
 } */
 
 .header-details {
+    gap: 5px;
     width: 88%;
     border-radius: 16px;
     display: flex;
@@ -254,6 +255,19 @@ input[type=number] {
     padding-bottom: 20px;
 }
 
+.main2 {
+  display: grid;
+  grid-template-columns: 8fr 4fr;
+  padding: 0px 50px;
+  gap: 2%;
+  padding-bottom: 20px;
+}
+
+.strobe>p{
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
 .box1,
 .box2 {
     /* background-color: #f0f0f0;
@@ -292,11 +306,19 @@ input[type=number] {
 }
 
 .controls-box {
-    width: 100%;
+    width: 50%;
     display: flex;
     flex-direction: column;
     row-gap: 14px;
-    padding: 10px 15px;
+    /* padding: 10px 15px; */
+}
+
+.control-box-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  height: calc(100% - 60px);
+  padding: 50px;
 }
 
 .controls-box>h2 {
@@ -316,7 +338,7 @@ input[type=number] {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     row-gap: 11px;
 }
 
@@ -527,7 +549,7 @@ input[type=number] {
 }
 
 .log-box {
-    width: 30%;
+    width: 100%;
 }
 
 .radio-box-content {
@@ -567,12 +589,13 @@ input[type=number] {
 
 .log-detail {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
+    width: 50%;
 }
 
 .log-detail>p {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
 }
 
@@ -1455,9 +1478,9 @@ input[type=number] {
         font-size: 14px;
     }
 
-    .data-type {
+    /* .data-type {
         width: 35%;
-    }
+    } */
 
     .main {
         display: grid;
@@ -1484,7 +1507,6 @@ input[type=number] {
     }
 
     .charts-data-between,
-    .fan-box,
     .magnetometer-box,
     .horizontal-box1,
     .horizontal-box2 {
@@ -1520,9 +1542,9 @@ input[type=number] {
         padding: 5px 12px;
     }
 
-    .controls-box>h2 {
+    /* .controls-box>h2 {
         text-align: center;
-    }
+    } */
 
     /* .charts-data-box {
         min-height: 150px;
@@ -1532,10 +1554,10 @@ input[type=number] {
         width: 100%;
     }
 
-    .log-detail {
+    /* .log-detail {
         flex-direction: column;
         row-gap: 4px;
-    }
+    } */
 
     .charts-data-box-light,
     .charts-data-box-dark {
@@ -1587,6 +1609,10 @@ input[type=number] {
         padding: 0px 10px 10px 10px;
         gap: 20px;
         /* padding-bottom: 20px; */
+    }
+
+    .main2 {
+      padding: 0px 10px 10px 10px;
     }
 
     /* .box2 {
@@ -1665,6 +1691,10 @@ input[type=number] {
         gap: 1%;
     }
 
+    .main2 {
+      padding: 0px 19px 10px 19px;
+    }
+
     .header {
         padding: 23px 19px;
     }
@@ -1676,6 +1706,10 @@ input[type=number] {
         grid-template-columns: 25% 73%;
         padding: 0px 19px 10px 19px;
         gap: 1%;
+    }
+
+    .main2 {
+      padding: 0px 19px 10px 19px;
     }
 
     /* .heading-box .child-card, .heading-box2 .child-card{
@@ -1756,9 +1790,9 @@ input[type=number] {
         padding-bottom: 9px;
     }
 
-    .controls-box {
+    /* .controls-box {
         padding: 6px 15px;
-    }
+    } */
 
     .log-box-content {
         row-gap: 20px;
@@ -1930,6 +1964,36 @@ input[type=number] {
     .heading-box .child-card {
         padding: 26px 17px !important;
     }
+}
+
+@media screen and (max-width:1919px) {
+  .chart-value h2 {
+    font-size: 24px;
+  }
+}
+
+@media screen and (max-width:1440px) {
+  .control-box-card {
+    padding: 25px;
+  }
+}
+
+@media screen and (max-width:1280px) {
+  .control-box-card {
+    padding: 25px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .controls-box{
+    width: 100%;
+  }
+
+  .log-detail {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 
@@ -2143,6 +2207,11 @@ input[type=number] {
         height: 668px;
     }
 
+    .main2 {
+       padding: 0px 10px 0px 10px;
+       grid-template-columns: 12fr;
+    }
+
     .modal-header {
         font-size: 16px;
         line-height: 19.36px;
@@ -2262,6 +2331,13 @@ input[type=number] {
 
 .sidebar-logo {
   width: 100% !important;
+}
+
+.menu-parent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
 .sidebar p {
