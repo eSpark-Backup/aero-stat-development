@@ -47,10 +47,12 @@ const Header = ({ time, fileFetching, handleSidebarOpen }) => {
                 </div>
                 <div className={`header-details ${theme === "light" ? "header-details-light" : "header-details-dark"}`}>
                     <div>
-                        <div className={`${theme} menu-icon`}>
-                            <img onClick={handleSidebarOpen} src={theme === "light" ? menuLight : menuDark} alt="menu-icon" />
+                        <div className='menu-parent'>
+                        <div onClick={handleSidebarOpen} className={`${theme} menu-icon`}>
+                            <img src={theme === "light" ? menuLight : menuDark} alt="menu-icon" />
                         </div>
                         <h2 className={`data-type ${theme === "light" ? "data-type-light" : "data-type-dark"}`}>{fileFetching ? "Recorded Data:" : "Live Data:"}</h2>
+                        </div>
                         <div className={`day ${theme === "light" ? "day-light" : "day-dark"}`}>
                             <h2>{day}</h2>
                         </div>
