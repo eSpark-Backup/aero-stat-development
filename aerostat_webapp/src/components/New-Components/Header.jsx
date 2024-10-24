@@ -3,8 +3,10 @@ import logo from "../../assets/logo.svg"
 import logowhite from "../../assets/logo-white.svg"
 import { ThemeContext } from '../../ThemeHandler';
 import { formatDateTime } from '../../Js_parsing';
+import menuLight from "../../assets/menu-light.svg";
+import menuDark from "../../assets/menu-dark.svg";
 
-const Header = ({ time, fileFetching }) => {
+const Header = ({ time, fileFetching, handleSidebarOpen }) => {
     const { theme } = useContext(ThemeContext);
 
     const [currTime, setTime] = useState(time ? time : formatDateTime());
@@ -45,6 +47,9 @@ const Header = ({ time, fileFetching }) => {
                 </div>
                 <div className={`header-details ${theme === "light" ? "header-details-light" : "header-details-dark"}`}>
                     <div>
+                        <div className={`${theme} menu-icon`}>
+                            <img onClick={handleSidebarOpen} src={theme === "light" ? menuLight : menuDark} alt="menu-icon" />
+                        </div>
                         <h2 className={`data-type ${theme === "light" ? "data-type-light" : "data-type-dark"}`}>{fileFetching ? "Recorded Data:" : "Live Data:"}</h2>
                         <div className={`day ${theme === "light" ? "day-light" : "day-dark"}`}>
                             <h2>{day}</h2>

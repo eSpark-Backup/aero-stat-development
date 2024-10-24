@@ -2,6 +2,7 @@ import './App.css';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import Header from './components/New-Components/Header';
 import Home from './components/New-Components/Home';
+import Sidebar from './components/New-Components/Sidebar';
 import { ThemeContext } from './ThemeHandler';
 import { fetchDataUtil, updateConfigUtil } from './utils';
 import { formatDateTime, processData, processDataArray } from './Js_parsing';
@@ -24,6 +25,7 @@ function App() {
   });
 
   const { theme } = useContext(ThemeContext);
+  const [sidebar, setSidebar] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [responses, setResponses] = useState(lastPerfectResponses.current);
   const [isLoading, setIsLoading] = useState(1);
@@ -410,7 +412,15 @@ function App() {
   return (
     <>
       <div style={{ display: 'flex', flexDirection: 'column', rowGap: '0px' }}>
-        <Header time={responses?.time} fileFetching={startFetchingFromFile} />
+        <Header  handleSidebarOpen={() => setSidebar(true)} time={responses?.time} fileFetching={startFetchingFromFile} />
+        <Sidebar
+          open={sidebar}
+          onClose={() => setSidebar(false)}
+          handleOpenModal={handleOpenModal}
+          playBtn={playBtn}
+          fwdBtn={fwdBtn}
+          StopBtn={stopBtn}
+        />
         <Home
           response={responses}
           isLoading={responses?.loading}

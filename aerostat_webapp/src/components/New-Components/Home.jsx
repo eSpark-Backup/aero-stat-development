@@ -279,10 +279,10 @@ const Home = ({
                                         <div style={{ display: "none" }} className={`loading-bar ${theme === "light" ? "loading-bar-light" : "loading-bar-dark"}`}>
                                             <div className="progress"></div>
                                         </div>
-                                        <button onClick={handleOpenModal} className={!playBtn && StopBtn && fwdBtn || !playBtn && !fwdBtn && StopBtn ? "disable" : ""}>Configure</button>
+                                        {/* <button onClick={handleOpenModal} className={!playBtn && StopBtn && fwdBtn || !playBtn && !fwdBtn && StopBtn ? "disable" : ""}>Configure</button> */}
 
                                     </div>
-                                    <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>
+                                    {/* <div className={`config-details ${theme === "light" ? "config-details-light" : "config-details-dark"}`}>
                                         <h1>Details</h1>
                                         <div className={`config-details-items ${theme === "light" ? "config-details-items-light" : "config-details-items-dark"}`}>
                                             <div>
@@ -328,7 +328,7 @@ const Home = ({
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </MainCard>
                         </div>
