@@ -24,6 +24,8 @@ struct ParsedData_AS {
 class AdamsSensor {
 public:
     ParsedData_AS readAdamsSensorData(const std::string& nmeaData);
+private:
+    double max_tension = 0.0;
 };
 
 #endif //ADAMS_SENSOR_H

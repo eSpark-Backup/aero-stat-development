@@ -19,9 +19,6 @@ ParsedData_AS AdamsSensor::readAdamsSensorData(const std::string& nmeaData) {
         msgsList.push_back(line);
     }
 
-    // Initialize max tension
-    double max_tension = 0.0;
-
     for (const auto& packet : msgsList) {
         std::vector<std::string> msgsList;
         std::istringstream packetStream(packet);
