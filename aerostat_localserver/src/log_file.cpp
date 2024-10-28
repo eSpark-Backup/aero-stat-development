@@ -4,12 +4,13 @@
 #include <iomanip>
 #include <ctime>
 #include <sys/stat.h>
-#include <direct.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include <sstream>
 
 // Constants
 const size_t MAX_LOG_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const std::string LOG_DIR_PATH = std::string(getenv("USERPROFILE")) + "\\logs"; // Home directory for logs
+const std::string LOG_DIR_PATH = std::string(getenv("HOME")) + "/logs";
 std::string log_file_path;
 
 // Ensure the log directory exists
@@ -17,7 +18,7 @@ void setup_log_directory() {
     struct stat info;
     if (stat(LOG_DIR_PATH.c_str(), &info) != 0) {
         // Directory does not exist, create it
-        _mkdir(LOG_DIR_PATH.c_str());
+        mkdir(LOG_DIR_PATH.c_str(), 0755);
     } else if (!(info.st_mode & S_IFDIR)) {
         // Exists but is not a directory
         std::cerr << LOG_DIR_PATH << " is not a directory" << std::endl;

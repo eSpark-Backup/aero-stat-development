@@ -3,6 +3,7 @@
 #include "util.h"
 #include <iomanip>
 #include <sstream>
+#include <cmath>
 
 std::string strip(const std::string& str) {
     auto start = str.begin();
