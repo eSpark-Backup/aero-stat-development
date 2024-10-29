@@ -1,0 +1,10 @@
+^C:\USERS\FAIZA BEAUTY CREAM\DOWNLOADS\AEROSTAT_LOCALSERVER\BUILD\CMAKEFILES\1B448A1BCBE773975BE6B3AA82C58946\GENERATE.STAMP.RULE
+setlocal
+"C:\Users\Faiza Beauty Cream\Downloads\cmake-3.31.0-rc2-windows-x86_64\bin\cmake.exe" "-SC:/Users/Faiza Beauty Cream/Downloads/aerostat_localserver" "-BC:/Users/Faiza Beauty Cream/Downloads/aerostat_localserver/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/Faiza Beauty Cream/Downloads/aerostat_localserver/build/HTTPServer.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

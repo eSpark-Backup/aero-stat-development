@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\src\adams_sensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\src\ballonet_pressure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\src\digital_compass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\src\helium_pressure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\src\log_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\src\util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\src\weather_station.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{9181BDAA-B96E-32DB-8DE3-90925C9838BA}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

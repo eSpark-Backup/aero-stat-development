@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Faiza Beauty Cream\Downloads\aerostat_localserver\build\CMakeFiles\1b448a1bcbe773975be6b3aa82c58946\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{89CDD6C7-81F8-32C7-BA4C-7E0F103C2E3D}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -22,7 +22,7 @@ std::map<int, SOCKET> sockets;
 #include <netinet/in.h>
 
 #define SOCKET_ERROR -1
-#define INVALID_SOCKET -1
+//#define INVALID_SOCKET -1
 std::map<int, int> sockets;
 
 #endif
@@ -74,19 +74,20 @@ void ping_host() {
         } else {
             std::cout << "Host unreachable, disconnecting..." << std::endl;
             for (auto &socket_pair : sockets) {
-// #ifdef WINDOWS                
                 if (socket_pair.second != INVALID_SOCKET) {
+ #ifdef WINDOWS                
                     closesocket(socket_pair.second);
+ #else
+                    close(socket_pair.second);
+#endif
                     socket_pair.second = INVALID_SOCKET;
                 }
-// #else
 //                 if (socket_pair.second != -1) {
-//                     close(socket_pair.second);
 //                     socket_pair.second = -1;
 //                 }                
             }
         }
-#ifdef WINODWS
+#ifdef WINDOWS
         Sleep(1000);
 #else        
         usleep(1000000);
@@ -156,7 +157,7 @@ std::string connect_to_port(int port) {
         }
         else
         {
-#ifdef WINODWS     
+#ifdef WINDOWS     
             SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 #else            
             int sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -171,8 +172,11 @@ std::string connect_to_port(int port) {
             struct timeval timeout;
             timeout.tv_sec = 1;
             timeout.tv_usec = 0;
+#ifdef WINDOWS
+            setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+#else
             setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-
+#endif
             sockaddr_in serverAddress;
             serverAddress.sin_family = AF_INET;
             serverAddress.sin_port = htons(port);
@@ -182,7 +186,7 @@ std::string connect_to_port(int port) {
             {
                 std::cerr << "Connection Timed out to " << host << ":" << port << "\n";
                 port_flag = false;
-#ifdef WINODWS                
+#ifdef WINDOWS                
                 closesocket(sock);
                 Sleep(1000);
 #else
@@ -219,7 +223,11 @@ std::string connect_to_port(int port) {
         port_flag = false;
         if (sockets[port] != INVALID_SOCKET)
         {
-            closesocket(sockets[port]);
+ #ifdef WINDOWS
+            	    closesocket(sockets[port]);
+ #else
+                    close(sockets[port]);
+#endif
             sockets[port] = INVALID_SOCKET;
         }
     }
@@ -337,7 +345,7 @@ void continuous_port_connection() {
                 }
             }
         }
-#ifdef WINODWS        
+#ifdef WINDOWS        
         Sleep(200);
 #else
         usleep(200 * 1000);
@@ -628,7 +636,7 @@ int main() {
     std::cout << "Server is running on http://localhost:5000" << std::endl;
     svr.listen("localhost", 5000);
 
-#ifdef WINODWS
+#ifdef WINDOWS
     WSACleanup();
 #endif
     return 0;

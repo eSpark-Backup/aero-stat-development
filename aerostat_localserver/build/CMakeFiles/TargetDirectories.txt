@@ -1,0 +1,3 @@
+C:/Users/Faiza Beauty Cream/Downloads/aerostat_localserver/build/CMakeFiles/TEST.dir
+C:/Users/Faiza Beauty Cream/Downloads/aerostat_localserver/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Faiza Beauty Cream/Downloads/aerostat_localserver/build/CMakeFiles/ZERO_CHECK.dir

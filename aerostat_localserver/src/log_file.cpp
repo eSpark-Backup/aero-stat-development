@@ -4,15 +4,15 @@
 #include <sstream>
 #include <iomanip>
 #include <fstream>
-#include <direct.h>
 #include <iostream>
 #include <sys/stat.h>
 
 // Constants
 const size_t MAX_LOG_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 #ifdef WINDOWS
+#include <direct.h>
 const std::string LOG_DIR_PATH = std::string(getenv("USERPROFILE")) + "\\logs";
-else
+#else
 const std::string LOG_DIR_PATH = std::string(getenv("HOME")) + "/logs";
 #endif
 std::string log_file_path;
