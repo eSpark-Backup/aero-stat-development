@@ -3,7 +3,6 @@
 
 #include <string>
 
-// Function to trim whitespace from both ends of a string
 void setup_log_directory();
 std::string get_current_datetime();
 std::string create_log_file();

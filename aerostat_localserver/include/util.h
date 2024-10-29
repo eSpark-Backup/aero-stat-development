@@ -3,7 +3,8 @@
 
 #include <string>
 
-// Function to trim whitespace from both ends of a string
+#define WINDOWS
+
 std::string strip(const std::string& str);
 float formatFloat(float value);
 

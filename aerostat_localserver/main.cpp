@@ -6,10 +6,27 @@
 #include "json.hpp"
 #include <iostream>
 #include "httplib.h"
+#include "log_file.h"
+
+#ifdef WINDOWS
 #include <windows.h>
 #include <stdexcept>
 #include <winsock2.h>
-#include "log_file.h"
+
+std::map<int, SOCKET> sockets;
+
+#else
+#include <unistd.h>      
+#include <arpa/inet.h>  
+#include <sys/socket.h>  
+#include <netinet/in.h>
+
+#define SOCKET_ERROR -1
+//#define INVALID_SOCKET -1
+std::map<int, int> sockets;
+
+#endif
+
 #include "adams_sensor.h"
 #include "weather_station.h"
 #include "digital_compass.h"
@@ -31,13 +48,11 @@ std::string TENSION_REQ_MSG = "#01\r";
 std::string fans_command = "";
 std::string lights_command = "";
 std::map<int, bool> connection_status;
-std::map<int, SOCKET> sockets;
 const std::string data_4007_template = "@A01,25.5,{0},{1},{2},{3}\r\n";
 std::unordered_map<std::string, std::string> state_4007 = {
     {"field1", "ON"},   // First field
     {"field2", "ON"},   // Second field
     {"field3", "OFF"},  // Third field
-    // {"field4", "1"}     // Fourth field
 };
 
 bool check_host_reachable(const std::string &ip_address);
@@ -48,37 +63,41 @@ void ping_host() {
     bool reachable = false;
     while (true) {
         bool reachable = check_host_reachable(host);
-
-        // Update connect_flag based on reachability
         connect_flag = reachable;
         if (connect_flag) {
             std::cout << "Host reachable, starting port connections..." << std::endl;
             if(!connect_thread_flag)
             {
-                std::thread(continuous_port_connection).detach();  // Start the connection thread
+                std::thread(continuous_port_connection).detach();
             }
         } else {
             std::cout << "Host unreachable, disconnecting..." << std::endl;
-            // Optionally, close all sockets here
             for (auto &socket_pair : sockets) {
                 if (socket_pair.second != INVALID_SOCKET) {
+ #ifdef WINDOWS                
                     closesocket(socket_pair.second);
+ #else
+                    close(socket_pair.second);
+#endif
                     socket_pair.second = INVALID_SOCKET;
-                }
+                }           
             }
         }
-        Sleep(1000); // Check every 5 seconds
+#ifdef WINDOWS
+        Sleep(1*1000);
+#else        
+        usleep(1*1000*1000);
+#endif        
     }
 }
 
 bool check_host_reachable(const std::string &ip_address) {
     try {
-        std::string command;
-
-        // Determine the platform and create the appropriate ping command
-        command = "ping -n 1 -w 1000 " + ip_address; // Windows command
-
-        // Execute the ping command and get the return code
+#ifdef WINDOWS        
+        std::string command = "ping -n 1 -w 1000 " + ip_address;
+#else
+        std::string command = "ping -c 1 -W 1 " + ip_address;
+#endif        
         int return_code = system(command.c_str());
 
         if (return_code == 0) {
@@ -94,7 +113,6 @@ bool check_host_reachable(const std::string &ip_address) {
     }
 }
 
-// Establish connection to a specific port
 std::string connect_to_port(int port) {
     if (connection_status.find(port) == connection_status.end()) {
         connection_status[port] = false;
@@ -125,13 +143,21 @@ std::string connect_to_port(int port) {
                 std::cerr << "Connection Timed out to " << host << ":" << port << std::endl;
                 connection_status[port] = false;
                 port_flag = false;
+#ifdef WINDOWS                
                 closesocket(sockets[port]);
+#else
+                close(sockets[port]);
+#endif                        
                 sockets[port] = INVALID_SOCKET;
             }
         }
         else
         {
+#ifdef WINDOWS     
             SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+#else            
+            int sock = socket(AF_INET, SOCK_STREAM, 0);
+#endif            
             if (sock == INVALID_SOCKET)
             {
                 std::cerr << "Socket creation failed\n";
@@ -139,9 +165,16 @@ std::string connect_to_port(int port) {
                 return "";
             }
 
-            int timeout = 1000;
-            setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
-
+            
+#ifdef WINDOWS
+            int timeout = 1*1000;
+            setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
+#else
+            struct timeval timeout;
+            timeout.tv_sec = 1;
+            timeout.tv_usec = 0;
+            setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+#endif
             sockaddr_in serverAddress;
             serverAddress.sin_family = AF_INET;
             serverAddress.sin_port = htons(port);
@@ -151,8 +184,13 @@ std::string connect_to_port(int port) {
             {
                 std::cerr << "Connection Timed out to " << host << ":" << port << "\n";
                 port_flag = false;
+#ifdef WINDOWS                
                 closesocket(sock);
-                Sleep(1000);
+                Sleep(1*1000);
+#else
+                close(sock);
+                usleep(1*1000*1000);
+#endif                                
                 return "";
             }
             else
@@ -183,14 +221,17 @@ std::string connect_to_port(int port) {
         port_flag = false;
         if (sockets[port] != INVALID_SOCKET)
         {
-            closesocket(sockets[port]);
+ #ifdef WINDOWS
+            	    closesocket(sockets[port]);
+ #else
+                    close(sockets[port]);
+#endif
             sockets[port] = INVALID_SOCKET;
         }
     }
     return "";
 }
 
-// Thread to handle continuous connection and data retrieval
 void continuous_port_connection() {
     WeatherStation ws;
     DigitalCompass dc;
@@ -302,11 +343,15 @@ void continuous_port_connection() {
                 }
             }
         }
+#ifdef WINDOWS        
         Sleep(200);
+#else
+        usleep(200 * 1000);
+#endif        
     }
     connect_thread_flag = false;
 }
-
+#ifdef WINDOWS
 std::string connect_and_send_to_port(const std::string &command) {
     if (host.empty()) {
         return "Host is not configured";
@@ -330,24 +375,54 @@ std::string connect_and_send_to_port(const std::string &command) {
             return "Connection failed";
         }
         std::cout << "Connected to " << host << ":" << target_port << std::endl;
-        // std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << command << std::endl;
-        // std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << command.c_str() << std::endl;
         send(sock, command.c_str(), command.size(), 0);
         
-        // Optionally receive a response (uncomment if needed)
         char buffer[1024] = {0};
         int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
         closesocket(sock);
-        // return std::string(buffer, bytesReceived);
-
-        // std::cout << "Command sent successfully: " << buffer << std::endl;
-        // closesocket(sock);
         return "Command sent successfully";
     } catch (const std::exception &e) {
         std::cerr << "Error on port " << target_port << ": " << e.what() << std::endl;
         return "Error occurred";
     }
 }
+#else
+std::string connect_and_send_to_port(const std::string &command) {
+    if (host.empty()) {
+        return "Host is not configured";
+    }
+
+    try {
+        int sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0) {
+            std::cerr << "Socket creation failed\n";
+            return "Socket creation failed";
+        }
+
+        sockaddr_in serverAddress{};
+        serverAddress.sin_family = AF_INET;
+        serverAddress.sin_port = htons(target_port);
+        inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
+
+        if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
+            std::cerr << "Connection failed to " << host << ":" << target_port << "\n";
+            close(sock);
+            return "Connection failed";
+        }
+
+        std::cout << "Connected to " << host << ":" << target_port << std::endl;
+        send(sock, command.c_str(), command.size(), 0);
+
+        char buffer[1024] = {0};
+        recv(sock, buffer, sizeof(buffer), 0);
+        close(sock);
+        return "Command sent successfully";
+    } catch (const std::exception &e) {
+        std::cerr << "Error on port " << target_port << ": " << e.what() << std::endl;
+        return "Error occurred";
+    }
+}
+#endif
 
 void handle_device_commands(const std::string &command) {
     if (command.substr(0, 5) == "@01DO") {
@@ -366,25 +441,14 @@ void handle_device_commands(const std::string &command) {
             state_4007["field1"] = "OFF";
             state_4007["field2"] = "OFF";
         }
-        // else if (command_type == "10") {
-        //     state_4007["field3"] = "ON";
-        //     state_4007["field4"] = "1";
-        // } 
         else if (command_type == "11") {
             state_4007["field3"] = "ON";
-            // state_4007["field4"] = "1";
         } else if (command_type == "12") {
             state_4007["field3"] = "OFF";
-            // state_4007["field4"] = "0";
         }
-        // else if (command_type == "13") {
-        //     state_4007["field3"] = "OFF";
-        //     state_4007["field4"] = "0";
-        // }
     }
 }
 
-// Handler for sending device commands
 void handle_send_device_commands(const json &json_data, httplib::Response &res) {
     if (host.empty()) {
         res.status = 500;
@@ -433,15 +497,11 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
                     << state_4007["field1"] << ","
                     << state_4007["field2"] << ","
                     << state_4007["field3"] << "\r\n";
-                    // << state_4007["field4"] << "\r\n";
-
-
     json response_json;
     response_json["ButtonResponse"] = response_stream.str();
     res.set_content(response_json.dump(), "application/json");
 }
 
-// Handler for get-port-data
 void handle_get_port_data(httplib::Response &res) {
     json get_response_json;
     get_response_json["connection_status"] = connect_flag ? "Connected" : "Disconnected";
@@ -514,11 +574,13 @@ void handle_options_request(httplib::Response &res) {
 }
 
 int main() {
+#ifdef WINDOWS    
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         std::cerr << "WSAStartup failed." << std::endl;
         return 1;
     }
+#endif
 
     setup_log_directory();
     create_log_file();
@@ -565,6 +627,8 @@ int main() {
     std::cout << "Server is running on http://localhost:5000" << std::endl;
     svr.listen("localhost", 5000);
 
+#ifdef WINDOWS
     WSACleanup();
+#endif
     return 0;
 }
