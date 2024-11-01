@@ -3,8 +3,8 @@ This repository will contain the latest project progress
 
 ## STEPS TO BE FOLLOWED
 
-1. Open folder `be-executable` and launch the .exe file start the backend C++ server. The server will wait for GCS port and configuration info from the Frontend Dashboard.
-2. After that, open `fe-src` folder and open `cmd prompt` on this directory.
+1. Open folder `Backend_Application` and launch the .exe file start the backend C++ server. The server will wait for GCS port and configuration info from the Frontend Dashboard.
+2. After that, open `aerostat_webapp` folder and open `cmd prompt` on this directory.
 3. Type `npm install` to install all the required node_modules. Before running this command, npm will be required in the system as a pre-requisite. Instructions for that are mentioned below.
 4. Afterwards, run `npm run build` to build the src code.
 5. After successful build, run `npm run preview` to launch the Frontend Dashboard.
