@@ -33,7 +33,7 @@ Run npm --version to check the npm version.
 
 
 ## Video Demonstration of Deployment Procedure
-[Deployment Procedure Recording]([url](https://www.loom.com/share/c457404340014f1a92c6fff8859ac802))
+[Deployment Procedure Recording](https://www.loom.com/share/c457404340014f1a92c6fff8859ac802)
 
 ## GCS ANYDESK:
 ID: 1122996002  
