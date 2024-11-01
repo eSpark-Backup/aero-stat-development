@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdlib>
 #include "json.hpp"
+#include "modbus_tcp.h"
 #include <iostream>
 #include "httplib.h"
 #include "log_file.h"
