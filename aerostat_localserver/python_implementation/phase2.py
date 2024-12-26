@@ -6,6 +6,7 @@ import logging
 import threading
 import time
 import random
+import struct
 
 # Configure logging
 logging.basicConfig(level=logging.ERROR)
@@ -53,12 +54,28 @@ RELAY_REGISTERS = {
     "payload_power": 0x0003
 }
 
+def create_load_cell_data_store():
+    return ModbusSlaveContext(
+        di=ModbusSequentialDataBlock(0, [0]*100),
+        co=ModbusSequentialDataBlock(0, [0]*100),
+        hr=ModbusSequentialDataBlock(LOAD_CELL_REGISTER, [0]*2),
+        ir=ModbusSequentialDataBlock(0, [0]*100)
+    )
+
+def create_ahrs_data_store():
+    return ModbusSlaveContext(
+        di=ModbusSequentialDataBlock(0, [0]*100),
+        co=ModbusSequentialDataBlock(0, [0]*100),
+        hr=ModbusSequentialDataBlock(0, [0]*65535),
+        ir=ModbusSequentialDataBlock(0, [0]*100)
+    )
+
 # Create Modbus data store for different sensors
 def create_data_store():
     return ModbusSlaveContext(
         di=ModbusSequentialDataBlock(0, [0]*100),  # Discrete Inputs
         co=ModbusSequentialDataBlock(0, [0]*100),  # Coils
-        hr=ModbusSequentialDataBlock(0, [0]*100),  # Holding Registers
+        hr=ModbusSequentialDataBlock(0, [0]*65535),  # Holding Registers
         ir=ModbusSequentialDataBlock(0, [0]*100)   # Input Registers
     )
 
@@ -92,24 +109,42 @@ def run_modbus_server_with_update(port, context, update_function):
     update.daemon = True
     update.start()
 
-# Update functions for different contexts
+# Function to update weather registers
 def update_weather_registers(context):
     while True:
         try:
             temperature = random.uniform(20, 30)
             humidity = random.uniform(50, 70)
-            wind_speed = random.uniform(0, 10)
+            wind_speed = random.uniform(0, 100)
             wind_direction = random.uniform(0, 360)
+            air_pressure = random.uniform(950, 1050)
 
-            context[0].setValues(3, WEATHER_REGISTERS["temperature"][0], [int(temperature * 100)])
-            context[0].setValues(3, WEATHER_REGISTERS["humidity"][0], [int(humidity * 100)])
-            context[0].setValues(3, WEATHER_REGISTERS["wind_speed"][0], [int(wind_speed * 100)])
-            context[0].setValues(3, WEATHER_REGISTERS["wind_direction"][0], [int(wind_direction)])
+            log.debug(f"Generated weather data: temperature={temperature}, humidity={humidity}, wind_speed={wind_speed}, wind_direction={wind_direction}, air_pressure={air_pressure}")
 
-            log.debug(f"Updated weather registers: temperature={temperature}, humidity={humidity}")
+            context[0].setValues(3, WEATHER_REGISTERS['wind_direction'][0], [int(wind_direction)])
+
+            # Pack the float values into two 16-bit registers
+            temperature_bytes = struct.pack('<f', temperature)
+            temperature_low, temperature_high = struct.unpack('<HH', temperature_bytes)
+            context[0].setValues(3, WEATHER_REGISTERS['temperature'][0], [temperature_low, temperature_high])
+
+            humidity_bytes = struct.pack('<f', humidity)
+            humidity_low, humidity_high = struct.unpack('<HH', humidity_bytes)
+            context[0].setValues(3, WEATHER_REGISTERS['humidity'][0], [humidity_low, humidity_high])
+
+            wind_speed_bytes = struct.pack('<f', wind_speed)
+            wind_speed_low, wind_speed_high = struct.unpack('<HH', wind_speed_bytes)
+            context[0].setValues(3, WEATHER_REGISTERS['wind_speed'][0], [wind_speed_low, wind_speed_high])
+
+            air_pressure_bytes = struct.pack('<f', air_pressure)
+            air_pressure_low, air_pressure_high = struct.unpack('<HH', air_pressure_bytes)
+            context[0].setValues(3, WEATHER_REGISTERS['air_pressure'][0], [air_pressure_low, air_pressure_high])
+
+            log.debug(f"Updated weather registers: temperature={temperature}, humidity={humidity}, wind_speed={wind_speed}, wind_direction={wind_direction}, air_pressure={air_pressure}")
+
         except Exception as e:
             log.error(f"Error updating weather registers: {e}")
-        time.sleep(5)
+        time.sleep(0.2)
 
 def update_load_cell_registers(context):
     while True:
@@ -121,7 +156,7 @@ def update_load_cell_registers(context):
             log.debug(f"Updated load cell registers: high={load_cell_high}, low={load_cell_low}")
         except Exception as e:
             log.error(f"Error updating load cell registers: {e}")
-        time.sleep(5)
+        time.sleep(0.2)
 
 def update_ultrasonic_registers(context):
     while True:
@@ -131,7 +166,7 @@ def update_ultrasonic_registers(context):
             log.debug(f"Updated ultrasonic register: value={ultrasonic_value}")
         except Exception as e:
             log.error(f"Error updating ultrasonic registers: {e}")
-        time.sleep(5)
+        time.sleep(0.2)
 
 def update_pressure_sensor_registers(context):
     while True:
@@ -141,19 +176,19 @@ def update_pressure_sensor_registers(context):
             log.debug(f"Updated pressure sensor register: value={pressure_value}")
         except Exception as e:
             log.error(f"Error updating pressure sensor registers: {e}")
-        time.sleep(5)
+        time.sleep(0.2)
 
 def update_ahrs_gps_registers(context):
     while True:
         try:
-            roll = int((random.uniform(-180, 180) / 180.0) * 32768)
-            pitch = int((random.uniform(-90, 90) / 180.0) * 32768)
-            yaw = int((random.uniform(0, 360) / 180.0) * 32768)
-            longitude = int(random.uniform(-180, 180) * 1000000)
-            latitude = int(random.uniform(-90, 90) * 1000000)
-            altitude = int(random.uniform(0, 10000) * 10)
+            roll = int((random.uniform(0, 360) / 180.0) * (32768))
+            pitch = int((random.uniform(0, 180) / 180.0) * (32768))
+            yaw = int((random.uniform(0, 360) / 180.0) * (32768))
+            longitude = int(random.uniform(0, 2048) * 100)
+            latitude = int(random.uniform(0, 2048) * 100)
+            altitude = int(random.uniform(0, 2048) * 10)
             heading = int(random.uniform(0, 360) * 100)
-            ground_speed = int(random.uniform(0, 100) * 100)
+            ground_speed = int(random.uniform(0, 32768*2))
             pdop = int(random.uniform(0, 10) * 100)
             hdop = int(random.uniform(0, 10) * 100)
             vdop = int(random.uniform(0, 10) * 100)
@@ -178,7 +213,7 @@ def update_ahrs_gps_registers(context):
                       f"heading={heading}, ground_speed={ground_speed}, pdop={pdop}, hdop={hdop}, vdop={vdop}")
         except Exception as e:
             log.error(f"Error updating AHRS/GPS registers: {e}")
-        time.sleep(1)
+        time.sleep(0.2)
 
 def update_relay_registers(context):
     while True:
@@ -204,16 +239,16 @@ def update_temp_humidity_registers(context):
             log.debug(f"Updated temp/humidity registers: temperature={temperature}, humidity={humidity}")
         except Exception as e:
             log.error(f"Error updating temp/humidity registers: {e}")
-        time.sleep(1)
+        time.sleep(0.2)
 
 # Start servers with their respective update routines
 def start_servers():
     contexts = {
-        "load_cell": ModbusServerContext(slaves=create_data_store(), single=True),
+        "load_cell": ModbusServerContext(slaves=create_load_cell_data_store(), single=True),
         "ultrasonic": ModbusServerContext(slaves=create_data_store(), single=True),
         "weather_station": ModbusServerContext(slaves=create_data_store(), single=True),
         "pressure_sensor": ModbusServerContext(slaves=create_data_store(), single=True),
-        "ahrs": ModbusServerContext(slaves=create_data_store(), single=True),
+        "ahrs": ModbusServerContext(slaves=create_ahrs_data_store(), single=True),
         "temp_humidity": ModbusServerContext(slaves=create_data_store(), single=True),
         "relay": ModbusServerContext(slaves=create_data_store(), single=True)
     }
@@ -231,4 +266,4 @@ if __name__ == "__main__":
     log.info("Starting servers and update routines")
     start_servers()
     while True:
-        time.sleep(1)
+        time.sleep(0.2)
