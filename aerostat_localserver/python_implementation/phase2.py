@@ -34,6 +34,14 @@ LOAD_CELL_REGISTER = 0x9C40
 ULTRASONIC_REGISTER = 0x0101
 PRESSURE_SENSOR_REGISTER = 0x0004
 
+# Define relay button configurations
+relay_configs = [
+    {"name": "Primary Blower", "relay_num": 3},
+    {"name": "Secondary Blower", "relay_num": 5},
+    {"name": "Strobe Lights", "relay_nums": [4, 6]},  # Controls both relays 4 and 6
+    {"name": "Payload Power", "relay_num": 7}
+]
+
 WEATHER_REGISTERS = {
     "wind_direction": (0x0001, 1, 'int'),
     "wind_speed": (0x0002, 2, 'float'),
@@ -48,10 +56,12 @@ AHRS_GPS_REGISTERS = {
     'GPSHeight': 0x4D, 'GPSYAW': 0x4E, 'GPSVL': 0x4F, 'GPSVH': 0x50,
     'SVNUM': 0x55, 'PDOP': 0x56, 'HDOP': 0x57, 'VDOP': 0x58
 }
-RELAY_REGISTERS = {
-    "blower": 0x0001,
-    "strobe_light": 0x0002,
-    "payload_power": 0x0003
+RELAY_FUNCTIONS = {
+    3: "Primary Blower",
+    4: "Strobe Light 1",
+    5: "Secondary Blower",
+    6: "Strobe Light 2",
+    7: "Payload Power"
 }
 
 def create_load_cell_data_store():
@@ -67,6 +77,15 @@ def create_ahrs_data_store():
         di=ModbusSequentialDataBlock(0, [0]*100),
         co=ModbusSequentialDataBlock(0, [0]*100),
         hr=ModbusSequentialDataBlock(0, [0]*65535),
+        ir=ModbusSequentialDataBlock(0, [0]*100)
+    )
+
+# Create Modbus data store for weather station and relays
+def create_relay_data_store():
+    return ModbusSlaveContext(
+        di=ModbusSequentialDataBlock(0, [0]*100),
+        co=ModbusSequentialDataBlock(0, [0]*10),  # Coils for relays
+        hr=ModbusSequentialDataBlock(0, [0]*10),
         ir=ModbusSequentialDataBlock(0, [0]*100)
     )
 
@@ -208,26 +227,31 @@ def update_ahrs_gps_registers(context):
             context[0].setValues(3, AHRS_GPS_REGISTERS['HDOP'], [hdop])
             context[0].setValues(3, AHRS_GPS_REGISTERS['VDOP'], [vdop])
 
-            log.error(f"Updated AHRS/GPS registers: roll={roll}, pitch={pitch}, yaw={yaw}, "
+            log.debug(f"Updated AHRS/GPS registers: roll={roll}, pitch={pitch}, yaw={yaw}, "
                       f"longitude={longitude}, latitude={latitude}, altitude={altitude}, "
                       f"heading={heading}, ground_speed={ground_speed}, pdop={pdop}, hdop={hdop}, vdop={vdop}")
         except Exception as e:
             log.error(f"Error updating AHRS/GPS registers: {e}")
         time.sleep(0.2)
 
-def update_relay_registers(context):
+# Function to print relay status
+def print_relay_status(context):
     while True:
         try:
-            blower_state = random.randint(0, 1)
-            strobe_light_state = random.randint(0, 1)
-            payload_power_state = random.randint(0, 1)
-            context[0].setValues(1, RELAY_REGISTERS["blower"], [blower_state])
-            context[0].setValues(1, RELAY_REGISTERS["strobe_light"], [strobe_light_state])
-            context[0].setValues(1, RELAY_REGISTERS["payload_power"], [payload_power_state])
-            log.debug(f"Updated relay registers: blower={blower_state}, strobe_light={strobe_light_state}, payload_power={payload_power_state}")
+            relay_status = {}
+            for config in relay_configs:
+                if "relay_num" in config:
+                    state = context[0].getValues(1, config["relay_num"] - 1, count=1)[0]
+                    relay_status[config["name"]] = 'ON' if state else 'OFF'
+                elif "relay_nums" in config:
+                    states = [context[0].getValues(1, num - 1, count=1)[0] for num in config["relay_nums"]]
+                    relay_status[config["name"]] = 'ON' if all(states) else 'OFF'
+
+            log.error(f"Relay status - " + ", ".join([f"{name}: {status}" for name, status in relay_status.items()]))
+
         except Exception as e:
-            log.error(f"Error updating relay registers: {e}")
-        time.sleep(5)
+            log.error(f"Error reading relay status: {e}")
+        time.sleep(1)
 
 def update_temp_humidity_registers(context):
     while True:
@@ -250,7 +274,7 @@ def start_servers():
         "pressure_sensor": ModbusServerContext(slaves=create_data_store(), single=True),
         "ahrs": ModbusServerContext(slaves=create_ahrs_data_store(), single=True),
         "temp_humidity": ModbusServerContext(slaves=create_data_store(), single=True),
-        "relay": ModbusServerContext(slaves=create_data_store(), single=True)
+        "relay": ModbusServerContext(slaves=create_relay_data_store(), single=True)
     }
 
     run_modbus_server_with_update(PORTS["LOAD_CELL_PORT"], contexts["load_cell"], update_load_cell_registers)
@@ -260,7 +284,7 @@ def start_servers():
     run_modbus_server_with_update(PORTS["HULL_PRESSURE_PORT"], contexts["pressure_sensor"], update_pressure_sensor_registers)
     run_modbus_server_with_update(PORTS["AHRS_PORT"], contexts["ahrs"], update_ahrs_gps_registers)
     run_modbus_server_with_update(PORTS["TEMP_HUMIDITY_TCP_PORT"], contexts["temp_humidity"], update_temp_humidity_registers)
-    run_modbus_server_with_update(PORTS["RELAY_PORT"], contexts["relay"], update_relay_registers)
+    run_modbus_server_with_update(PORTS["RELAY_PORT"], contexts["relay"], print_relay_status)
 
 if __name__ == "__main__":
     log.info("Starting servers and update routines")
