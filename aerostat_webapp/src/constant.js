@@ -304,3 +304,78 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
         }]
     }
 }
+
+export const details = [
+    {
+      key: "Load Cell Tension:",
+      value: "Error",
+    },
+    {
+      key: "Roll:",
+      value: "Error",
+    },
+    {
+      key: "Wind Direction:",
+      value: "Error",
+    },
+    {
+      key: "Pitch:",
+      value: "0.00°",
+    },
+    {
+      key: "Wind Speed:",
+      value: "0.00 m/s",
+    },
+    {
+      key: "Yaw:",
+      value: "0.00°",
+    },
+    {
+      key: "Temperature:",
+      value: "0.00 °C",
+    },
+    {
+      key: "Longitude:",
+      value: "N/A",
+    },
+    {
+      key: "Humidity:",
+      value: "0.00 %",
+    },
+    {
+      key: "Latitude:",
+      value: "N/A",
+    },
+    {
+      key: "Barometric Pressure:",
+      value: "0.00 hPa",
+    },
+    {
+      key: "Altitude:",
+      value: "N/A",
+    },
+    {
+      key: "Ballonet Curtain:",
+      value: "Error",
+    },
+    {
+      key: "Position Accuracy",
+      value: "Error",
+    },
+    {
+      key: "Ballonet Pressure:",
+      value: "Error",
+    },
+    {
+      key: "Ground Speed:",
+      value: "N/A",
+    },
+    {
+      key: "Hull Pressure:",
+      value: "Error",
+    },
+    {
+      key: "Heading:",
+      value: "N/A",
+    },
+  ];
