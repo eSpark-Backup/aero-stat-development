@@ -9,7 +9,7 @@ import random
 import struct
 
 # Configure logging
-logging.basicConfig(level=logging.ERROR)
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
 
 # TCP Server Settings
