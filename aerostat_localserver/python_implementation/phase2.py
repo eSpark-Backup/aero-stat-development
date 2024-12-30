@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
 
 # TCP Server Settings
-TCP_IP = 'localhost'
+TCP_IP = '0.0.0.0'
 PORTS = {
     "LOAD_CELL_PORT": 5005,
     "ULTRASONIC_PORT": 5004,

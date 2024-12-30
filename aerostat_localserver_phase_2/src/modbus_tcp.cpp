@@ -10,9 +10,12 @@
 #define PRESSURE_SENSOR_REGISTER 0x0004
 #define WIND_DIRECTION_REGISTER  0x0001
 #define WIND_SPEED_REGISTER  0x0002
-#define TEMPERATURE_REGISTER  0x0004
-#define HUMIDITY_REGISTER  0x0006
+#define WIND_TEMPERATURE_REGISTER  0x0004
+#define WIND_HUMIDITY_REGISTER  0x0006
 #define AIR_PRESSURE_REGISTER  0x0008
+
+#define TEMP_HUMIDITY_REGISTER 0x0001
+#define HUMIDITY_REGISTER 0x0000
 
 // AHRS/GPS register addresses
 const uint16_t ROLL_REGISTER = 0x3D;
@@ -64,8 +67,8 @@ struct RegisterInfo {
 std::map<std::string, RegisterInfo> WEATHER_REGISTERS = {
     {"wind_direction", {WIND_DIRECTION_REGISTER, 1, "int"}},
     {"wind_speed", {WIND_SPEED_REGISTER, 2, "float"}},
-    {"temperature", {TEMPERATURE_REGISTER, 2, "float"}},
-    {"humidity", {HUMIDITY_REGISTER, 2, "float"}},
+    {"temperature", {WIND_TEMPERATURE_REGISTER, 2, "float"}},
+    {"humidity", {WIND_HUMIDITY_REGISTER, 2, "float"}},
     {"air_pressure", {AIR_PRESSURE_REGISTER, 2, "float"}}
 };
 
@@ -88,6 +91,7 @@ void Modbus_TCP::initSensors() {
     mb_ballonet = new modbus(host, ballonet_pressure);
     mb_hull = new modbus(host, hull_pressure_port);
     mb_ahrs = new modbus(host, ahrs_port);
+    mb_temp_humidity = new modbus(host, temp_humidity_port);
 
     mb_loadcell->modbus_set_slave_id(1);
     mb_ultrasonic->modbus_set_slave_id(2);
@@ -95,6 +99,7 @@ void Modbus_TCP::initSensors() {
     mb_ballonet->modbus_set_slave_id(4);
     mb_hull->modbus_set_slave_id(5);
     mb_ahrs->modbus_set_slave_id(6);
+    mb_temp_humidity->modbus_set_slave_id(7);
 
     load_cell_client = mb_loadcell->modbus_connect();
     ultrasonic_client = mb_ultrasonic->modbus_connect();
@@ -102,6 +107,7 @@ void Modbus_TCP::initSensors() {
     ballonet_pressure_client = mb_ballonet->modbus_connect();
     hull_pressure_client = mb_hull->modbus_connect();
     ahrs_client = mb_ahrs->modbus_connect();
+    temp_humidity_client = mb_temp_humidity->modbus_connect();
 }
 
 void Modbus_TCP::start_readings()
@@ -109,12 +115,12 @@ void Modbus_TCP::start_readings()
     if (!running) {
         running = true;
         // Define and start threads
-        std::thread loadCellThread(&Modbus_TCP::read_load_cell, this);
-        std::thread ultrasonicThread(&Modbus_TCP::read_ultrasonic, this);
-        std::thread weatherThread(&Modbus_TCP::read_weather_station, this);
-        std::thread ballonetThread(&Modbus_TCP::read_pressure_sensor, this);
-        std::thread hullThread(&Modbus_TCP::read_pressure_sensor, this);
-        std::thread ahrsThread(&Modbus_TCP::read_ahrs_gps, this);
+        std::thread loadCellThread(&Modbus_TCP::read_load_cell_thread, this);
+        std::thread ultrasonicThread(&Modbus_TCP::read_ultrasonic_thread, this);
+        std::thread weatherThread(&Modbus_TCP::read_weather_station_thread, this);
+        std::thread ballonetThread(&Modbus_TCP::read_pressure_sensor_thread, this);
+        std::thread hullThread(&Modbus_TCP::read_pressure_sensor_thread, this);
+        std::thread ahrsThread(&Modbus_TCP::read_ahrs_gps_thread, this);
 
         // Detach threads
         loadCellThread.detach();
@@ -126,110 +132,159 @@ void Modbus_TCP::start_readings()
     }
 }
 
-void Modbus_TCP::read_load_cell()
-{
-    while (load_cell_client)
-    {
-        uint16_t regs[2];
-        if (!mb_loadcell->modbus_read_holding_registers(LOAD_CELL_REGISTER, 2, regs))
-        {
-            int16_t high_value = regs[0];
-            int16_t low_value = regs[1];
+// Function to read the load cell data once and return the weight
+double Modbus_TCP::read_load_cell() {
+    uint16_t regs[2];
 
-            // Calculate weight
-            double differential_value = high_value - low_value;
-            const double max_raw_value = 65535.0;
-            const double scaling_adjustment = 3.4;
-            const double max_weight = 2000.0;
+    if (!mb_loadcell->modbus_read_holding_registers(LOAD_CELL_REGISTER, 2, regs)) {
+        int16_t high_value = regs[0];
+        int16_t low_value = regs[1];
 
-            double adjusted_max_weight = max_weight * scaling_adjustment;
-            double weight = (differential_value / max_raw_value) * adjusted_max_weight;
-        } else {
-            std::cerr << "Invalid load cell response.\n";
+        // Calculate weight
+        double differential_value = high_value - low_value;
+        const double max_raw_value = 65535.0;
+        const double scaling_adjustment = 3.4;
+        const double max_weight = 2000.0;
+
+        double adjusted_max_weight = max_weight * scaling_adjustment;
+        double weight = (differential_value / max_raw_value) * adjusted_max_weight;
+
+        return weight;
+    } else {
+        std::cerr << "Invalid load cell response.\n";
+        return -1.0;  // Return an error value
+    }
+}
+
+// Threaded function to continuously read load cell data
+void Modbus_TCP::read_load_cell_thread() {
+    std::cout << "Load cell thread started\n";
+
+    while (load_cell_client) {
+        double weight = read_load_cell();
+        if (weight >= 0) {  // Only store valid weight values
+            std::cout << "Weight: " << weight << " kg\n";
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+
+    std::cout << "Load cell thread ended\n";
+}
+
+// Function to read ultrasonic sensor data once and return the distance
+float Modbus_TCP::read_ultrasonic() {
+    uint16_t regs[1];
+
+    if (!mb_ultrasonic->modbus_read_holding_registers(ULTRASONIC_REGISTER, 1, regs)) {
+        // Convert raw register value to distance in meters
+        return regs[0] / 1000.0;
+    } else {
+        std::cerr << "Invalid ultrasonic response.\n";
+        return -1.0f;  // Return an error value
+    }
+}
+
+// Threaded function to continuously read ultrasonic sensor data
+void Modbus_TCP::read_ultrasonic_thread() {
+    while (ultrasonic_client) {
+        float distance = read_ultrasonic();
+
+        if (distance >= 0) {  // Only process valid distance values
+            std::cout << "Ultrasonic Distance: " << distance << " m\n";
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
 
-void Modbus_TCP::read_ultrasonic()
-{
-    while (ultrasonic_client)
-    {
-        uint16_t regs[1];
-        if (!mb_ultrasonic->modbus_read_holding_registers(ULTRASONIC_REGISTER, 1, regs))
-        {
-            float distance =  regs[0]/1000.0;
-        }
-        else
-        {
-            std::cerr << "Invalid load cell response.\n";
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+float Modbus_TCP::read_pressure() {
+    uint16_t regs[1];  // To store the register values
+
+    // Read the pressure register using modbus_read_holding_registers
+    if (mb_ballonet->modbus_read_holding_registers(PRESSURE_SENSOR_REGISTER, 1, regs) == -1) {
+        std::cerr << "Error reading pressure register\n";
+        return -1.0f;  // Return an invalid value on error
     }
+
+    // Convert the register value to pressure in kPa
+    float pressure_kpa = regs[0] / 1000.0f;
+    
+    // Convert kPa to inWG using the scaling factor
+    float pressure_inwg = pressure_kpa * PRESSURE_SCALING_FACTOR;
+
+    return pressure_inwg;
 }
 
-void Modbus_TCP::read_pressure_sensor()
+void Modbus_TCP::read_pressure_sensor_thread()
 {
     while (ballonet_pressure_client || hull_pressure_client)
     {
-        uint16_t regs[1];
-        if(ballonet_pressure_client)
+        // Read pressure from the ballonet pressure client if active
+        if (ballonet_pressure_client)
         {
-            if (!mb_ballonet->modbus_read_holding_registers(PRESSURE_SENSOR_REGISTER, 1, regs))
-            {
-                float pressure_kpa =  regs[0]/1000.0;
-                float pressure_inwg = pressure_kpa * PRESSURE_SCALING_FACTOR;
-            }
-            else
-            {
-                std::cerr << "Invalid load cell response.\n";
+            float pressure_inwg = read_pressure();
+            if (pressure_inwg != -1.0f) {
+                // Process ballonet pressure (if needed)
+                std::cout << "Ballonet Pressure: " << pressure_inwg << " inWG\n";
             }
         }
-        else if(hull_pressure_client)
+
+        // Read pressure from the hull pressure client if active
+        else if (hull_pressure_client)
         {
-            if (!mb_hull->modbus_read_holding_registers(PRESSURE_SENSOR_REGISTER, 1, regs))
-            {
-                float pressure_kpa =  regs[0]/1000.0;
-                float pressure_inwg = pressure_kpa * PRESSURE_SCALING_FACTOR;
-            }
-            else
-            {
-                std::cerr << "Invalid load cell response.\n";
+            float pressure_inwg = read_pressure();
+            if (pressure_inwg != -1.0f) {
+                // Process hull pressure (if needed)
+                std::cout << "Hull Pressure: " << pressure_inwg << " inWG\n";
             }
         }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
 
-void Modbus_TCP::read_weather_station()
-{
-    while (weather_station_client)
-    {
-        for (const auto& [key, reg_info] : WEATHER_REGISTERS)
-        {
-            uint16_t regs[2] = {0};
-            if (!mb_weatherstation->modbus_read_holding_registers(reg_info.address, reg_info.count, regs))
-            {
-                if (reg_info.data_type == "int")
-                {
-                    int value = regs[0];
-                    std::cout << key << ": " << value << "°\n";
-                } else if (reg_info.data_type == "float")
-                {
-                    float value = convert_to_float(regs);
-                    std::string unit = (key == "wind_speed") ? " m/s" :
-                                       (key == "temperature") ? " °C" :
-                                       (key == "humidity") ? " %" :
-                                       (key == "air_pressure") ? " hPa" : "";
+std::unordered_map<std::string, WeatherParameter> Modbus_TCP::read_weather_station() {
+    std::unordered_map<std::string, WeatherParameter> weather_data;
 
-                    std::cout << key << ": " << value << unit << "\n";
-                }
+    for (const auto& [key, reg_info] : WEATHER_REGISTERS) {
+        uint16_t regs[2] = {0};
+
+        if (!mb_weatherstation->modbus_read_holding_registers(reg_info.address, reg_info.count, regs)) {
+            WeatherParameter parameter;
+            if (reg_info.data_type == "int") {
+                int value = regs[0];
+                parameter.value = static_cast<float>(value);
+                parameter.unit = ""; // No unit for integer data
+            } else if (reg_info.data_type == "float") {
+                float value = convert_to_float(regs);
+                parameter.value = value;
+                parameter.unit = (key == "wind_speed") ? "m/s" :
+                                 (key == "temperature") ? "°C" :
+                                 (key == "humidity") ? "%" :
+                                 (key == "air_pressure") ? "hPa" : "";
             }
-            else
-            {
-                std::cerr << "Error reading " << key << " register.\n";
-            }
+
+            // Store the parameter in the map
+            weather_data[key] = parameter;
+        } else {
+            std::cerr << "Error reading " << key << " register.\n";
         }
+    }
+
+    return weather_data;
+}
+
+void Modbus_TCP::read_weather_station_thread() {
+    while (weather_station_client) {
+        // Get the weather data from the station
+        auto weather_data = read_weather_station();
+
+        // Print the weather parameters
+        for (const auto& [key, parameter] : weather_data) {
+            std::cout << key << ": " << parameter.value << " " << parameter.unit << "\n";
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 }
@@ -240,35 +295,63 @@ float Modbus_TCP::convert_to_float(uint16_t regs[2])
     return *reinterpret_cast<float*>(&combined);
 }
 
-void Modbus_TCP::read_ahrs_gps()
-{
-    while (ahrs_client)
-    {
-        std::map<std::string, uint16_t> data;
-        for (const auto& [key, reg_info] : AHRS_GPS_REGISTERS) {
-            uint16_t regs[1] = {0};
-            if (!mb_ahrs->modbus_read_holding_registers(reg_info.address, reg_info.count, regs)) {
-                data[key] = regs[0];
-            } else {
-                std::cerr << "Error reading " << key << " register.\n";
-            }
-        }
 
-        float roll = (data["roll"] / 32768.0f) * 180.0f;
-        float pitch = (data["pitch"] / 32768.0f) * 180.0f;
-        float yaw = (data["yaw"] / 32768.0f) * 180.0f;
-        float longitude = ((data["LonH"] << 16) | data["LonL"]) / 1000000.0f;
-        float latitude = ((data["LatH"] << 16) | data["LatL"]) / 1000000.0f;
-        float altitude = data["GPSHeight"] / 10.0f;
-        float heading = data["GPSYAW"] / 100.0f;
-        float ground_speed = ((data["GPSVH"] << 16) | data["GPSVL"]) * 0.01f;
-        float pdop = data["PDOP"] / 100.0f;
-        float hdop = data["HDOP"] / 100.0f;
-        float vdop = data["VDOP"] / 100.0f;
-        float position_accuracy = calculate_position_accuracy(pdop, hdop, vdop);
+AhrsGpsData Modbus_TCP::read_ahrs_gps_data() {
+    std::map<std::string, uint16_t> data;
+
+    // Read the registers for AHRS GPS data
+    for (const auto& [key, reg_info] : AHRS_GPS_REGISTERS) {
+        uint16_t regs[1] = {0};
+        if (!mb_ahrs->modbus_read_holding_registers(reg_info.address, reg_info.count, regs)) {
+            data[key] = regs[0];
+        } else {
+            std::cerr << "Error reading " << key << " register.\n";
+        }
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    // Process the data and fill the AhrsGpsData structure
+    AhrsGpsData ahrs_gps_data;
+    ahrs_gps_data.roll = (data["roll"] / 32768.0f) * 180.0f;
+    ahrs_gps_data.pitch = (data["pitch"] / 32768.0f) * 180.0f;
+    ahrs_gps_data.yaw = (data["yaw"] / 32768.0f) * 180.0f;
+    ahrs_gps_data.longitude = ((data["LonH"] << 16) | data["LonL"]) / 1000000.0f;
+    ahrs_gps_data.latitude = ((data["LatH"] << 16) | data["LatL"]) / 1000000.0f;
+    ahrs_gps_data.altitude = data["GPSHeight"] / 10.0f;
+    ahrs_gps_data.heading = data["GPSYAW"] / 100.0f;
+    ahrs_gps_data.ground_speed = ((data["GPSVH"] << 16) | data["GPSVL"]) * 0.01f;
+    ahrs_gps_data.pdop = data["PDOP"] / 100.0f;
+    ahrs_gps_data.hdop = data["HDOP"] / 100.0f;
+    ahrs_gps_data.vdop = data["VDOP"] / 100.0f;
+    ahrs_gps_data.position_accuracy = calculate_position_accuracy(ahrs_gps_data.pdop, ahrs_gps_data.hdop, ahrs_gps_data.vdop);
+
+    return ahrs_gps_data;
 }
+
+void Modbus_TCP::read_ahrs_gps_thread() {
+    while (ahrs_client) {
+        // Step 1: Get the AHRS GPS data
+        AhrsGpsData ahrs_gps_data = read_ahrs_gps_data();
+
+        // Optional: Print the values (for debugging purposes)
+        std::cout << "Roll: " << ahrs_gps_data.roll << "°\n";
+        std::cout << "Pitch: " << ahrs_gps_data.pitch << "°\n";
+        std::cout << "Yaw: " << ahrs_gps_data.yaw << "°\n";
+        std::cout << "Longitude: " << ahrs_gps_data.longitude << "°\n";
+        std::cout << "Latitude: " << ahrs_gps_data.latitude << "°\n";
+        std::cout << "Altitude: " << ahrs_gps_data.altitude << " m\n";
+        std::cout << "Heading: " << ahrs_gps_data.heading << "°\n";
+        std::cout << "Ground Speed: " << ahrs_gps_data.ground_speed << " m/s\n";
+        std::cout << "PDOP: " << ahrs_gps_data.pdop << "\n";
+        std::cout << "HDOP: " << ahrs_gps_data.hdop << "\n";
+        std::cout << "VDOP: " << ahrs_gps_data.vdop << "\n";
+        std::cout << "Position Accuracy: " << ahrs_gps_data.position_accuracy << "\n";
+
+        // Step 2: Sleep for a while before reading again
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+}
+
+
 
 float Modbus_TCP::calculate_position_accuracy(float pdop, float hdop, float vdop) 
 {
@@ -280,4 +363,60 @@ float Modbus_TCP::calculate_position_accuracy(float pdop, float hdop, float vdop
     float vdop_accuracy = max(0.0f, min(100.0f, 100.0f - ((vdop - min_dop) / (max_dop - min_dop)) * 100.0f));
 
     return min(pdop_accuracy, min(hdop_accuracy, vdop_accuracy));
+}
+
+
+TempHumidityData Modbus_TCP::read_temp_humidity_data() {
+    // Data structure to store the result
+    TempHumidityData temp_humidity_data;
+
+    // Read the temperature register
+    uint16_t temp_regs[1] = {0};
+    if (!mb_temp_humidity->modbus_read_holding_registers(TEMP_HUMIDITY_REGISTER, 1, temp_regs)) {
+        // Convert to float, assuming that the value in the register is in an appropriate range
+        temp_humidity_data.temperature = temp_regs[0] / 10.0f;  // Adjust division as needed
+    } else {
+        std::cerr << "Error reading temperature register.\n";
+        temp_humidity_data.temperature = 0.0f;  // Set default value on error
+    }
+
+    // Read the humidity register
+    uint16_t hum_regs[1] = {0};
+    if (!mb_temp_humidity->modbus_read_holding_registers(HUMIDITY_REGISTER, 1, hum_regs)) {
+        // Convert to float, assuming the register value represents humidity in percentage
+        temp_humidity_data.humidity = hum_regs[0]  / 10.0f;  // Adjust division as needed
+    } else {
+        std::cerr << "Error reading humidity register.\n";
+        temp_humidity_data.humidity = 0.0f;  // Set default value on error
+    }
+
+    // Return the populated data structure
+    return temp_humidity_data;
+}
+
+void Modbus_TCP::set_host(std::string __host){
+    host = __host;
+}
+
+bool Modbus_TCP::is_connected()
+{
+     try {
+#ifdef WINDOWS        
+        std::string command = "ping -n 1 -w 1000 " + host;
+#else
+        std::string command = "ping -c 1 -W 1 " + host;
+#endif        
+        int return_code = system(command.c_str());
+
+        if (return_code == 0) {
+            std::cout << "MODBUS Host " << host << " is reachable." << std::endl;
+            return true;
+        } else {
+            std::cout << "MODBUS Host " << host << " is unreachable." << std::endl;
+            return false;
+        }
+    } catch (const std::exception &e) {
+        std::cerr << "Error occurred while pinging " << host << ": " << e.what() << std::endl;
+        return false;
+    }
 }

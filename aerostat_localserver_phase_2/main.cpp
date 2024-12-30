@@ -37,6 +37,7 @@ std::map<int, int> sockets;
 using namespace std;
 using json = nlohmann::json;
 
+Modbus_TCP modbus;
 std::map<int, bool> connection_status;
 bool connect_flag =false;
 bool port_flag =false;
@@ -44,6 +45,16 @@ bool connect_thread_flag =false;
 std::string TENSION_REQ_MSG = "#01\r";
 std::string host;
 std::vector<int> ports;
+
+const int hull_pressure_port = 5001;
+const int ballonet_pressure = 5002;
+const int ahrs_port = 5003;
+const int ultrasonic_port = 5004;
+const int load_cell_port = 5005;
+const int temp_humidity_port = 5006;
+const int weather_station_port = 5007;
+
+std::vector<int> modbus_ports = {hull_pressure_port, ballonet_pressure, ahrs_port, ultrasonic_port, load_cell_port, temp_humidity_port, weather_station_port};
 
 // Placeholder data structures for registers
 // (These would be the real Modbus register addresses and corresponding data structures)
@@ -63,6 +74,7 @@ struct RawTcpData {
 };
 
 void continuous_port_connection();
+void continuous_port_connection_modbus();
 bool check_host_reachable(const std::string &ip_address);
 std::string fetch_modbus_data(int port);
 std::string connect_to_port(int port);
@@ -70,6 +82,115 @@ std::string connect_to_port(int port);
 json final_json_response;
 json json_data;
 std::mutex port_data_mutex;
+json json_data_modbus;
+std::mutex modbus_json_mutex;
+
+void continuous_port_connection_modbus() {
+    while(connect_flag)
+    {
+        std::lock_guard<std::mutex> lock(modbus_json_mutex);
+
+        // if (system_data_map.find("current_data") != system_data_map.end()) {
+        if(modbus.is_connected()) {
+            for(int port : modbus_ports)
+            {
+                switch(port){
+                    case hull_pressure_port:
+                    {
+                        json hull_json;
+                        hull_json["Hull_Pressure"] = modbus.read_pressure();
+                        json_data_modbus["port_" + std::to_string(port)] = hull_json;
+                        break;
+                    }
+                    case ballonet_pressure:
+                    {
+                        json ballonet_json;
+                        ballonet_json["Ballonet_Pressure"] = modbus.read_pressure();
+                        json_data_modbus["port_" + std::to_string(port)] = ballonet_json;
+                        break;
+                    }
+                    case ahrs_port:
+                    {
+                        // Step 1: Get the AHRS GPS data using the read_ahrs_gps_data function
+                        AhrsGpsData ahrs_data = modbus.read_ahrs_gps_data();
+
+                        // Step 2: Create a json object to store the data
+                        json ahrs_json;
+                        ahrs_json["Latitude"] = ahrs_data.latitude;
+                        ahrs_json["Longitude"] = ahrs_data.longitude;
+                        ahrs_json["Roll"] = ahrs_data.roll;
+                        ahrs_json["Pitch"] = ahrs_data.pitch;
+                        ahrs_json["Yaw"] = ahrs_data.yaw;
+                        ahrs_json["Altitude"] = ahrs_data.altitude;
+                        ahrs_json["Heading"] = ahrs_data.heading;
+                        ahrs_json["Ground_Speed"] = ahrs_data.ground_speed;
+                        ahrs_json["PDOP"] = ahrs_data.pdop;
+                        ahrs_json["HDOP"] = ahrs_data.hdop;
+                        ahrs_json["VDOP"] = ahrs_data.vdop;
+                        ahrs_json["Position_Accuracy"] = ahrs_data.position_accuracy;
+
+                        // Step 3: Add the json data to the main json_data_modbus map
+                        json_data_modbus["port_" + std::to_string(port)] = ahrs_json;
+
+                        break;
+                    }
+                    case load_cell_port:
+                    {
+
+                        json load_cell_json;
+                        load_cell_json["Tension"] = modbus.read_load_cell();
+                        json_data_modbus["port_" + std::to_string(port)] = load_cell_json;
+                        break;
+                    }
+                    case ultrasonic_port:
+                    {
+                        json ultrasonic_json;
+                        ultrasonic_json["ballonet_curtain"] = modbus.read_ultrasonic();
+                        json_data_modbus["port_" + std::to_string(port)] = ultrasonic_json;
+                        break;
+                    }
+                    case temp_humidity_port:
+                    {
+                        json temp_humidity_json;
+                        TempHumidityData temp_humidity_data = modbus.read_temp_humidity_data();
+                        temp_humidity_json["Temperature"] = temp_humidity_data.temperature;
+                        temp_humidity_json["Humidity"] = temp_humidity_data.humidity;
+                        json_data_modbus["port_" + std::to_string(port)] = temp_humidity_json;
+                        break;
+                    }
+                    case weather_station_port: {
+                        // Step 1: Fetch weather data from the station
+                        auto weather_data = modbus.read_weather_station();  // Calling the function to get weather data
+
+                        // Step 2: Create a JSON object and populate it with weather data
+                        json weather_station_json;
+                        for (const auto& [key, parameter] : weather_data) {
+                            weather_station_json[key] = parameter.value;
+                        }
+
+                        // Step 3: Store the weather data in json_data_modbus under the current port
+                        json_data_modbus["port_" + std::to_string(port)] = weather_station_json;
+
+                        // Optional: Print the data (for debugging purposes)
+                        for (const auto& [key, parameter] : weather_data) {
+                            std::cout << key << ": " << parameter.value << " " << parameter.unit << "\n";
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+        else {
+            std::cout << "Error: Telemetry data not found in system_data_map.\n";
+        }
+#ifdef WINDOWS        
+        Sleep(200);
+#else
+        usleep(200 * 1000);
+#endif 
+    }
+}
 
 void continuous_port_connection() {
     WeatherStation ws;
@@ -201,6 +322,7 @@ void ping_host() {
             if(!connect_thread_flag)
             {
                 std::thread(continuous_port_connection).detach();
+                std::thread(continuous_port_connection_modbus).detach();
             }
         } else {
             std::cout << "Host unreachable, disconnecting..." << std::endl;
@@ -368,8 +490,18 @@ std::string connect_to_port(int port)
 // Simulated Modbus fetch function (to be replaced with real Modbus code)
 std::string fetch_modbus_data() 
 {
-    // return "Modbus Data from port " + std::to_string("port");
-    return "Modbus Data from port ";
+    json get_response_json;
+    if(json_data_modbus.empty())
+    {
+        get_response_json["port_data"] = nullptr;
+    }
+    else
+    {
+        get_response_json["port_data"] = json_data_modbus;
+    }
+        
+    return get_response_json.dump();
+    // return "{\"dummy\": \"data\"}";
 }
 
 // Fetch and parse data from raw TCP sockets for the specified port
@@ -459,6 +591,8 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
     }
 
     host = json_data["ip"].get<std::string>();
+    modbus.set_host(host);
+    modbus.initSensors();
     ports = {
         json_data["weather"].get<int>(),
         json_data["hmr"].get<int>(),
@@ -486,7 +620,8 @@ void handle_options_request(httplib::Response &res) {
 
 int main() {
     httplib::Server svr;
-    Modbus_TCP modbus;
+
+
     // Define the POST endpoint to toggle the phase
     svr.Post("/toggle-phase", handle_toggle_phase);
 
@@ -517,8 +652,10 @@ int main() {
 
     std::thread(ping_host).detach();
 
-    modbus.initSensors();
-    modbus.start_readings();
+
+    // Keep the main thread alive
+    std::cout << "Press Enter to stop readings..." << std::endl;
+    std::cin.get();    
 
     return 0;
 }
