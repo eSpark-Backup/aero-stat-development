@@ -539,12 +539,12 @@ void handle_toggle_phase(const httplib::Request& req, httplib::Response& res) {
 
         if (toggle_value == "true") {
             phase = !phase;  // Toggle the phase flag
-            std::cout << "Phase is now: " << (phase ? "Modbus" : "Raw TCP") << std::endl;
+            std::cout << "Phase is now: " << (phase ? "modbustcp" : "rawtcp") << std::endl;
         }
     }
 
     // Respond with the current phase
-    std::string response = "{ \"phase\": \"" + std::string(phase ? "Modbus" : "Raw TCP") + "\" }";
+    std::string response = "{ \"phase_type\": \"" + std::string(phase ? "modbustcp" : "rawtcp") + "\" }";
     res.set_content(response, "application/json");
 }
 
@@ -561,7 +561,7 @@ void handle_fetch_data(const httplib::Request& req, httplib::Response& res) {
     std::string data = fetch_data();
     auto response_json = nlohmann::json::parse(data);
 
-    response_json["connection_status"] = "Connected";
+    response_json["connection_status"] = connect_flag ? "Connected" : "Disconnected";
     response_json["phase_type"] = phase ? "modbustcp" : "rawtcp";
 
     // Send the response with the fetched data
