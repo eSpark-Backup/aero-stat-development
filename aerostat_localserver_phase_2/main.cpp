@@ -38,6 +38,7 @@ using namespace std;
 using json = nlohmann::json;
 
 Modbus_TCP modbus;
+bool phase = false;  // Global flag to toggle between raw TCP and Modbus data fetchers
 std::map<int, bool> connection_status;
 bool connect_flag =false;
 bool port_flag =false;
@@ -122,14 +123,14 @@ void continuous_port_connection_modbus() {
                     case hull_pressure_port:
                     {
                         json hull_json;
-                        hull_json["Hull_Pressure"] = modbus.read_pressure();
+                        hull_json["hull_pressure"] = modbus.read_pressure();
                         json_data_modbus["port_" + std::to_string(port)] = hull_json;
                         break;
                     }
                     case ballonet_pressure:
                     {
                         json ballonet_json;
-                        ballonet_json["Ballonet_Pressure"] = modbus.read_pressure();
+                        ballonet_json["bal_pressure"] = modbus.read_pressure();
                         json_data_modbus["port_" + std::to_string(port)] = ballonet_json;
                         break;
                     }
@@ -140,18 +141,18 @@ void continuous_port_connection_modbus() {
 
                         // Step 2: Create a json object to store the data
                         json ahrs_json;
-                        ahrs_json["Latitude"] = ahrs_data.latitude;
-                        ahrs_json["Longitude"] = ahrs_data.longitude;
-                        ahrs_json["Roll"] = ahrs_data.roll;
-                        ahrs_json["Pitch"] = ahrs_data.pitch;
-                        ahrs_json["Yaw"] = ahrs_data.yaw;
-                        ahrs_json["Altitude"] = ahrs_data.altitude;
-                        ahrs_json["Heading"] = ahrs_data.heading;
-                        ahrs_json["Ground_Speed"] = ahrs_data.ground_speed;
-                        ahrs_json["PDOP"] = ahrs_data.pdop;
-                        ahrs_json["HDOP"] = ahrs_data.hdop;
-                        ahrs_json["VDOP"] = ahrs_data.vdop;
-                        ahrs_json["Position_Accuracy"] = ahrs_data.position_accuracy;
+                        ahrs_json["latitude"] = ahrs_data.latitude;
+                        ahrs_json["longitude"] = ahrs_data.longitude;
+                        ahrs_json["roll"] = ahrs_data.roll;
+                        ahrs_json["pitch"] = ahrs_data.pitch;
+                        ahrs_json["yaw"] = ahrs_data.yaw;
+                        ahrs_json["altitude"] = ahrs_data.altitude;
+                        ahrs_json["heading"] = ahrs_data.heading;
+                        ahrs_json["ground_speed"] = ahrs_data.ground_speed;
+                        ahrs_json["pdop"] = ahrs_data.pdop;
+                        ahrs_json["hdop"] = ahrs_data.hdop;
+                        ahrs_json["vdop"] = ahrs_data.vdop;
+                        ahrs_json["position_accuracy"] = ahrs_data.position_accuracy;
 
                         // Step 3: Add the json data to the main json_data_modbus map
                         json_data_modbus["port_" + std::to_string(port)] = ahrs_json;
@@ -162,7 +163,7 @@ void continuous_port_connection_modbus() {
                     {
 
                         json load_cell_json;
-                        load_cell_json["Tension"] = modbus.read_load_cell();
+                        load_cell_json["tension"] = modbus.read_load_cell();
                         json_data_modbus["port_" + std::to_string(port)] = load_cell_json;
                         break;
                     }
@@ -177,8 +178,8 @@ void continuous_port_connection_modbus() {
                     {
                         json temp_humidity_json;
                         TempHumidityData temp_humidity_data = modbus.read_temp_humidity_data();
-                        temp_humidity_json["Temperature"] = temp_humidity_data.temperature;
-                        temp_humidity_json["Humidity"] = temp_humidity_data.humidity;
+                        temp_humidity_json["temperature"] = temp_humidity_data.temperature;
+                        temp_humidity_json["humidity"] = temp_humidity_data.humidity;
                         json_data_modbus["port_" + std::to_string(port)] = temp_humidity_json;
                         break;
                     }
@@ -252,27 +253,27 @@ void continuous_port_connection() {
                             case 4002: {
                             ParsedData ws_data = ws.readWeatherSData(data);
                             json weather_json;
-                            ws_data.status = port_flag ? "Connected" : "Disconnected";
-                            weather_json["connectionstatus"] = ws_data.status;
+                            ws_data.status = port_flag ? "connected" : "disconnected";
+                            weather_json["connection_status"] = ws_data.status;
                             if(OFFSET(HEADING_OFFSET) & ws_data.flag)
                             {
                                 weather_json["heading"] = ws_data.heading;
                             }
                             if(OFFSET(BAROPRES_OFFSET) & ws_data.flag)
                             {
-                                weather_json["baroPres"] = ws_data.barometricPressure;
+                                weather_json["baro_presssure"] = ws_data.barometricPressure;
                             }
                             if(OFFSET(AIRTEMP_OFFSET) & ws_data.flag)
                             {
-                                weather_json["airTemp"] = ws_data.airTemperature;
+                                weather_json["air_temp"] = ws_data.airTemperature;
                             }
                             if(OFFSET(WINDANGLE_OFFSET) & ws_data.flag)
                             {
-                                weather_json["windAngle"] = ws_data.windAngle;
+                                weather_json["wind_angle"] = ws_data.windAngle;
                             }
                             if(OFFSET(WINDSPEED_OFFSET) & ws_data.flag)
                             {
-                                weather_json["windSpeed"] = ws_data.windSpeed;
+                                weather_json["wind_speed"] = ws_data.windSpeed;
                             }
                             
                             json_data["port_" + std::to_string(port)] = weather_json;
@@ -281,19 +282,19 @@ void continuous_port_connection() {
                         case 4003: {
                             ParsedData_DC dc_data = dc.readDigitalCompassData(data);
                             json compass_json;
-                            dc_data.status = port_flag ? "Connected" : "Disconnected";
-                            compass_json["connectionstatus"] = dc_data.status;
+                            dc_data.status = port_flag ? "connected" : "disconnected";
+                            compass_json["connection_status"] = dc_data.status;
                             if(OFFSET(MAGHEADING_OFFSET) & dc_data.flag)
                             {
-                                compass_json["Magheading"] = dc_data.Magheading;
+                                compass_json["mag_heading"] = dc_data.Magheading;
                             }
                             if(OFFSET(PITCH_OFFSET) & dc_data.flag)
                             {
-                                compass_json["Pitch"] = dc_data.Pitch;
+                                compass_json["pitch"] = dc_data.Pitch;
                             }
                             if(OFFSET(ROLL_OFFSET) & dc_data.flag)
                             {
-                                compass_json["Roll"] = dc_data.Roll;
+                                compass_json["roll"] = dc_data.Roll;
                             }
                             json_data["port_" + std::to_string(port)] = compass_json;
                             break;
@@ -301,11 +302,11 @@ void continuous_port_connection() {
                         case 4004: {
                             ParsedData_BP bp_data = bp.readBalPressureData(data);
                             json pressure_json;
-                            bp_data.status = port_flag ? "Connected" : "Disconnected";
-                            pressure_json["connectionstatus"] = bp_data.status;
+                            bp_data.status = port_flag ? "connected" : "disconnected";
+                            pressure_json["connection_status"] = bp_data.status;
                             if(OFFSET(BALPRES_OFFSET) & bp_data.flag)
                             {
-                                pressure_json["BalPressure"] = bp_data.BalPressure;
+                                pressure_json["bal_pressure"] = bp_data.BalPressure;
                             }
                             json_data["port_" + std::to_string(port)] = pressure_json;
                             break;
@@ -313,11 +314,11 @@ void continuous_port_connection() {
                         case 4005: {
                             ParsedData_HP hp_data = hp.readHelPressureData(data);
                             json helium_pressure_json;
-                            hp_data.status = port_flag ? "Connected" : "Disconnected";
-                            helium_pressure_json["connectionstatus"] = hp_data.status;
+                            hp_data.status = port_flag ? "connected" : "disconnected";
+                            helium_pressure_json["connection_status"] = hp_data.status;
                             if(OFFSET(HELPRES_OFFSET) & hp_data.flag)
                             {
-                                helium_pressure_json["HelPressure"] = hp_data.HelPressure;
+                                helium_pressure_json["hel_pressure"] = hp_data.HelPressure;
                             }
                             json_data["port_" + std::to_string(port)] = helium_pressure_json;
                             break;
@@ -325,15 +326,15 @@ void continuous_port_connection() {
                         case 4006: {
                             ParsedData_AS as_data = as.readAdamsSensorData(data);
                             json adams_sensor_json;
-                            as_data.status = port_flag ? "Connected" : "Disconnected";
-                            adams_sensor_json["connectionstatus"] = as_data.status;
+                            as_data.status = port_flag ? "connected" : "disconnected";
+                            adams_sensor_json["connection_status"] = as_data.status;
                             if(OFFSET(TENSION) & as_data.flag)
                             {
-                                adams_sensor_json["Tension"] = as_data.Tension;
+                                adams_sensor_json["tension"] = as_data.Tension;
                             }
                             if(OFFSET(MAX_TENSION) & as_data.flag)
                             {
-                                adams_sensor_json["MaxTension"] = as_data.MaxTension;
+                                adams_sensor_json["max_tension"] = as_data.MaxTension;
                             }
                             json_data["port_" + std::to_string(port)] = adams_sensor_json;
                             break;
@@ -541,7 +542,6 @@ std::string fetch_modbus_data()
     }
         
     return get_response_json.dump();
-    // return "{\"dummy\": \"data\"}";
 }
 
 // Fetch and parse data from raw TCP sockets for the specified port
@@ -558,8 +558,6 @@ std::string fetch_raw_tcp_data() {
 
     return get_response_json.dump();
 }
-
-bool phase = false;  // Global flag to toggle between raw TCP and Modbus data fetchers
 
 // Function to fetch data based on the current phase
 std::string fetch_data() {
@@ -671,12 +669,6 @@ void handle_device_commands(const std::string &command) {
 }
 
 void handle_send_device_commands(const json &json_data, httplib::Response &res) {
-    // if (host.empty()) {
-    //     res.status = 500;
-    //     res.set_content(R"({"error": "Host is not configured"})", "application/json");
-    //     return;
-    // }
-
     if(phase)
     {
         if (modbus_host.empty()) {
@@ -685,7 +677,7 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
             return;
         }   
         if (!check_host_reachable(modbus_host)) {
-            res.set_content(R"({"connection_status": "Disconnected"})", "application/json");
+            res.set_content(R"({"connection_status": "disconnected"})", "application/json");
             return;
         }
     }
@@ -697,7 +689,7 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
             return;
         }   
         if (!check_host_reachable(host)) {
-            res.set_content(R"({"connection_status": "Disconnected"})", "application/json");
+            res.set_content(R"({"connection_status": "disconnected"})", "application/json");
             return;
         }
 
@@ -716,6 +708,16 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
         bool strobe_lights_value = json_data.value("strobe_lights", false);
         bool payload_power_value = json_data.value("payload_power", false);
         int relay_setting = (primary_blower_value << 3) | (secondary_blower_value << 2) | (strobe_lights_value << 1) | payload_power_value;
+
+        if (!json_data.contains("primary_blower") && 
+            !json_data.contains("secondary_blower") && 
+            !json_data.contains("strobe_lights") && 
+            !json_data.contains("payload_power")) 
+        {
+            res.status = 400;
+            res.set_content(R"({"error": "No valid commands provided"})", "application/json");
+            return;
+        }
         
         std::cout << "Relay Settings:" << std::endl;
         std::cout << "Primary Blower: " << (primary_blower_value ? "ON" : "OFF") << std::endl;
@@ -780,7 +782,7 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
                         << state_4007["field2"] << ","
                         << state_4007["field3"] << "\r\n";
         json response_json;
-        response_json["ButtonResponse"] = response_stream.str();
+        response_json["button_response"] = response_stream.str();
         res.set_content(response_json.dump(), "application/json");
     }
     
@@ -818,12 +820,12 @@ void handle_fetch_data(const httplib::Request& req, httplib::Response& res) {
     if(phase)
     {
         response_json["phase_type"] = "modbustcp";
-        response_json["connection_status"] = modbus.is_connected() ? "Connected" : "Disconnected";
+        response_json["connection_status"] = modbus.is_connected() ? "connected" : "disconnected";
     }
     else
     {
         response_json["phase_type"] = "rawtcp";
-        response_json["connection_status"] = connect_flag ? "Connected" : "Disconnected";   
+        response_json["connection_status"] = connect_flag ? "connected" : "disconnected";   
     }
     // response_json["phase_type"] = phase ? "modbustcp" : "rawtcp";
 
