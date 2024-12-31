@@ -14,11 +14,12 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 
 :: Build the project
 echo Building the project...
-cmake --build .
+cmake --build . --config release
 
 :: Navigate to the debug directory and run the test executable
 echo Navigating to the debug directory...
-cd debug
+@REM cd debug
+cd release
 
 echo Running the test executable...
 TEST.exe

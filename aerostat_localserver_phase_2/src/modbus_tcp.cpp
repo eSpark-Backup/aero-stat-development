@@ -422,8 +422,14 @@ void Modbus_TCP::set_host(std::string __host){
 
 bool Modbus_TCP::is_connected()
 {
-     try {
-#ifdef WINDOWS        
+    if(host.empty())
+    {
+        std::cerr << "Host is not configured.\n";
+        return false;
+    }
+
+    try {
+#ifdef _WIN32        
         std::string command = "ping -n 1 -w 1000 " + host;
 #else
         std::string command = "ping -c 1 -W 1 " + host;

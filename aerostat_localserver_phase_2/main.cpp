@@ -46,6 +46,7 @@ std::string fans_command = "";
 std::string lights_command = "";
 std::string TENSION_REQ_MSG = "#01\r";
 std::string host;
+std::string modbus_host;
 std::vector<int> ports;
 int target_port = 4006;
 
@@ -109,7 +110,7 @@ json json_data_modbus;
 std::mutex modbus_json_mutex;
 
 void continuous_port_connection_modbus() {
-    while(connect_flag)
+    while(1)
     {
         std::lock_guard<std::mutex> lock(modbus_json_mutex);
 
@@ -362,7 +363,6 @@ void ping_host() {
             if(!connect_thread_flag)
             {
                 std::thread(continuous_port_connection).detach();
-                std::thread(continuous_port_connection_modbus).detach();
             }
         } else {
             std::cout << "Host unreachable, disconnecting..." << std::endl;
@@ -671,15 +671,36 @@ void handle_device_commands(const std::string &command) {
 }
 
 void handle_send_device_commands(const json &json_data, httplib::Response &res) {
-    if (host.empty()) {
-        res.status = 500;
-        res.set_content(R"({"error": "Host is not configured"})", "application/json");
-        return;
-    }
+    // if (host.empty()) {
+    //     res.status = 500;
+    //     res.set_content(R"({"error": "Host is not configured"})", "application/json");
+    //     return;
+    // }
 
-    if (!check_host_reachable(host)) {
-        res.set_content(R"({"connection_status": "Disconnected"})", "application/json");
-        return;
+    if(phase)
+    {
+        if (modbus_host.empty()) {
+            res.status = 500;
+            res.set_content(R"({"error": "Host is not configured"})", "application/json");
+            return;
+        }   
+        if (!check_host_reachable(modbus_host)) {
+            res.set_content(R"({"connection_status": "Disconnected"})", "application/json");
+            return;
+        }
+    }
+    else
+    {
+        if (host.empty()) {
+            res.status = 500;
+            res.set_content(R"({"error": "Host is not configured"})", "application/json");
+            return;
+        }   
+        if (!check_host_reachable(host)) {
+            res.set_content(R"({"connection_status": "Disconnected"})", "application/json");
+            return;
+        }
+
     }
 
     if (json_data.is_null()) {
@@ -720,6 +741,10 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
                     std::cerr << "Failed to write to relay " << relay_num << " (" << config.name << ").\n";
                 }
             }
+
+            json response_json;
+            response_json["relay_response"] = "Relay settings updated successfully";
+            res.set_content(response_json.dump(), "application/json");
         }
     }
     else
@@ -790,8 +815,17 @@ void handle_fetch_data(const httplib::Request& req, httplib::Response& res) {
     std::string data = fetch_data();
     auto response_json = nlohmann::json::parse(data);
 
-    response_json["connection_status"] = connect_flag ? "Connected" : "Disconnected";
-    response_json["phase_type"] = phase ? "modbustcp" : "rawtcp";
+    if(phase)
+    {
+        response_json["phase_type"] = "modbustcp";
+        response_json["connection_status"] = modbus.is_connected() ? "Connected" : "Disconnected";
+    }
+    else
+    {
+        response_json["phase_type"] = "rawtcp";
+        response_json["connection_status"] = connect_flag ? "Connected" : "Disconnected";   
+    }
+    // response_json["phase_type"] = phase ? "modbustcp" : "rawtcp";
 
     // Send the response with the fetched data
     res.set_content(response_json.dump(), "application/json");
@@ -804,7 +838,7 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
         return;
     }
 
-    if (!json_data.contains("ip")) {
+    if (!json_data.contains("rawtcp_host_ip") | !json_data.contains("modbustcp_host_ip")) {
         res.status = 400;
         res.set_content(R"({"error": "IP address is required"})", "application/json");
         return;
@@ -819,9 +853,11 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
         }
     }
 
-    host = json_data["ip"].get<std::string>();
-    modbus.set_host(host);
-    modbus.initSensors();
+    host = json_data["rawtcp_host_ip"].get<std::string>();
+    modbus_host = json_data["modbustcp_host_ip"].get<std::string>();
+
+    modbus.set_host(modbus_host);
+    // modbus.initSensors();
     ports = {
         json_data["weather"].get<int>(),
         json_data["hmr"].get<int>(),
@@ -835,11 +871,11 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
 
     json response_json;
     response_json["message"] = "Configuration updated successfully";
-    response_json["ip"] = host;
+    response_json["rawtcp_host_ip"] = host;
+    response_json["modbustcp_host_ip"] = modbus_host;
     response_json["ports"] = ports;
     res.set_content(response_json.dump(), "application/json");
 }
-
 
 
 void handle_options_request(httplib::Response &res) {
@@ -847,9 +883,28 @@ void handle_options_request(httplib::Response &res) {
     set_cors_headers(res);
 }
 
+void check_modbus_connection(Modbus_TCP &modbus) {
+    while (true) {
+        if (modbus.is_connected() == false) {
+            std::cout << "Waiting for Modbus connection..." << std::endl;
+        } else {
+            std::cout << "Modbus connection Successful..." << std::endl;
+            modbus.initSensors();
+            std::thread(continuous_port_connection_modbus).detach();
+        }
+
+#ifdef WINDOWS        
+            Sleep(5000);
+#else
+            usleep(5000 * 1000);
+#endif 
+    }
+}
+
 int main() {
     httplib::Server svr;
 
+    std::thread modbus_thread(check_modbus_connection, std::ref(modbus));   
 
     // Define the POST endpoint to toggle the phase
     svr.Post("/toggle-phase", handle_toggle_phase);
@@ -893,7 +948,20 @@ int main() {
     std::cout << "Server is running at http://localhost:5000" << std::endl;
     svr.listen("localhost", 5000);
 
-    std::thread(ping_host).detach();
+    // std::thread(ping_host).detach();
+
+    while(modbus.is_connected() == false) 
+    {
+        std::cout << "Waiting for Modbus connection..." << std::endl;
+#ifdef WINDOWS        
+        Sleep(500);
+#else
+        usleep(500 * 1000);
+#endif 
+    }
+    std::cout << " Modbus connection Successfull..." << std::endl;
+
+    modbus.initSensors();
 
 
     // Keep the main thread alive
