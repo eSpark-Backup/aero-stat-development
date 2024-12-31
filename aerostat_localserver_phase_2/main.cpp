@@ -42,9 +42,18 @@ std::map<int, bool> connection_status;
 bool connect_flag =false;
 bool port_flag =false;
 bool connect_thread_flag =false;
+std::string fans_command = "";
+std::string lights_command = "";
 std::string TENSION_REQ_MSG = "#01\r";
 std::string host;
 std::vector<int> ports;
+int target_port = 4006;
+
+std::unordered_map<std::string, std::string> state_4007 = {
+    {"field1", "ON"},   // First field
+    {"field2", "ON"},   // Second field
+    {"field3", "OFF"},  // Third field
+};
 
 const int hull_pressure_port = 5001;
 const int ballonet_pressure = 5002;
@@ -532,6 +541,157 @@ std::string fetch_data() {
     }
 }
 
+#ifdef WINDOWS
+std::string connect_and_send_to_port(const std::string &command) {
+    if (host.empty()) {
+        return "Host is not configured";
+    }
+
+    try {
+        SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock == INVALID_SOCKET) {
+            std::cerr << "Socket creation failed\n";
+            return "Socket creation failed";
+        }
+
+        sockaddr_in serverAddress;
+        serverAddress.sin_family = AF_INET;
+        serverAddress.sin_port = htons(target_port);
+        inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
+
+        if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR) {
+            std::cerr << "Connection failed to " << host << ":" << target_port << "\n";
+            closesocket(sock);
+            return "Connection failed";
+        }
+        std::cout << "Connected to " << host << ":" << target_port << std::endl;
+        send(sock, command.c_str(), command.size(), 0);
+        
+        char buffer[1024] = {0};
+        int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
+        closesocket(sock);
+        return "Command sent successfully";
+    } catch (const std::exception &e) {
+        std::cerr << "Error on port " << target_port << ": " << e.what() << std::endl;
+        return "Error occurred";
+    }
+}
+#else
+std::string connect_and_send_to_port(const std::string &command) {
+    if (host.empty()) {
+        return "Host is not configured";
+    }
+
+    try {
+        int sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0) {
+            std::cerr << "Socket creation failed\n";
+            return "Socket creation failed";
+        }
+
+        sockaddr_in serverAddress{};
+        serverAddress.sin_family = AF_INET;
+        serverAddress.sin_port = htons(target_port);
+        inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
+
+        if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
+            std::cerr << "Connection failed to " << host << ":" << target_port << "\n";
+            close(sock);
+            return "Connection failed";
+        }
+
+        std::cout << "Connected to " << host << ":" << target_port << std::endl;
+        send(sock, command.c_str(), command.size(), 0);
+
+        char buffer[1024] = {0};
+        recv(sock, buffer, sizeof(buffer), 0);
+        close(sock);
+        return "Command sent successfully";
+    } catch (const std::exception &e) {
+        std::cerr << "Error on port " << target_port << ": " << e.what() << std::endl;
+        return "Error occurred";
+    }
+}
+#endif
+
+void handle_device_commands(const std::string &command) {
+    if (command.substr(0, 5) == "@01DO") {
+        std::string command_type = command.substr(5, 2);
+        
+        if (command_type == "00") {
+            state_4007["field1"] = "ON";
+            state_4007["field2"] = "ON";
+        } else if (command_type == "01") {
+            state_4007["field1"] = "OFF";
+            state_4007["field2"] = "ON";
+        } else if (command_type == "02") {
+            state_4007["field1"] = "ON";
+            state_4007["field2"] = "OFF";
+        } else if (command_type == "03") {
+            state_4007["field1"] = "OFF";
+            state_4007["field2"] = "OFF";
+        }
+        else if (command_type == "11") {
+            state_4007["field3"] = "ON";
+        } else if (command_type == "12") {
+            state_4007["field3"] = "OFF";
+        }
+    }
+}
+
+void handle_send_device_commands(const json &json_data, httplib::Response &res) {
+    if (host.empty()) {
+        res.status = 500;
+        res.set_content(R"({"error": "Host is not configured"})", "application/json");
+        return;
+    }
+
+    if (!check_host_reachable(host)) {
+        res.set_content(R"({"connection_status": "Disconnected"})", "application/json");
+        return;
+    }
+
+    if (json_data.is_null()) {
+        res.status = 400;
+        res.set_content(R"({"error": "No JSON data received"})", "application/json");
+        return;
+    }
+
+    std::string fans_command_new = json_data.value("Fans", "");
+    std::string lights_command_new = json_data.value("Lights", "");
+
+    if (fans_command_new.empty() && lights_command_new.empty()) {
+        res.status = 400;
+        res.set_content(R"({"error": "No valid commands provided"})", "application/json");
+        return;
+    }
+
+    std::string fans_response = "No Fans command provided";
+    std::cout << "FANS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << fans_command_new << std::endl;
+    if (!fans_command_new.empty() && fans_command != fans_command_new) {
+        fans_command = fans_command_new;
+        connect_and_send_to_port(fans_command);
+        handle_device_commands(fans_command);
+    }
+
+    std::string lights_response = "No Lights command provided";
+    std::cout << "LIGHTSS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << lights_command_new << std::endl;
+    if (!lights_command_new.empty() && lights_command != lights_command_new) {
+        lights_command = lights_command_new;
+        connect_and_send_to_port(lights_command);
+        handle_device_commands(lights_command);
+    }
+
+    std::stringstream response_stream;
+    response_stream << "@A01,25.5,"
+                    << state_4007["field1"] << ","
+                    << state_4007["field2"] << ","
+                    << state_4007["field3"] << "\r\n";
+    json response_json;
+    response_json["ButtonResponse"] = response_stream.str();
+    res.set_content(response_json.dump(), "application/json");
+}
+
 // Endpoint handler to toggle the phase (Modbus/Raw TCP switch)
 void handle_toggle_phase(const httplib::Request& req, httplib::Response& res) {
     if (req.has_param("toggle")) {
@@ -633,6 +793,20 @@ int main() {
         try {
             auto json_data = json::parse(req.body);
             handle_update_config(json_data, res);
+        } catch (json::parse_error &e) {
+            json error_json;
+            error_json["error"] = "Invalid JSON format.";
+            error_json["exception"] = e.what();
+            res.status = 400;
+            res.set_content(error_json.dump(), "application/json");
+        }
+    });
+
+    svr.Post("/send-device-commands", [](const httplib::Request &req, httplib::Response &res) {
+        set_cors_headers(res);
+        try {
+            auto json_data = json::parse(req.body);
+            handle_send_device_commands(json_data, res);
         } catch (json::parse_error &e) {
             json error_json;
             error_json["error"] = "Invalid JSON format.";
