@@ -64,10 +64,10 @@ struct RelayConfig {
 };
 
 std::vector<RelayConfig> relay_configs = {
-    {"Primary Blower", {3}},
-    {"Secondary Blower", {5}},
-    {"Strobe Lights", {4, 6}},  // Controls both relays 4 and 6
-    {"Payload Power", {7}}
+    {"primary_blower", {3}},
+    {"secondary_blower", {5}},
+    {"strobe_lights", {4, 6}},  // Controls both relays 4 and 6
+    {"payload_power", {7}}
 };
 
 const int hull_pressure_port = 5001;
@@ -728,13 +728,13 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
         // Set the coils based on the relay configurations
         for (const auto& config : relay_configs) {
             bool value = false;
-            if (config.name == "Primary Blower") {
+            if (config.name == relay_configs[0].name) {
                 value = primary_blower_value;
-            } else if (config.name == "Secondary Blower") {
+            } else if (config.name == relay_configs[1].name) {
                 value = secondary_blower_value;
-            } else if (config.name == "Strobe Lights") {
+            } else if (config.name == relay_configs[2].name) {
                 value = strobe_lights_value;
-            } else if (config.name == "Payload Power") {
+            } else if (config.name == relay_configs[3].name) {
                 value = payload_power_value;
             }
 
