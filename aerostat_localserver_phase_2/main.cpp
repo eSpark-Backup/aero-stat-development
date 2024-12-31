@@ -55,6 +55,19 @@ std::unordered_map<std::string, std::string> state_4007 = {
     {"field3", "OFF"},  // Third field
 };
 
+// Define relay button configurations
+struct RelayConfig {
+    std::string name;
+    std::vector<int> relay_nums;
+};
+
+std::vector<RelayConfig> relay_configs = {
+    {"Primary Blower", {3}},
+    {"Secondary Blower", {5}},
+    {"Strobe Lights", {4, 6}},  // Controls both relays 4 and 6
+    {"Payload Power", {7}}
+};
+
 const int hull_pressure_port = 5001;
 const int ballonet_pressure = 5002;
 const int ahrs_port = 5003;
@@ -62,8 +75,9 @@ const int ultrasonic_port = 5004;
 const int load_cell_port = 5005;
 const int temp_humidity_port = 5006;
 const int weather_station_port = 5007;
+const int relay_port = 4196;
 
-std::vector<int> modbus_ports = {hull_pressure_port, ballonet_pressure, ahrs_port, ultrasonic_port, load_cell_port, temp_humidity_port, weather_station_port};
+std::vector<int> modbus_ports = {hull_pressure_port, ballonet_pressure, ahrs_port, ultrasonic_port, load_cell_port, temp_humidity_port, weather_station_port, relay_port};
 
 // Placeholder data structures for registers
 // (These would be the real Modbus register addresses and corresponding data structures)
@@ -185,6 +199,23 @@ void continuous_port_connection_modbus() {
                             std::cout << key << ": " << parameter.value << " " << parameter.unit << "\n";
                         }
 
+                        break;
+                    }
+                    case relay_port:
+                    {
+                        json relay_json;
+                        for (const auto& config : relay_configs) {
+                            for (int relay_num : config.relay_nums) {
+                                // relay_json[config.name] = modbus.read_coil(relay_num - 1);
+                                bool relay_value;
+                                if (modbus.read_coil(relay_num - 1, relay_value)) {
+                                    relay_json[config.name] = relay_value;
+                                } else {
+                                    std::cerr << "Failed to read relay " << relay_num << " (" << config.name << ").\n";
+                                }
+                            }
+                        }
+                        json_data_modbus["port_" + std::to_string(port)] = relay_json;
                         break;
                     }
                 }
@@ -657,39 +688,77 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
         return;
     }
 
-    std::string fans_command_new = json_data.value("Fans", "");
-    std::string lights_command_new = json_data.value("Lights", "");
+    if(phase)
+    {
+        bool primary_blower_value = json_data.value("primary_blower", false);
+        bool secondary_blower_value = json_data.value("secondary_blower", false);
+        bool strobe_lights_value = json_data.value("strobe_lights", false);
+        bool payload_power_value = json_data.value("payload_power", false);
+        int relay_setting = (primary_blower_value << 3) | (secondary_blower_value << 2) | (strobe_lights_value << 1) | payload_power_value;
+        
+        std::cout << "Relay Settings:" << std::endl;
+        std::cout << "Primary Blower: " << (primary_blower_value ? "ON" : "OFF") << std::endl;
+        std::cout << "Secondary Blower: " << (secondary_blower_value ? "ON" : "OFF") << std::endl;
+        std::cout << "Strobe Lights: " << (strobe_lights_value ? "ON" : "OFF") << std::endl;
+        std::cout << "Payload Power: " << (payload_power_value ? "ON" : "OFF") << std::endl;
 
-    if (fans_command_new.empty() && lights_command_new.empty()) {
-        res.status = 400;
-        res.set_content(R"({"error": "No valid commands provided"})", "application/json");
-        return;
+        // Set the coils based on the relay configurations
+        for (const auto& config : relay_configs) {
+            bool value = false;
+            if (config.name == "Primary Blower") {
+                value = primary_blower_value;
+            } else if (config.name == "Secondary Blower") {
+                value = secondary_blower_value;
+            } else if (config.name == "Strobe Lights") {
+                value = strobe_lights_value;
+            } else if (config.name == "Payload Power") {
+                value = payload_power_value;
+            }
+
+            for (int relay_num : config.relay_nums) {
+                if (!modbus.write_coil(relay_num - 1, value)) {
+                    std::cerr << "Failed to write to relay " << relay_num << " (" << config.name << ").\n";
+                }
+            }
+        }
     }
+    else
+    {
+        std::string fans_command_new = json_data.value("Fans", "");
+        std::string lights_command_new = json_data.value("Lights", "");
 
-    std::string fans_response = "No Fans command provided";
-    std::cout << "FANS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << fans_command_new << std::endl;
-    if (!fans_command_new.empty() && fans_command != fans_command_new) {
-        fans_command = fans_command_new;
-        connect_and_send_to_port(fans_command);
-        handle_device_commands(fans_command);
+        if (fans_command_new.empty() && lights_command_new.empty()) {
+            res.status = 400;
+            res.set_content(R"({"error": "No valid commands provided"})", "application/json");
+            return;
+        }
+
+        std::string fans_response = "No Fans command provided";
+        std::cout << "FANS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << fans_command_new << std::endl;
+        if (!fans_command_new.empty() && fans_command != fans_command_new) {
+            fans_command = fans_command_new;
+            connect_and_send_to_port(fans_command);
+            handle_device_commands(fans_command);
+        }
+
+        std::string lights_response = "No Lights command provided";
+        std::cout << "LIGHTSS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << lights_command_new << std::endl;
+        if (!lights_command_new.empty() && lights_command != lights_command_new) {
+            lights_command = lights_command_new;
+            connect_and_send_to_port(lights_command);
+            handle_device_commands(lights_command);
+        }
+
+        std::stringstream response_stream;
+        response_stream << "@A01,25.5,"
+                        << state_4007["field1"] << ","
+                        << state_4007["field2"] << ","
+                        << state_4007["field3"] << "\r\n";
+        json response_json;
+        response_json["ButtonResponse"] = response_stream.str();
+        res.set_content(response_json.dump(), "application/json");
     }
-
-    std::string lights_response = "No Lights command provided";
-    std::cout << "LIGHTSS COMMANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD: " << lights_command_new << std::endl;
-    if (!lights_command_new.empty() && lights_command != lights_command_new) {
-        lights_command = lights_command_new;
-        connect_and_send_to_port(lights_command);
-        handle_device_commands(lights_command);
-    }
-
-    std::stringstream response_stream;
-    response_stream << "@A01,25.5,"
-                    << state_4007["field1"] << ","
-                    << state_4007["field2"] << ","
-                    << state_4007["field3"] << "\r\n";
-    json response_json;
-    response_json["ButtonResponse"] = response_stream.str();
-    res.set_content(response_json.dump(), "application/json");
+    
 }
 
 // Endpoint handler to toggle the phase (Modbus/Raw TCP switch)

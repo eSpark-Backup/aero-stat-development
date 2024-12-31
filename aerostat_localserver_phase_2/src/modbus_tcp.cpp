@@ -92,6 +92,7 @@ void Modbus_TCP::initSensors() {
     mb_hull = new modbus(host, hull_pressure_port);
     mb_ahrs = new modbus(host, ahrs_port);
     mb_temp_humidity = new modbus(host, temp_humidity_port);
+    mb_relay = new modbus(host, relay_port);
 
     mb_loadcell->modbus_set_slave_id(1);
     mb_ultrasonic->modbus_set_slave_id(2);
@@ -100,6 +101,7 @@ void Modbus_TCP::initSensors() {
     mb_hull->modbus_set_slave_id(5);
     mb_ahrs->modbus_set_slave_id(6);
     mb_temp_humidity->modbus_set_slave_id(7);
+    mb_relay->modbus_set_slave_id(8);
 
     load_cell_client = mb_loadcell->modbus_connect();
     ultrasonic_client = mb_ultrasonic->modbus_connect();
@@ -108,6 +110,7 @@ void Modbus_TCP::initSensors() {
     hull_pressure_client = mb_hull->modbus_connect();
     ahrs_client = mb_ahrs->modbus_connect();
     temp_humidity_client = mb_temp_humidity->modbus_connect();
+    relay_client = mb_relay->modbus_connect();
 }
 
 void Modbus_TCP::start_readings()
@@ -392,6 +395,25 @@ TempHumidityData Modbus_TCP::read_temp_humidity_data() {
 
     // Return the populated data structure
     return temp_humidity_data;
+}
+
+bool Modbus_TCP::write_coil(int coil_address, bool value) {
+    uint16_t coil_value = value ? 0xFF00 : 0x0000;  // Modbus protocol uses 0xFF00 for ON and 0x0000 for OFF
+    if (mb_relay->modbus_write_coil(coil_address, coil_value)) {
+        std::cerr << "Error writing to coil at address " << coil_address << ".\n";
+        return false;
+    }
+    return true;
+}
+
+bool Modbus_TCP::read_coil(int coil_address, bool &value) {
+    bool coil_value = false;
+    if (mb_relay->modbus_read_coils(coil_address, 1, &coil_value)) {
+        std::cerr << "Error reading coil at address " << coil_address << ".\n";
+        return false;
+    }
+    value = coil_value;
+    return true;
 }
 
 void Modbus_TCP::set_host(std::string __host){

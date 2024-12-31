@@ -44,6 +44,8 @@ void read_pressure_sensor_thread();
 void read_ahrs_gps_thread();
 void set_host(std::string __host);
 bool is_connected();
+bool write_coil(int coil_address, bool value);
+bool read_coil(int coil_address, bool &value);
 
 double read_load_cell();
 float read_ultrasonic();
@@ -60,6 +62,7 @@ modbus *mb_ballonet;
 modbus *mb_hull;
 modbus *mb_ahrs;
 modbus *mb_temp_humidity;
+modbus *mb_relay;
 
 bool load_cell_client;
 bool ultrasonic_client;
@@ -68,6 +71,7 @@ bool ballonet_pressure_client;
 bool hull_pressure_client;
 bool ahrs_client;
 bool temp_humidity_client;
+bool relay_client;
 
 bool running =false;
 std::string host;
@@ -78,6 +82,7 @@ int ultrasonic_port = 5004;
 int load_cell_port = 5005;
 int temp_humidity_port = 5006;
 int weather_station_port = 5007;
+int relay_port = 4196;
 
 float convert_to_float(uint16_t regs[2]);
 float calculate_position_accuracy(float pdop, float hdop, float vdop) ;

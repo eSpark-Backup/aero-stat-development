@@ -10,7 +10,7 @@ cd build
 
 :: Run cmake to configure the project
 echo Running cmake to configure the project...
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 
 :: Build the project
 echo Building the project...
