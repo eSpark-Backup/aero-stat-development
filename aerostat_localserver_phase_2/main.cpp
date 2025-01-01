@@ -788,8 +788,15 @@ void handle_send_device_commands(const json &json_data, httplib::Response &res) 
     
 }
 
+void set_cors_headers(httplib::Response &res) {
+    res.set_header("Access-Control-Allow-Origin", "http://localhost:8080");  // Allow all origins or specify your frontend IP/URL
+    res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");  // Allowed methods
+    res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");  // Allowed headers
+}
+
 // Endpoint handler to toggle the phase (Modbus/Raw TCP switch)
 void handle_toggle_phase(const httplib::Request& req, httplib::Response& res) {
+    set_cors_headers(res);
     if (req.has_param("toggle")) {
         std::string toggle_value = req.get_param_value("toggle");
 
@@ -802,12 +809,6 @@ void handle_toggle_phase(const httplib::Request& req, httplib::Response& res) {
     // Respond with the current phase
     std::string response = "{ \"phase_type\": \"" + std::string(phase ? "modbustcp" : "rawtcp") + "\" }";
     res.set_content(response, "application/json");
-}
-
-void set_cors_headers(httplib::Response &res) {
-    res.set_header("Access-Control-Allow-Origin", "http://localhost:8080");  // Allow all origins or specify your frontend IP/URL
-    res.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");  // Allowed methods
-    res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");  // Allowed headers
 }
 
 // Endpoint handler to fetch data from the current phase (Modbus/Raw TCP)
@@ -840,7 +841,7 @@ void handle_update_config(const json &json_data, httplib::Response &res) {
         return;
     }
 
-    if (!json_data.contains("rawtcp_host_ip") | !json_data.contains("modbustcp_host_ip")) {
+    if (!json_data.contains("rawtcp_host_ip") || !json_data.contains("modbustcp_host_ip")) {
         res.status = 400;
         res.set_content(R"({"error": "IP address is required"})", "application/json");
         return;

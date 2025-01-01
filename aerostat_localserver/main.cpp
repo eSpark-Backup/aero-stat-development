@@ -570,8 +570,8 @@ void set_cors_headers(httplib::Response &res) {
 }
 
 void handle_options_request(httplib::Response &res) {
-    res.status = 204;
     set_cors_headers(res);
+    res.status = 204;
 }
 
 int main() {
