@@ -111,7 +111,7 @@ function Phase2() {
   useEffect(() => {
     if (startFetchData) {
       fetchData();
-      const intervalId = setInterval(fetchData, 500);
+      const intervalId = setInterval(fetchData, 1000);
       return () => clearInterval(intervalId);
     }
   }, [startFetchData])

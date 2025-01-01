@@ -181,11 +181,11 @@ export const sendDeviceCommands = async (FansLight) => {
 
 export const getValueForKey = (key, data) => {
   const formatNumber = (value) => {
-    
-    if (isNaN(value) || value === null || value === undefined) {
+
+    if (isNaN(value) || value === null || value === undefined || value < 0) {
       return "0.00";
     }
-    
+
     return parseFloat(value).toFixed(2);
   };
 
