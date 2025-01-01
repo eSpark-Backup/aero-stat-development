@@ -307,75 +307,93 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
 
 export const details = [
     {
-      key: "Load Cell Tension:",
-      value: "Error",
+        key: "Load Cell Tension:",
+        value: "Error",
+        unit: null
     },
     {
-      key: "Roll:",
-      value: "Error",
+        key: "Roll:",
+        value: "Error",
+        unit: null
     },
     {
-      key: "Wind Direction:",
-      value: "Error",
+        key: "Wind Direction:",
+        value: "Error",
+        unit: null
     },
     {
-      key: "Pitch:",
-      value: "0.00°",
+        key: "Pitch:",
+        value: "0.00°",
+        unit: "°"
     },
     {
-      key: "Wind Speed:",
-      value: "0.00 m/s",
+        key: "Wind Speed:",
+        value: "0.00",
+        unit: "m/s"
     },
     {
-      key: "Yaw:",
-      value: "0.00°",
+        key: "Yaw:",
+        value: "0.00",
+        unit: "°"
     },
     {
-      key: "Temperature:",
-      value: "0.00 °C",
+        key: "Temperature:",
+        value: "0.00",
+        unit: "°C"
     },
     {
-      key: "Longitude:",
-      value: "N/A",
+        key: "Longitude:",
+        value: "N/A",
+        unit: null
     },
     {
-      key: "Humidity:",
-      value: "0.00 %",
+        key: "Humidity:",
+        value: "0.00",
+        unit: "%"
     },
     {
-      key: "Latitude:",
-      value: "N/A",
+        key: "Latitude:",
+        value: "N/A",
+        unit: null
     },
     {
-      key: "Barometric Pressure:",
-      value: "0.00 hPa",
+        key: "Barometric Pressure:",
+        value: "0.00",
+        unit: "hPa"
     },
     {
-      key: "Altitude:",
-      value: "N/A",
+        key: "Altitude:",
+        value: "N/A",
+        unit: null
     },
     {
-      key: "Ballonet Curtain:",
-      value: "Error",
+        key: "Ballonet Curtain:",
+        value: "Error",
+        unit: null
     },
     {
-      key: "Position Accuracy",
-      value: "Error",
+        key: "Position Accuracy:",
+        value: "Error",
+        unit: null
     },
     {
-      key: "Ballonet Pressure:",
-      value: "Error",
+        key: "Ballonet Pressure:",
+        value: "Error",
+        unit: null
     },
     {
-      key: "Ground Speed:",
-      value: "N/A",
+        key: "Ground Speed:",
+        value: "N/A",
+        unit: null
     },
     {
-      key: "Hull Pressure:",
-      value: "Error",
+        key: "Hull Pressure:",
+        value: "Error",
+        unit: null
     },
     {
-      key: "Heading:",
-      value: "N/A",
+        key: "Heading:",
+        value: "N/A",
+        unit: null
     },
-  ];
+];

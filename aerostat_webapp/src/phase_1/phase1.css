@@ -198,6 +198,10 @@ input[type=number] {
     align-items: center;
 }
 
+.header-details .time{
+    height: 35px;
+}
+
 .time-light {
     background-color: var(--main-light-bg-color);
     box-shadow: 4px 4px 6px 0px #ABC2D499, -4px -4px 6px 0px #FFFFFF80;

@@ -14,6 +14,16 @@ const Sidebar = ({
   fwdBtn,
 }) => {
   const { theme } = useContext(ThemeContext);
+  const { phase, setPhase } = useContext(ThemeContext);
+
+  const changePhase = (newPhase) => {
+    if (phase === newPhase) {
+      return
+    }
+    else {
+      setPhase(newPhase)
+    }
+  };
 
   return (
     <div className={`sidebar ${open ? "open" : ""} ${theme}`}>
@@ -25,12 +35,14 @@ const Sidebar = ({
       />
       <img src={theme === "light" ? logo : logowhite} alt="Logo" />
       <div className="sidebar-menu">
-        <p>Dashboard</p>
+        <div style={{ display: "flex", flexDirection: "column", rowGap: "20px" }}>
+          <p onClick={() => changePhase(1)}>Phase 1</p>
+          <p onClick={() => changePhase(2)}>Phase 2</p>
+        </div>
         <div
           style={{ width: "306px" }}
-          className={`config-box ${
-            theme === "light" ? "config-box-light" : "config-box-dark"
-          }`}
+          className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"
+            }`}
         >
           <button
             onClick={() => {
@@ -39,7 +51,7 @@ const Sidebar = ({
             }}
             className={
               (!playBtn && StopBtn && fwdBtn) ||
-              (!playBtn && !fwdBtn && StopBtn)
+                (!playBtn && !fwdBtn && StopBtn)
                 ? "disable"
                 : ""
             }

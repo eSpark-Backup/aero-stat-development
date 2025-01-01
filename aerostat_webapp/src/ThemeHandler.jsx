@@ -7,6 +7,8 @@ const ThemeHandler = ({ children }) => {
         return window.localStorage.getItem('theme') || 'light';
     });
 
+    const [phase, setPhase] = useState(1);
+
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
@@ -17,7 +19,7 @@ const ThemeHandler = ({ children }) => {
     }, [theme]);
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{ theme, toggleTheme, phase, setPhase }}>
             {children}
         </ThemeContext.Provider>
     );

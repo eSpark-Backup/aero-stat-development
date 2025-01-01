@@ -107,10 +107,6 @@ const Home = ({
 
   }, [sendData, fan1, fan2, light]);
 
-  useEffect(() => {
-        console.log(response)
-    }, [response])
-
   return (
     <>
       <div className="main">
