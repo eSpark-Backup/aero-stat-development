@@ -24,14 +24,13 @@ import { formatDateTime } from '../../Js_parsing'
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
 
-const Home = ({
-    form, setForm, handleSubmit, errorValues, setErrorValues, response, isLoading, openModal, setOpenModal, handleOpenModal, fetchingStart, HandleBrowse, fileName, HandlePlay, HandleForward, HandleStop, playBtn, fwdBtn, StopBtn
+const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, openModal, setOpenModal, handleOpenModal, fetchingStart, HandleBrowse, fileName, HandlePlay, HandleForward, HandleStop, playBtn, fwdBtn, StopBtn
 
 }) => {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const width = useWindowWidth();
-    const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
-    const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
+  const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
+  const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
   // const [openModal, setOpenModal] = useState(false);
 
   const [fan1, setFan1] = useState("Continuous");
@@ -42,15 +41,15 @@ const Home = ({
   const handleChange = (name, value) => {
     if (fetchingStart) {
       switch (name) {
-                case 'fan1':
+        case 'fan1':
           setFan1(value);
           setSendData(true);
           break;
-                case 'fan2':
+        case 'fan2':
           setFan2(value);
           setSendData(true);
           break;
-                case 'light':
+        case 'light':
           setLight(value);
           setSendData(true);
           break;
@@ -63,7 +62,7 @@ const Home = ({
   useEffect(() => {
     let FansLight = {
       Fans: null,
-            Lights: null
+      Lights: null
     };
     if (fan1 === "Continuous" && fan2 === "Continuous") {
       FansLight.Fans = "@01DO00\r";
@@ -85,21 +84,21 @@ const Home = ({
     // }
     if (light === "Off") {
       FansLight.Lights = "@01DO12\r";
-        }
-        else if (light === "On") {
+    }
+    else if (light === "On") {
       FansLight.Lights = "@01DO11\r";
     }
     if (sendData) {
       sendDeviceCommands(FansLight)
         .then((response) => {
           const result = response?.ButtonResponse.split(",");
-                    setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
+          setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
           setFan2(result[3].toLowerCase() === "off" ? "Off" : "Continuous");
           setLight(result[4].toLowerCase().startsWith("off") ? "Off" : "On");
           // setPosition(result[5].toLowerCase()?.startsWith("1") ? "Continuous" : "Off");
         })
         .catch((error) => {
-                    console.error('Error sending device commands:', error);
+          console.error('Error sending device commands:', error);
         })
         .finally(() => setSendData(false));
     }
@@ -111,15 +110,13 @@ const Home = ({
     <>
       <div className="main">
         <div
-          className={`preferences2 ${
-            theme === "light" ? "preferences2-light" : "preferences2-dark"
-          }`}
+          className={`preferences2 ${theme === "light" ? "preferences2-light" : "preferences2-dark"
+            }`}
         >
           <p>Preference</p>
           <div
-            className={`choice ${
-              theme === "light" ? "choice-light" : "choice-dark"
-            }`}
+            className={`choice ${theme === "light" ? "choice-light" : "choice-dark"
+              }`}
             onClick={toggleTheme}
           >
             {theme === "light" ? (
@@ -178,8 +175,8 @@ const Home = ({
                     parseFloat(response?.weather?.windSpeed) > 70
                       ? 70
                       : parseFloat(response?.weather?.windSpeed) < 0
-                      ? 0
-                      : parseFloat(response?.weather?.windSpeed),
+                        ? 0
+                        : parseFloat(response?.weather?.windSpeed),
                   ],
                   getChartSize()
                 )}
@@ -199,15 +196,13 @@ const Home = ({
         </div>
         <div className="box2">
           <div
-            className={`preferences ${
-              theme === "light" ? "preferences-light" : "preferences-dark"
-            }`}
+            className={`preferences ${theme === "light" ? "preferences-light" : "preferences-dark"
+              }`}
           >
             <p>Preference</p>
             <div
-              className={`choice ${
-                theme === "light" ? "choice-light" : "choice-dark"
-              }`}
+              className={`choice ${theme === "light" ? "choice-light" : "choice-dark"
+                }`}
               onClick={toggleTheme}
             >
               {theme === "light" ? (
@@ -285,8 +280,8 @@ const Home = ({
                           parseFloat(response?.helium?.HelPressure) > 6
                             ? 6
                             : parseFloat(response?.helium?.HelPressure) < 0
-                            ? 0
-                            : parseFloat(response?.helium?.HelPressure),
+                              ? 0
+                              : parseFloat(response?.helium?.HelPressure),
                         ],
                         getChartSize()
                       )}
@@ -310,8 +305,8 @@ const Home = ({
                           parseFloat(response?.ballonet?.BalPressure) > 6
                             ? 6
                             : parseFloat(response?.ballonet?.BalPressure) < 0
-                            ? 0
-                            : parseFloat(response?.ballonet?.BalPressure),
+                              ? 0
+                              : parseFloat(response?.ballonet?.BalPressure),
                         ],
                         getChartSize()
                       )}
@@ -346,8 +341,8 @@ const Home = ({
                           parseFloat(response?.adams?.Tension) > 700
                             ? 700
                             : parseFloat(response?.adams?.Tension) < 0
-                            ? 0
-                            : parseFloat(response?.adams?.Tension),
+                              ? 0
+                              : parseFloat(response?.adams?.Tension),
                         ],
                         getChartSize()
                       )}
@@ -372,15 +367,13 @@ const Home = ({
         <MainCard title={"Controls & Radio Link"}>
           <div className="control-box-card">
             <div
-              className={`controls-box ${
-                theme === "light" ? "controls-box-light" : "controls-box-dark"
-              }`}
+              className={`controls-box ${theme === "light" ? "controls-box-light" : "controls-box-dark"
+                }`}
             >
               <h2>Fan Control</h2>
               <div
-                className={`fan-box ${
-                  theme === "light" ? "fan-box-light" : "fan-box-dark"
-                }`}
+                className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                  }`}
               >
                 <p>
                   Fan 1 <span>(Left direction)</span>
@@ -395,9 +388,8 @@ const Home = ({
                 />
               </div>
               <div
-                className={`fan-box ${
-                  theme === "light" ? "fan-box-light" : "fan-box-dark"
-                }`}
+                className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                  }`}
               >
                 <p>
                   Fan 2 <span>(Right direction)</span>
@@ -417,9 +409,8 @@ const Home = ({
                                 <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
                             </div> */}
               <div
-                className={`strobe fan-box ${
-                  theme === "light" ? "fan-box-light" : "fan-box-dark"
-                }`}
+                className={`strobe fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                  }`}
               >
                 <p>Strobe Lights Control</p>
                 <OptionBox
@@ -433,9 +424,8 @@ const Home = ({
               </div>
             </div>
             <div
-              className={`log-detail ${
-                theme === "light" ? "log-detail-light" : "log-detail-dark"
-              }`}
+              className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"
+                }`}
             >
               {/* <p>Tether Link:</p> */}
               <p>Comms Status:</p>
@@ -445,8 +435,8 @@ const Home = ({
                   !fetchingStart
                     ? "Disconnected"
                     : isLoading
-                    ? isLoading
-                    : "Disconnected"
+                      ? isLoading
+                      : "Disconnected"
                 }
               />
             </div>
@@ -457,19 +447,17 @@ const Home = ({
             <MainCard title={"Data Logging"}>
               <div className="log-box-content">
                 <div
-                  className={`log-input-box ${
-                    theme === "light"
+                  className={`log-input-box ${theme === "light"
                       ? "log-input-box-light"
                       : "log-input-box-dark"
-                  }`}
+                    }`}
                 >
                   <p>Log File</p>
                   <div
-                    className={`file-name-box ${
-                      theme === "light"
+                    className={`file-name-box ${theme === "light"
                         ? "file-name-box-light"
                         : "file-name-box-dark"
-                    }`}
+                      }`}
                   >
                     {fileName ? fileName : ""}
                   </div>
@@ -482,18 +470,16 @@ const Home = ({
                   />
                   <label
                     htmlFor="fileInput"
-                    className={`custom-file-input ${theme} ${
-                      !playBtn && StopBtn ? "disable" : ""
-                    }`}
+                    className={`custom-file-input ${theme} ${!playBtn && StopBtn ? "disable" : ""
+                      }`}
                   >
                     Browse
                   </label>
                 </div>
                 <div className="button-groups">
                   <div
-                    className={`tdbutton ${
-                      theme === "light" ? "td-light" : "td-dark"
-                    }`}
+                    className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"
+                      }`}
                   >
                     <button
                       className={`upper-part ${!playBtn ? "disable" : ""}`}
@@ -504,9 +490,8 @@ const Home = ({
                     </button>
                   </div>
                   <div
-                    className={`tdbutton ${
-                      theme === "light" ? "td-light" : "td-dark"
-                    }`}
+                    className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"
+                      }`}
                   >
                     <button
                       className={`upper-part ${!fwdBtn ? "disable" : ""}`}
@@ -517,9 +502,8 @@ const Home = ({
                     </button>
                   </div>
                   <div
-                    className={`tdbutton ${
-                      theme === "light" ? "td-light" : "td-dark"
-                    }`}
+                    className={`tdbutton ${theme === "light" ? "td-light" : "td-dark"
+                      }`}
                   >
                     <button
                       className={`upper-part ${!StopBtn ? "disable" : ""}`}
@@ -540,8 +524,6 @@ const Home = ({
         open={openModal}
         handleClose={() => setOpenModal(false)}
         handleSubmit={handleSubmit}
-        form={form}
-        setForm={setForm}
         errorValues={errorValues}
         setErrorValues={setErrorValues}
       />

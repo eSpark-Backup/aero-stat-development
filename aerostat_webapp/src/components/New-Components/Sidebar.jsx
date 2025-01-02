@@ -4,6 +4,7 @@ import logo from "../../assets/logo.svg";
 import logowhite from "../../assets/logo-white.svg";
 import close from "../../assets/close.svg";
 import close2 from "../../assets/close-dark.svg";
+import { updateToggle } from "../../utils";
 
 const Sidebar = ({
   open,
@@ -16,12 +17,19 @@ const Sidebar = ({
   const { theme } = useContext(ThemeContext);
   const { phase, setPhase } = useContext(ThemeContext);
 
-  const changePhase = (newPhase) => {
+  const changePhase = async (newPhase) => {
     if (phase === newPhase) {
       return
     }
-    else {
-      setPhase(newPhase)
+    try {
+      const result = await updateToggle(true);
+      if (result) {
+        setPhase(newPhase);
+      } else {
+        console.error("updateToggle failed or returned an invalid response.");
+      }
+    } catch (error) {
+      console.error("Error during updateToggle:", error);
     }
   };
 
@@ -36,8 +44,8 @@ const Sidebar = ({
       <img src={theme === "light" ? logo : logowhite} alt="Logo" />
       <div className="sidebar-menu">
         <div style={{ display: "flex", flexDirection: "column", rowGap: "20px" }}>
-          <p onClick={() => changePhase(1)}>Phase 1</p>
-          <p onClick={() => changePhase(2)}>Phase 2</p>
+          <p className={phase === 2 && "side-item-notactive"} onClick={() => changePhase(1)}>Phase 1</p>
+          <p className={phase === 1 && "side-item-notactive"} onClick={() => changePhase(2)}>Phase 2</p>
         </div>
         <div
           style={{ width: "306px" }}

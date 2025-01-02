@@ -1,25 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { details } from "../constant";
 import "./phase2.css";
 import { fetchDataUtil, getValueForKey, updateConfigUtil, updateToggle } from "../utils";
 import Sidebar from "../components/New-Components/Sidebar";
 import menuLight from "../assets/menu-light.svg";
+import Modal from "../components/Modal";
+import { ThemeContext } from "../ThemeHandler";
 
 function Phase2() {
+  const { form, phase2Start, setPhase2Start } = useContext(ThemeContext);
+
   const [startFetchData, setStartFetchData] = useState(false)
   const [sideBarOpen, setSidebarOpen] = useState(false)
   const [temprature, setTemprature] = useState("0.00")
   const [humidity, setHumidity] = useState("0.00")
-  const [form, setForm] = useState({
-    rawtcp_host_ip: "192.168.100.5",
-    weather: 4002,
-    hmr: 4003,
-    ballonet: 4004,
-    helium: 4005,
-    adam: 4006,
-    ebox: 4007,
-    modbustcp_host_ip: "192.168.100.5"
-  });
+  const [openModal, setOpenModal] = useState(false)
+  const [errorValues, setErrorValues] = useState([]);
   const [apiData, setApiData] = useState([
     { key: "Load Cell Tension:", value: "0.00", unit: null },
     { key: "Roll:", value: "0", unit: null },
@@ -91,30 +87,12 @@ function Phase2() {
   }
 
   useEffect(() => {
-    const updateConfigurations = async () => {
-      try {
-
-        const result = await updateToggle(true);
-
-
-        await updateConfigUtil(form);
-        setStartFetchData(true)
-
-      } catch (error) {
-        console.error("Error during update:", error);
-      }
-    };
-
-    updateConfigurations();
-  }, [form]);
-
-  useEffect(() => {
-    if (startFetchData) {
+    if (startFetchData || phase2Start) {
       fetchData();
       const intervalId = setInterval(fetchData, 1000);
       return () => clearInterval(intervalId);
     }
-  }, [startFetchData])
+  }, [startFetchData, phase2Start])
 
   const [currentTime, setCurrentTime] = useState("");
 
@@ -134,11 +112,62 @@ function Phase2() {
       setCurrentTime(formattedTime);
     };
 
-    updateTime(); // Initial call
-    const timeInterval = setInterval(updateTime, 1000); // Update every second
+    updateTime();
+    const timeInterval = setInterval(updateTime, 1000);
 
-    return () => clearInterval(timeInterval); // Cleanup interval
+    return () => clearInterval(timeInterval);
   }, []);
+
+  const handleSubmit = async () => {
+    const errors = [];
+    const ipRegex =
+      /^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)$/;
+
+    Object.keys(form).forEach((key) => {
+      if (form[key].trim() === "") {
+        errors.push(key);
+      }
+    });
+
+    if (form.modbustcp_host_ip && !ipRegex.test(form.modbustcp_host_ip.trim())) {
+      errors.push("modbustcp_host_ip");
+    }
+
+    setErrorValues(errors);
+    if (errors.length > 0) {
+      return;
+    }
+
+    const newForm = {
+      rawtcp_host_ip: form?.rawtcp_host_ip,
+      weather: Number(form?.weather),
+      hmr: Number(form?.hmr),
+      ballonet: Number(form?.ballonet),
+      helium: Number(form?.helium),
+      adam: Number(form?.adam),
+      ebox: Number(form?.ebox),
+      modbustcp_host_ip: form?.modbustcp_host_ip,
+    };
+
+    try {
+      const result = await updateConfigUtil(newForm);
+      if (result) {
+        setOpenModal(false);
+        setStartFetchData(true);
+        setPhase2Start(true);
+      } else {
+        console.error("updateConfigUtil failed or returned an invalid response.");
+        setStartFetchData(false);
+        setPhase2Start(false);
+        setOpenModal(false)
+      }
+    } catch (error) {
+      console.error("Error during updateConfigUtil:", error);
+      setStartFetchData(false);
+      setPhase2Start(false);
+    }
+  };
+
 
   return (
     <div className="alpha2">
@@ -148,7 +177,6 @@ function Phase2() {
             <img src={menuLight} alt="menu-icon-phase2" />
           </div>
         </div>
-        {/* <div>Tuesday, December 24 2024, 03:38:33 PM</div> */}
         <div>{currentTime}</div>
       </div>
       <div className="header">
@@ -165,6 +193,7 @@ function Phase2() {
       <Sidebar
         open={sideBarOpen}
         onClose={() => setSidebarOpen(false)}
+        handleOpenModal={() => setOpenModal(true)}
       />
       <div className="details-container">
         {apiData.map((detail) => (
@@ -182,6 +211,13 @@ function Phase2() {
         <p className="footer-value">Strobe Lights: OFF</p>
         <p className="footer-value">Payload Power: OFF</p>
       </div>
+      <Modal
+        open={openModal}
+        handleClose={() => setOpenModal(false)}
+        handleSubmit={handleSubmit}
+        errorValues={errorValues}
+        setErrorValues={setErrorValues}
+      />
     </div>
   );
 }

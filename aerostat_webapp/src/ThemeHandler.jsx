@@ -8,6 +8,19 @@ const ThemeHandler = ({ children }) => {
     });
 
     const [phase, setPhase] = useState(1);
+    const [phase2Start, setPhase2Start] = useState(false)
+    const [phase1Start, setPhase1Start] = useState(false)
+
+    const [form, setForm] = useState({
+        rawtcp_host_ip: "192.168.100.5",
+        weather: "4002",
+        hmr: "4003",
+        ballonet: "4004",
+        helium: "4005",
+        adam: "4006",
+        ebox: "4007",
+        modbustcp_host_ip: "192.168.0.2"
+    });
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -19,7 +32,7 @@ const ThemeHandler = ({ children }) => {
     }, [theme]);
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme, phase, setPhase }}>
+        <ThemeContext.Provider value={{ theme, toggleTheme, phase, setPhase, form, setForm, phase2Start, setPhase2Start, phase1Start, setPhase1Start }}>
             {children}
         </ThemeContext.Provider>
     );

@@ -41,7 +41,7 @@ function Phase1() {
     port_4006: "Disconnected",
   });
 
-  const { theme } = useContext(ThemeContext);
+  const { theme, form, phase1Start, setPhase1Start } = useContext(ThemeContext);
   const [sidebar, setSidebar] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [responses, setResponses] = useState(lastPerfectResponses.current);
@@ -160,8 +160,6 @@ function Phase1() {
           : "Disconnected",
       };
 
-      console.log(data);
-
       lastPerfectResponses.current = {
         ...lastPerfectResponses.current,
         weather: parsedResponses.weather,
@@ -187,21 +185,11 @@ function Phase1() {
   };
 
   useEffect(() => {
-    if (!startFetchingFromFile && startFetchData) {
+    if ((!startFetchingFromFile && startFetchData) || (!startFetchingFromFile && phase1Start)) {
       const interval = setInterval(fetchData, 500);
       return () => clearInterval(interval);
     }
-  }, [startFetchingFromFile, startFetchData]);
-
-  const [form, setForm] = useState({
-    ip: "192.168.0.102",
-    weather: "4002",
-    hmr: "4003",
-    ballonet: "4004",
-    helium: "4005",
-    adam: "4006",
-    ebox: "4007",
-  });
+  }, [startFetchingFromFile, startFetchData, phase1Start]);
 
   const [errorValues, setErrorValues] = useState([]);
 
@@ -216,8 +204,8 @@ function Phase1() {
       }
     });
 
-    if (form.ip && !ipRegex.test(form.ip.trim())) {
-      errors.push("ip");
+    if (form.rawtcp_host_ip && !ipRegex.test(form.rawtcp_host_ip.trim())) {
+      errors.push("rawtcp_host_ip");
     }
 
     setErrorValues(errors);
@@ -226,17 +214,18 @@ function Phase1() {
     }
 
     const newForm = {
-      ip: form?.ip,
+      rawtcp_host_ip: form?.rawtcp_host_ip,
       weather: Number(form?.weather),
       hmr: Number(form?.hmr),
       ballonet: Number(form?.ballonet),
       helium: Number(form?.helium),
       adam: Number(form?.adam),
       ebox: Number(form?.ebox),
+      modbustcp_host_ip: form?.modbustcp_host_ip,
     };
-
     try {
       setStartFetchData(true);
+      setPhase1Start(true)
       setOpenModal(false);
       setStartFetchingFromFile(false);
       setErrorValues([]);
@@ -244,6 +233,7 @@ function Phase1() {
       if (!result) {
         setStartFetchingFromFile(false);
         setStartFetchData(false);
+        setPhase1Start(false)
       }
       console.log("Form successfully posted:", result);
     } catch (error) {
@@ -307,6 +297,7 @@ function Phase1() {
         setStopBtn(false);
         setFetchingSpeed(1000);
         setStartFetchData(false);
+        setPhase1Start(false)
 
         const fileInput = document.getElementById("fileInput");
         if (fileInput) fileInput.value = "";
@@ -353,6 +344,7 @@ function Phase1() {
     setFwdBtn(true);
     setStopBtn(true);
     setStartFetchData(false);
+    setPhase1Start(false)
     setPlayBtn(false);
   };
   const HandleForward = () => {
@@ -372,6 +364,7 @@ function Phase1() {
     setStopBtn(false);
     setFetchingSpeed(1000);
     setStartFetchData(false);
+    setPhase1Start(false)
 
     const fileInput = document.getElementById("fileInput");
     if (fileInput) fileInput.value = "";
@@ -430,15 +423,13 @@ function Phase1() {
         <Home
           response={responses}
           isLoading={responses?.loading}
-          form={form}
-          setForm={setForm}
           handleSubmit={handleSubmit}
           errorValues={errorValues}
           setErrorValues={setErrorValues}
           openModal={openModal}
           setOpenModal={setOpenModal}
           handleOpenModal={handleOpenModal}
-          fetchingStart={startFetchData}
+          fetchingStart={startFetchData || phase1Start}
           HandleBrowse={handleBrowse}
           fileName={logFile}
           HandleForward={HandleForward}
@@ -450,9 +441,8 @@ function Phase1() {
         />
       </div>
       <div
-        className={`watermark ${
-          theme === "light" ? "watermark-light" : "watermark-dark"
-        }`}
+        className={`watermark ${theme === "light" ? "watermark-light" : "watermark-dark"
+          }`}
       ></div>
     </>
   );

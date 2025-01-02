@@ -137,10 +137,19 @@ h2.footer-heading {
   height: 46px;
   cursor: pointer;
   border-radius: 12px;
-  background: #ad964b;
-  border: 1.53px solid #8f7c3f;
-  box-shadow: 4px 8px 15.25px 0px #342800, -6.1px -6.1px 15.25px 0px #ffffff,
+  background: #ac8400;
+  border: 1.53px solid #ac8400;
+}
 
+.modal.phase2 {
+  height: auto !important;
+  background: #342800;
+  border: 1.53px solid #ac8400;
+}
+
+.modal.phase2 .modal-btn-group button{
+  background-color: #ac8400;
+  color: white;
 }
 
 @media only screen and (max-width: 1124px) {
