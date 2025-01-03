@@ -105,6 +105,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
 
 
   }, [sendData, fan1, fan2, light]);
+  
 
   return (
     <>
@@ -150,7 +151,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                   <NewCompass
                     size={getCompassSize()}
                     needle1={response?.weather?.heading}
-                    needle2={response?.weather?.windAngle}
+                    needle2={response?.weather?.wind_angle}
                   />
                   <div className="weather-station-chips">
                     <StatusChip color={"blue"} description={"Wind Angle"} />
@@ -172,11 +173,11 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                   0,
                   70,
                   [
-                    parseFloat(response?.weather?.windSpeed) > 70
+                    parseFloat(response?.weather?.wind_speed) > 70
                       ? 70
-                      : parseFloat(response?.weather?.windSpeed) < 0
+                      : parseFloat(response?.weather?.wind_speed) < 0
                         ? 0
-                        : parseFloat(response?.weather?.windSpeed),
+                        : parseFloat(response?.weather?.wind_speed),
                   ],
                   getChartSize()
                 )}
@@ -184,10 +185,10 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
               <ChartsData
                 position={"between"}
                 description1={"Air Temp (C):"}
-                value1={parseFloat(response?.weather?.airTemp).toFixed(2)}
+                value1={parseFloat(response?.weather?.air_temp).toFixed(2)}
                 description2={"Baro Press (inHg):"}
-                value2={parseFloat(response?.weather?.baroPres).toFixed(2)}
-                graphValue={parseFloat(response?.weather?.windSpeed).toFixed(2)}
+                value2={parseFloat(response?.weather?.baro_presssure).toFixed(2)}
+                graphValue={parseFloat(response?.weather?.wind_speed).toFixed(2)}
                 graphName={"Wind Speed"}
                 unit={"Knots"}
               />
@@ -226,13 +227,13 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     <ChartChip
                       name={"Heading"}
                       value={parseFloat(
-                        response?.digitalCompass?.Magheading
+                        response?.digitalCompass?.mag_heading
                       ).toFixed(2)}
                       unit={"°"}
                     />
                     <NewCompass
                       size={getCompassSize()}
-                      needle1={response?.digitalCompass?.Magheading}
+                      needle1={response?.digitalCompass?.mag_heading}
                     />
                   </div>
                 </ChildCard>
@@ -244,21 +245,21 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       <ChartChip
                         name={"Roll:"}
                         value={parseFloat(
-                          response?.digitalCompass?.Roll
+                          response?.digitalCompass?.roll
                         ).toFixed(2)}
                         unit={"°"}
                       />
                       <ChartChip
                         name={"Pitch:"}
                         value={parseFloat(
-                          response?.digitalCompass?.Pitch
+                          response?.digitalCompass?.pitch
                         ).toFixed(2)}
                         unit={"°"}
                       />
                     </div>
                     <NewRollMeter
-                      roll={response?.digitalCompass?.Roll}
-                      pitch={response?.digitalCompass?.Pitch}
+                      roll={response?.digitalCompass?.roll}
+                      pitch={response?.digitalCompass?.pitch}
                     />
                   </div>
                 </ChildCard>
@@ -277,11 +278,11 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                         0,
                         6,
                         [
-                          parseFloat(response?.helium?.HelPressure) > 6
+                          parseFloat(response?.helium?.hel_pressure) > 6
                             ? 6
-                            : parseFloat(response?.helium?.HelPressure) < 0
+                            : parseFloat(response?.helium?.hel_pressure) < 0
                               ? 0
-                              : parseFloat(response?.helium?.HelPressure),
+                              : parseFloat(response?.helium?.hel_pressure),
                         ],
                         getChartSize()
                       )}
@@ -289,7 +290,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     <ChartsData
                       position={"around"}
                       graphValue={parseFloat(
-                        response?.helium?.HelPressure
+                        response?.helium?.hel_pressure
                       ).toFixed(2)}
                       graphName={"Hull Helium"}
                     />
@@ -302,11 +303,11 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                         0,
                         6,
                         [
-                          parseFloat(response?.ballonet?.BalPressure) > 6
+                          parseFloat(response?.ballonet?.bal_pressure) > 6
                             ? 6
-                            : parseFloat(response?.ballonet?.BalPressure) < 0
+                            : parseFloat(response?.ballonet?.bal_pressure) < 0
                               ? 0
-                              : parseFloat(response?.ballonet?.BalPressure),
+                              : parseFloat(response?.ballonet?.bal_pressure),
                         ],
                         getChartSize()
                       )}
@@ -314,7 +315,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     <ChartsData
                       position={"around"}
                       graphValue={parseFloat(
-                        response?.ballonet?.BalPressure
+                        response?.ballonet?.bal_pressure
                       ).toFixed(2)}
                       graphName={"Ballonet Air"}
                     />
@@ -327,7 +328,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                 <div className="confluence-box-content">
                   <ChartChip
                     name={"Max Tension"}
-                    value={parseFloat(response?.adams?.MaxTension).toFixed(2)}
+                    value={parseFloat(response?.adams?.max_tension).toFixed(2)}
                     unit={"kg"}
                   />
                   <div className="confluence-graph">
@@ -338,11 +339,11 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                         0,
                         700,
                         [
-                          parseFloat(response?.adams?.Tension) > 700
+                          parseFloat(response?.adams?.tension) > 700
                             ? 700
-                            : parseFloat(response?.adams?.Tension) < 0
+                            : parseFloat(response?.adams?.tension) < 0
                               ? 0
-                              : parseFloat(response?.adams?.Tension),
+                              : parseFloat(response?.adams?.tension),
                         ],
                         getChartSize()
                       )}
@@ -350,7 +351,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     <ChartsData
                       position={"center"}
                       graphName={"Current Tension"}
-                      graphValue={parseFloat(response?.adams?.Tension).toFixed(
+                      graphValue={parseFloat(response?.adams?.tension).toFixed(
                         2
                       )}
                       unit={"Kg"}

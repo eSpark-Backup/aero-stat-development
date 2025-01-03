@@ -12,7 +12,7 @@ const ThemeHandler = ({ children }) => {
     const [phase1Start, setPhase1Start] = useState(false)
 
     const [form, setForm] = useState({
-        rawtcp_host_ip: "192.168.100.5",
+        rawtcp_host_ip: "192.168.0.2",
         weather: "4002",
         hmr: "4003",
         ballonet: "4004",

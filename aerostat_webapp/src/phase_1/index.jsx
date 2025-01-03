@@ -10,14 +10,14 @@ import "./phase1.css";
 function Phase1() {
   const lastPerfectResponses = useRef({
     adams: {
-      MaxTension: parseFloat(700).toFixed(2),
-      Tension: parseFloat(10).toFixed(2),
+      max_tension: parseFloat(700).toFixed(2),
+      tension: parseFloat(10).toFixed(2),
     },
-    ballonet: { BalPressure: parseFloat(0.071).toFixed(2) },
+    ballonet: { bal_pressure: parseFloat(0.071).toFixed(2) },
     digitalCompass: {
-      Magheading: parseFloat(240.1).toFixed(2),
-      Pitch: parseFloat(0).toFixed(2),
-      Roll: parseFloat(0).toFixed(2),
+      mag_heading: parseFloat(240.1).toFixed(2),
+      pitch: parseFloat(0).toFixed(2),
+      roll: parseFloat(0).toFixed(2),
     },
     ebox: {
       InternalTemp: parseFloat(25.5).toFixed(2),
@@ -26,13 +26,13 @@ function Phase1() {
       position: "1",
       strobe: "OFF",
     },
-    helium: { HelPressure: parseFloat(0.398).toFixed(2) },
+    helium: { hel_pressure: parseFloat(0.398).toFixed(2) },
     weather: {
-      airTemp: parseFloat(18.8).toFixed(2),
-      baroPres: parseFloat(29.3).toFixed(29.3),
+      air_temp: parseFloat(18.8).toFixed(2),
+      baro_presssure: parseFloat(29.3).toFixed(29.3),
       heading: parseFloat(128).toFixed(2),
-      windAngle: parseFloat(158.4).toFixed(2),
-      windSpeed: parseFloat(70).toFixed(2),
+      wind_angle: parseFloat(158.4).toFixed(2),
+      wind_speed: parseFloat(70).toFixed(2),
     },
     port_4002: "Disconnected",
     port_4003: "Disconnected",
@@ -92,54 +92,55 @@ function Phase1() {
 
   const fetchData = async () => {
     const data = await fetchDataUtil();
+    console.log(data)
 
     if (data) {
       const parsedResponses = {
         weather: {
-          airTemp: isInvalidValue(data?.port_data?.port_4002?.airTemp)
-            ? lastPerfectResponses.current.weather.airTemp
-            : parseFloat(data.port_data.port_4002.airTemp).toFixed(2),
-          baroPres: isInvalidValue(data?.port_data?.port_4002?.baroPres)
-            ? lastPerfectResponses.current.weather.baroPres
-            : parseFloat(data.port_data.port_4002.baroPres).toFixed(2),
+          air_temp: isInvalidValue(data?.port_data?.port_4002?.air_temp)
+            ? lastPerfectResponses.current.weather.air_temp
+            : parseFloat(data.port_data.port_4002.air_temp).toFixed(2),
+          baro_presssure: isInvalidValue(data?.port_data?.port_4002?.baro_presssure)
+            ? lastPerfectResponses.current.weather.baro_presssure
+            : parseFloat(data.port_data.port_4002.baro_presssure).toFixed(2),
           heading: isInvalidValue(data?.port_data?.port_4002?.heading)
             ? lastPerfectResponses.current.weather.heading
             : parseFloat(data.port_data.port_4002.heading).toFixed(2),
-          windAngle: isInvalidValue(data?.port_data?.port_4002?.windAngle)
-            ? lastPerfectResponses.current.weather.windAngle
-            : parseFloat(data.port_data.port_4002.windAngle).toFixed(2),
-          windSpeed: isInvalidValue(data?.port_data?.port_4002?.windSpeed)
-            ? lastPerfectResponses.current.weather.windSpeed
-            : parseFloat(data.port_data.port_4002.windSpeed).toFixed(2),
+          wind_angle: isInvalidValue(data?.port_data?.port_4002?.wind_angle)
+            ? lastPerfectResponses.current.weather.wind_angle
+            : parseFloat(data.port_data.port_4002.wind_angle).toFixed(2),
+          wind_speed: isInvalidValue(data?.port_data?.port_4002?.wind_speed)
+            ? lastPerfectResponses.current.weather.wind_speed
+            : parseFloat(data.port_data.port_4002.wind_speed).toFixed(2),
         },
         digitalCompass: {
-          Magheading: isInvalidValue(data?.port_data?.port_4003?.Magheading)
-            ? lastPerfectResponses.current.digitalCompass.Magheading
-            : parseFloat(data.port_data.port_4003.Magheading).toFixed(2),
-          Pitch: isInvalidValue(data?.port_data?.port_4003?.Pitch)
-            ? lastPerfectResponses.current.digitalCompass.Pitch
-            : parseFloat(data.port_data.port_4003.Pitch).toFixed(2),
-          Roll: isInvalidValue(data?.port_data?.port_4003?.Roll)
-            ? lastPerfectResponses.current.digitalCompass.Roll
-            : parseFloat(data.port_data.port_4003.Roll).toFixed(2),
+          mag_heading: isInvalidValue(data?.port_data?.port_4003?.mag_heading)
+            ? lastPerfectResponses.current.digitalCompass.mag_heading
+            : parseFloat(data.port_data.port_4003.mag_heading).toFixed(2),
+          pitch: isInvalidValue(data?.port_data?.port_4003?.pitch)
+            ? lastPerfectResponses.current.digitalCompass.pitch
+            : parseFloat(data.port_data.port_4003.pitch).toFixed(2),
+          roll: isInvalidValue(data?.port_data?.port_4003?.roll)
+            ? lastPerfectResponses.current.digitalCompass.roll
+            : parseFloat(data.port_data.port_4003.roll).toFixed(2),
         },
         ballonet: {
-          BalPressure: isInvalidValue(data?.port_data?.port_4004?.BalPressure)
-            ? lastPerfectResponses.current.ballonet.BalPressure
-            : parseFloat(data.port_data.port_4004.BalPressure).toFixed(2),
+          bal_pressure: isInvalidValue(data?.port_data?.port_4004?.bal_pressure)
+            ? lastPerfectResponses.current.ballonet.bal_pressure
+            : parseFloat(data.port_data.port_4004.bal_pressure).toFixed(2),
         },
         helium: {
-          HelPressure: isInvalidValue(data?.port_data?.port_4005?.HelPressure)
-            ? lastPerfectResponses.current.helium.HelPressure
-            : parseFloat(data.port_data.port_4005.HelPressure).toFixed(2),
+          hel_pressure: isInvalidValue(data?.port_data?.port_4005?.hel_pressure)
+            ? lastPerfectResponses.current.helium.hel_pressure
+            : parseFloat(data.port_data.port_4005.hel_pressure).toFixed(2),
         },
         adams: {
-          MaxTension: isInvalidValue(data?.port_data?.port_4006?.MaxTension)
-            ? lastPerfectResponses.current.adams.MaxTension
-            : parseFloat(data.port_data.port_4006.MaxTension).toFixed(2),
-          Tension: isInvalidValue(data?.port_data?.port_4006?.Tension)
-            ? lastPerfectResponses.current.adams.Tension
-            : parseFloat(data.port_data.port_4006.Tension).toFixed(2),
+          max_tension: isInvalidValue(data?.port_data?.port_4006?.max_tension)
+            ? lastPerfectResponses.current.adams.max_tension
+            : parseFloat(data.port_data.port_4006.max_tension).toFixed(2),
+          tension: isInvalidValue(data?.port_data?.port_4006?.tension)
+            ? lastPerfectResponses.current.adams.tension
+            : parseFloat(data.port_data.port_4006.tension).toFixed(2),
         },
         time: formatDateTime(),
         loading: data?.connection_status,
@@ -185,8 +186,8 @@ function Phase1() {
   };
 
   useEffect(() => {
-    if ((!startFetchingFromFile && startFetchData) || (!startFetchingFromFile && phase1Start)) {
-      const interval = setInterval(fetchData, 500);
+    if (!startFetchingFromFile && (startFetchData || phase1Start)) {
+      const interval = setInterval(fetchData, 1500);
       return () => clearInterval(interval);
     }
   }, [startFetchingFromFile, startFetchData, phase1Start]);
@@ -303,9 +304,9 @@ function Phase1() {
         if (fileInput) fileInput.value = "";
 
         const newResponse = {
-          adams: { MaxTension: 700, Tension: 10 },
-          ballonet: { BalPressure: 0.071 },
-          digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
+          adams: { max_tension: 700, tension: 10 },
+          ballonet: { bal_pressure: 0.071 },
+          digitalCompass: { mag_heading: 240.1, pitch: 0, roll: 0 },
           ebox: {
             InternalTemp: 25.5,
             fan1: "ON",
@@ -313,13 +314,13 @@ function Phase1() {
             position: "1",
             strobe: "OFF",
           },
-          helium: { HelPressure: 0.398 },
+          helium: { hel_pressure: 0.398 },
           weather: {
-            airTemp: 18.8,
-            baroPres: 29.3,
+            air_temp: 18.8,
+            baro_presssure: 29.3,
             heading: 128,
-            windAngle: 158.4,
-            windSpeed: 70,
+            wind_angle: 158.4,
+            wind_speed: 70,
           },
           time: formatDateTime(),
         };
@@ -370,9 +371,9 @@ function Phase1() {
     if (fileInput) fileInput.value = "";
 
     let tempRes = {
-      adams: { MaxTension: 700, Tension: 10 },
-      ballonet: { BalPressure: 0.071 },
-      digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
+      adams: { max_tension: 700, tension: 10 },
+      ballonet: { bal_pressure: 0.071 },
+      digitalCompass: { mag_heading: 240.1, pitch: 0, roll: 0 },
       ebox: {
         InternalTemp: 25.5,
         fan1: "ON",
@@ -380,13 +381,13 @@ function Phase1() {
         position: "1",
         strobe: "OFF",
       },
-      helium: { HelPressure: 0.398 },
+      helium: { hel_pressure: 0.398 },
       weather: {
-        airTemp: 18.8,
-        baroPres: 29.3,
+        air_temp: 18.8,
+        baro_presssure: 29.3,
         heading: 128,
-        windAngle: 158.4,
-        windSpeed: 70,
+        wind_angle: 158.4,
+        wind_speed: 70,
       },
       time: formatDateTime(),
     };

@@ -9,7 +9,8 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData, size) => 
             plotShadow: false,
             backgroundColor: "transparent",
             height: size,
-            width: size
+            width: size,
+            animation: false
         },
         plotOptions: {
             gauge: {
