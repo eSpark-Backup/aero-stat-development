@@ -38,7 +38,7 @@ int hull_pressure_port = 5006;
 int ahrs_port = 5007;
 
 float convert_to_float(uint16_t regs[2]);
-float Modbus_TCP::calculate_position_accuracy(float pdop, float hdop, float vdop) ;
+float calculate_position_accuracy(float pdop, float hdop, float vdop) ;
 };
 
 #endif //MODBUS_TCP

@@ -2,8 +2,9 @@
 #define UTIL_H
 
 #include <string>
+#include <cstdint>
 
-#define WINDOWS
+// #define WINDOWS
 
 std::string strip(const std::string& str);
 float formatFloat(float value);

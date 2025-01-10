@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <sstream>
+#include <stdint.h>
 
 #define TENSION 0
 #define MAX_TENSION 1

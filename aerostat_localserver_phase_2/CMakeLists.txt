@@ -23,6 +23,8 @@ add_executable(TEST main.cpp ${SOURCES})
 # Include directories can be adjusted based on your setup
 include_directories(${CMAKE_SOURCE_DIR})
 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
 
 # Link socket libraries for Windows
 if(WIN32)

@@ -1,0 +1,55 @@
+# Use an Ubuntu base image
+FROM ubuntu:20.04
+
+# Set a label for metadata
+LABEL maintainer="maaz@esparkconsultants.com"
+
+# Update package lists
+RUN apt-get update
+
+# Install build-essential
+RUN apt-get install -y build-essential
+
+# Install cmake
+RUN apt-get install -y cmake
+
+# Install git
+RUN apt-get install -y git
+
+# Install dos2unix
+RUN apt-get install -y dos2unix
+
+# Clean up the package cache
+RUN apt-get clean
+
+# Remove unnecessary files to reduce the image size
+RUN rm -rf /var/lib/apt/lists/*
+
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy project files to the container
+COPY . /app/aerostat_localserver
+
+# Convert Windows-style line endings to Unix-style
+# This ensures compatibility with Linux
+RUN find /app/aerostat_localserver -type f -exec dos2unix {} +
+
+# Change to project directory
+WORKDIR /app/aerostat_localserver
+
+# Create a build directory
+# RUN mkdir build
+
+# Change to the build directory and configure the project
+WORKDIR /app/aerostat_localserver/build
+
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release
+
+# Build the project
+RUN cmake --build . --config Release
+
+
+# Set default command
+CMD ["bash"]
