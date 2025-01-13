@@ -7,3 +7,8 @@ sudo /usr/bin/vmhgfs-fuse .host:/aerostat-development-shared /home/alfa/vmshare 
 
 export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 ./example
+
+
+installing mongodb for local development
+
+sudo apt-get install gnupg curl

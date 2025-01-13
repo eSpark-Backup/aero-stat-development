@@ -1,0 +1,27 @@
+#ifndef MONGODB_DATABASE_H
+#define MONGODB_DATABASE_H
+
+#include "Database.h"
+#include <mongocxx/client.hpp>
+#include <mongocxx/database.hpp>
+#include <mongocxx/collection.hpp>
+#include <mongocxx/stdx.hpp>
+#include <bsoncxx/json.hpp>
+#include <vector>
+
+class MongoDBDatabase : public Database {
+public:
+    MongoDBDatabase();
+    virtual ~MongoDBDatabase();
+
+    bool connect(const std::string& connectionString) override;
+    bool insert(const std::string& table, const std::vector<std::string>& data) override;
+    std::vector<std::string> query(const std::string& query) override;
+    void disconnect() override;
+
+private:
+    mongocxx::client* client_;
+    mongocxx::database* db_;
+};
+
+#endif // MONGODB_DATABASE_H

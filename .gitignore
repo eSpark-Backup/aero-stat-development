@@ -25,3 +25,4 @@ dist-ssr
 
 build/
 /aerostat_webapp/.vite
+/aerostat_server_db_fetch/mongodb_example/alfacor01dump
