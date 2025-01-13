@@ -1,0 +1,6 @@
+sudo /usr/bin/vmhgfs-fuse .host:/aerostat-development-shared /home/alfa/vmshare -o subtype=vmhgfs-fuse,allow_other
+
+cmake -DCMAKE_BUILD_TYPE=Release -DUWEBSOCKETS_SOURCE_DIR=/home/alfa/uWebSockets ..
+cmake --build . --config release
+
+sudo /usr/bin/vmhgfs-fuse .host:/aerostat-development-shared /home/alfa/vmshare -o subtype=vmhgfs-fuse,allow_other
