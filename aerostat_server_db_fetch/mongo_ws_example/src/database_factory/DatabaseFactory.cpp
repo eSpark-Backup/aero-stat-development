@@ -1,5 +1,5 @@
-#include "DatabaseFactory.h"
-#include "MongoDBDatabase.h"
+#include "database_factory/DatabaseFactory.h"
+#include "databases/MongoDBDatabase.h"
 #include <stdexcept>
 
 

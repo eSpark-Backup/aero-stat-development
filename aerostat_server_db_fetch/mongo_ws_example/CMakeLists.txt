@@ -9,11 +9,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -ggdb -O3")
 
 # Define directories
 set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
+
 # set(PROT_BASE_INC ${CMAKE_SOURCE_DIR}/include/protocol_base)
 set(PROT_BASE_SRC ${CMAKE_SOURCE_DIR}/src/protocol_base)
 
 # set(PROT_INC ${CMAKE_SOURCE_DIR}/include/protocols)
 set(PROT_SRC ${CMAKE_SOURCE_DIR}/src/protocols)
+
+# Databases
+set(DB_FAC_INC ${CMAKE_SOURCE_DIR}/include/database_factory)
+set(DB_FAC_SRC ${CMAKE_SOURCE_DIR}/src/databases)
+
+set(DB_INC ${CMAKE_SOURCE_DIR}/include/database_factory)
+set(DB_SRC ${CMAKE_SOURCE_DIR}/src/databases)
 
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(LIB_DIR ${CMAKE_SOURCE_DIR}/lib)
