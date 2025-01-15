@@ -7,8 +7,9 @@ class CommunicationProtocol {
 public:
     virtual ~CommunicationProtocol() = default;
     
-    virtual bool sendData(const std::string& data) = 0;
-    virtual std::string receiveData() = 0;
+    virtual void startReading(void) = 0;
+    virtual void sendData(const std::string& message) = 0;
+    virtual std::string receiveData(void) = 0;
 };
 
 #endif // COMMUNICATION_PROTOCOL_H

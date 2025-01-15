@@ -12,3 +12,14 @@ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 installing mongodb for local development
 
 sudo apt-get install gnupg curl
+
+curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
+   sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
+   --dearmor
+
+
+scp -r a6admin@20.203.102.81:/home/a6admin /home/alfa/vmshare/aerostat_server_db_fetch/mongodb_example
+
+cmake .. && cmake --build . && make main
+
+cd .. && rm -rf ./build && mkdir build && cd build

@@ -1,29 +1,29 @@
-#include "DatabaseFactory.h"
-#include "MongoDBDatabase.h"
-#include "CommunicationProtocolFactory.h"
-#include "HTTPProtocol.h"
+#include "protocol_base/CommunicationProtocolFactory.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
 
 int main() {
-    // Example: Create a MongoDB database and connect
-    // Database* db = new MongoDBDatabase();
-    // if (db->connect("mongodb://localhost:27017/mydatabase")) {
-    //     std::vector<std::string> data = {"Data1", "Data2", "Data3"};
-    //     db->insert("mycollection", data);
+    try {
+        // Create a protocol using the factory
+        auto protocol = CommunicationProtocolFactory::createProtocol(ProtocolType::UWS);
 
-    //     std::vector<std::string> result = db->query("mycollection");
-    //     for (const auto& doc : result) {
-    //         std::cout << doc << std::endl;
-    //     }
+        // Start listening (polymorphic call)
+        protocol->startReading();
 
-    //     db->disconnect();
-    // }
+        // Send data over the protocol
+        protocol->sendData("Hello from WebSocket!");
 
-    // // Example: Create a protocol for communication
-    // CommunicationProtocol* protocol = CommunicationProtocolFactory::createProtocol("HTTP");
-    // protocol->sendData("Hello, world!");
-    
-    // delete db;
-    // delete protocol;
+        // Simulate a running server for some time
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+
+        // Properly clean up
+        std::cout << "Shutting down protocol listener..." << std::endl;
+
+    } catch (const std::exception& ex) {
+        std::cerr << "Exception Error: " << ex.what() << std::endl;
+        return 1;
+    }
 
     return 0;
 }
