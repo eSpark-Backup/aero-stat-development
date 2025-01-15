@@ -13,17 +13,18 @@ int main() {
         // Start listening (polymorphic call)
         protocol->startReading();
         std::string connectionString = "mongodb://localhost:27017/mydatabase";
+        std::string filePath = "local_database.txt";
 
         // Simulate a running server for some time
         std::this_thread::sleep_for(std::chrono::seconds(10));
 
-        // Connect to MongoDB
+        // Connect to Database
         if (db->connect(connectionString)) {
-            std::cout << "Connected to MongoDB!" << std::endl;
-            protocol->sendData("Connected to MongoDB!");
+            std::cout << "Connected to Database!" << std::endl;
+            protocol->sendData("Connected to Database!");
         } else {
-            std::cerr << "Failed to connect to MongoDB!" << std::endl;
-            protocol->sendData("Failed to connect to MongoDB!");
+            std::cerr << "Failed to connect to Database!" << std::endl;
+            protocol->sendData("Failed to connect to Database!");
             return 1;
         }
 
