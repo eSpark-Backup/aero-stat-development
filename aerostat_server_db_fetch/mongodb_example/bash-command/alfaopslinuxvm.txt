@@ -23,3 +23,15 @@ scp -r a6admin@20.203.102.81:/home/a6admin /home/alfa/vmshare/aerostat_server_db
 cmake .. && cmake --build . && make main
 
 cd .. && rm -rf ./build && mkdir build && cd build
+
+
+collection
+
+ahrs_sensor_readings
+avionics_environment_sensor_readings
+ballonet_curtain_height_sensor_readings
+ballonet_pressure_sensor_readings
+hull_pressure_sensor_readings
+lift_sensor_readings
+relay_status
+weather_sensor_readings

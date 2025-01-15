@@ -6,20 +6,25 @@
 
 int main() {
     try {
+        DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost:27017/alfacor01");
+        DatabaseConfig localDbConfig(DatabaseType::LOCAL_DB, "local_database.txt");
+
+        DatabaseConfig dbConfig = mongoConfig;
+
         // Create a protocol using the factory
         auto protocol = CommunicationProtocolFactory::createProtocol(ProtocolType::UWS);
-        auto db = DatabaseFactory::createDatabase("mongodb");
+        auto db = DatabaseFactory::createDatabase(dbConfig.type);
 
         // Start listening (polymorphic call)
         protocol->startReading();
-        std::string connectionString = "mongodb://localhost:27017/mydatabase";
-        std::string filePath = "local_database.txt";
+        // std::string connectionString = "mongodb://localhost:27017/alfacor01";
+        // std::string filePath = "local_database.txt";
 
         // Simulate a running server for some time
         std::this_thread::sleep_for(std::chrono::seconds(10));
 
         // Connect to Database
-        if (db->connect(connectionString)) {
+        if (db->connect(dbConfig.connectionStringOrFilePath)) {
             std::cout << "Connected to Database!" << std::endl;
             protocol->sendData("Connected to Database!");
         } else {
@@ -32,12 +37,13 @@ int main() {
         protocol->sendData("Hello from WebSocket!");
 
         // Query data from the database
-        std::vector<std::string> results = db->query("mycollection");
+        std::vector<std::string> results = db->query("lift_sensor_readings");
 
         // Send data over WebSocket
         for (const auto& doc : results) {
-            std::cout << "Sending document: " << doc << std::endl;
+            // std::cout << "Sending document: " << doc << std::endl;
             protocol->sendData(doc);
+            sleep(1);
         }
 
         // Simulate a running server for some time
