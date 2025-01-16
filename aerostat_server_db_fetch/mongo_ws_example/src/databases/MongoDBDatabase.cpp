@@ -7,8 +7,6 @@
 #include "logger/logger.h"
 
 
-MongoDBDatabase::MongoDBDatabase() : client_(nullptr), db_(nullptr) {}
-
 MongoDBDatabase::~MongoDBDatabase() {
     if (client_) {
         disconnect();

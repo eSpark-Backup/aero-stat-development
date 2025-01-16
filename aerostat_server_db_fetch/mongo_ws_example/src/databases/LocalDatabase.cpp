@@ -4,8 +4,6 @@
 #include <sstream>
 #include "logger/logger.h"
 
-LocalTextDatabase::LocalTextDatabase() : isConnected_(false) {}
-
 LocalTextDatabase::~LocalTextDatabase() {
     if (isConnected_) {
         disconnect();

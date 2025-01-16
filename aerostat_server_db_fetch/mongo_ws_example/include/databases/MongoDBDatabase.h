@@ -11,8 +11,8 @@
 
 class MongoDBDatabase : public Database {
 public:
-    MongoDBDatabase();
-    virtual ~MongoDBDatabase();
+    explicit MongoDBDatabase(const DatabaseConfig& config) : Database(config) {}
+    ~MongoDBDatabase() override;
 
     bool connect(const std::string& connectionString) override;
     bool insert(const std::string& table, const std::vector<std::string>& data) override;

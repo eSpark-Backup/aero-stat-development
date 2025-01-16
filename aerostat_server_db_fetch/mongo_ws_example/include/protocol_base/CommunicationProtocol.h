@@ -11,10 +11,10 @@ class CommunicationProtocol {
 public:
     virtual ~CommunicationProtocol() = default;
     
-    virtual void startListening(void) = 0;
-    virtual void sendData(const std::string& message) = 0;
-    virtual std::string receiveData(void) = 0;
-    virtual void setEventCallback(EventCallbackType callback) = 0;
+    virtual void startListening(void){}
+    virtual void sendData(const std::string& message){}
+    virtual std::string receiveData(void){}
+    virtual void setEventCallback(EventCallbackType callback){};
 
 protected:
     EventCallbackType eventCallback = nullptr;

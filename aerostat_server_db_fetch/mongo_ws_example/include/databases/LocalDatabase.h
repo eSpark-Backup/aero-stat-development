@@ -7,8 +7,8 @@
 
 class LocalTextDatabase : public Database {
 public:
-    LocalTextDatabase();
-    ~LocalTextDatabase();
+    explicit LocalTextDatabase(const DatabaseConfig& config) : Database(config) {}
+    ~LocalTextDatabase() override;
 
     bool connect(const std::string& filePath) override;
     bool insert(const std::string& table, const std::vector<std::string>& data) override;
