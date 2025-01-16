@@ -4,10 +4,11 @@
 #include <thread>
 #include <App.h>
 #include <regex>
+#include "logger/logger.h"
 
-WebSocketProtocol::WebSocketProtocol(const std::string& url)
-    : url(url), isRunning(false) {
-    std::cout << "WebSocketProtocol initialized with URL: " << url << std::endl;
+WebSocketProtocol::WebSocketProtocol(const std::string& _url)
+    : url(_url), isRunning(false) {
+    LOG_INFO("WebSocketProtocol initialized with URL: %s", _url.c_str());
     parseUrl();
 }
 
@@ -20,8 +21,8 @@ void WebSocketProtocol::parseUrl() {
         host = matches[1].str();        // Extract the hostname (IP or domain)
         port = std::stoi(matches[2].str());  // Extract the port number
 
-        std::cout << "Parsed Host: " << host << std::endl;
-        std::cout << "Parsed Port: " << port << std::endl;
+        LOG_INFO("Parsed Host: %s", host.c_str());
+        LOG_INFO("Parsed Port: %d", port);
     } else {
         std::cerr << "Invalid URL format. Expected ws://<host>:<port>" << std::endl;
     }
@@ -34,7 +35,7 @@ WebSocketProtocol::~WebSocketProtocol() {
             listeningThread->join();
         }
     }
-    std::cout << "WebSocketProtocol destroyed" << std::endl;
+    LOG_INFO("WebSocketProtocol destroyed");
 }
 
 void WebSocketProtocol::sendData(const std::string& message) {
@@ -42,19 +43,20 @@ void WebSocketProtocol::sendData(const std::string& message) {
         auto *ws = connection.second;
         if (ws) {
             ws->send(message, uWS::OpCode::TEXT);
-            std::cout << "Sent custom message: " << message << std::endl;
+            LOG_VERBOSE("Sent custom message: %s", message.c_str());
         } else {
-            std::cout << "WebSocket is not connected, cannot send message." << std::endl;
+            LOG_ERROR("WebSocket is not connected, cannot send message.");
         }
     }
 }
 
 void WebSocketProtocol::startReading(void) {
     if (isRunning) {
-        std::cerr << "WebSocketProtocol is already listening!" << std::endl;
+        // std::cerr << "WebSocketProtocol is already listening!" << std::endl;
+        LOG_WARNING("WebSocketProtocol is already listening!");
         return;
     }
-    std::cout << "Starting Websocket Reading thread!" << std::endl;
+    LOG_INFO("Starting Websocket Reading thread!");
     isRunning = true;
     listeningThread = std::make_unique<std::thread>(&WebSocketProtocol::listen, this);
 }
@@ -84,7 +86,8 @@ void WebSocketProtocol::listen() {
             /* Open event here, you may access ws->getUserData() which points to a PerSocketData struct */
             auto *data = (PerSocketData *) ws->getUserData();
             data->id = generateUniqueId();
-            std::cout << "WebSocket opened, ID: " << data->id << std::endl;
+            // LOG_INFO("WebSocket opened, ID: " << data->id);
+            LOG_INFO("WebSocket opened, ID: %s", (data->id).c_str());
             wsConnections[data->id] = ws;
         },
         .message = [](auto *ws, std::string_view message, uWS::OpCode opCode) {
@@ -110,12 +113,14 @@ void WebSocketProtocol::listen() {
 
             /* Remove the connection from the active connections map */
             auto *data = (PerSocketData *) ws->getUserData();
-            std::cout << "WebSocket closed, ID: " << data->id << std::endl;
+            // LOG_INFO("WebSocket closed, ID: " << data->id);
+            LOG_INFO("WebSocket closed, ID: %s", (data->id).c_str());
             wsConnections.erase(data->id);
         }
     }).listen(WebSocketProtocol::port, [this](auto *listen_socket) {
         if (listen_socket) {
-            std::cout << "Listening on port " << this->port << std::endl;
+            // LOG_INFO("Listening on port " << this->port);
+            LOG_INFO("Listening on port : %d", this->port);
         }
     }).run();
 
@@ -123,7 +128,9 @@ void WebSocketProtocol::listen() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    std::cout << "WebSocketProtocol listener stopped" << std::endl;
+    // LOG_INFO("WebSocketProtocol listener stopped");
+    LOG_INFO("WebSocketProtocol listener stopped");
+
 }
 
 std::string WebSocketProtocol::receiveData(void) {

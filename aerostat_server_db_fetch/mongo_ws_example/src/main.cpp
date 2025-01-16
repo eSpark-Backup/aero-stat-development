@@ -3,57 +3,49 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include "logger/logger.h"
 
 int main() {
+    Logger& logger = Logger::getInstance();
+    logger.setLogLevel(Logger::DEBUG);
+    logger.setLogFile();
+
     try {
         DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost:27017/alfacor01");
         DatabaseConfig localDbConfig(DatabaseType::LOCAL_DB, "local_database.txt");
 
         DatabaseConfig dbConfig = mongoConfig;
 
-        // Create a protocol using the factory
         auto protocol = CommunicationProtocolFactory::createProtocol(ProtocolType::UWS);
         auto db = DatabaseFactory::createDatabase(dbConfig.type);
 
-        // Start listening (polymorphic call)
         protocol->startReading();
-        // std::string connectionString = "mongodb://localhost:27017/alfacor01";
-        // std::string filePath = "local_database.txt";
 
-        // Simulate a running server for some time
         std::this_thread::sleep_for(std::chrono::seconds(10));
 
-        // Connect to Database
         if (db->connect(dbConfig.connectionStringOrFilePath)) {
-            std::cout << "Connected to Database!" << std::endl;
+            LOG_DEBUG("Connected to Database!");
             protocol->sendData("Connected to Database!");
         } else {
-            std::cerr << "Failed to connect to Database!" << std::endl;
-            protocol->sendData("Failed to connect to Database!");
+            LOG_DEBUG("Failed to connect to Database!");
             return 1;
         }
 
-        // Send data over the protocol
         protocol->sendData("Hello from WebSocket!");
 
-        // Query data from the database
-        std::vector<std::string> results = db->query("lift_sensor_readings");
+        std::vector<std::string> results = db->query("ballonet_pressure_sensor_readings");
 
-        // Send data over WebSocket
         for (const auto& doc : results) {
-            // std::cout << "Sending document: " << doc << std::endl;
             protocol->sendData(doc);
             sleep(1);
         }
 
-        // Simulate a running server for some time
         std::this_thread::sleep_for(std::chrono::seconds(10));
 
-        // Properly clean up
-        std::cout << "Shutting down protocol listener..." << std::endl;
+        LOG_DEBUG("Shutting down protocol listener...");
 
     } catch (const std::exception& ex) {
-        std::cerr << "Exception Error: " << ex.what() << std::endl;
+        LOG_ERROR("Exception Error: ");
         return 1;
     }
 

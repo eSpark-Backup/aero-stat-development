@@ -20,6 +20,8 @@ curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
 
 scp -r a6admin@20.203.102.81:/home/a6admin /home/alfa/vmshare/aerostat_server_db_fetch/mongodb_example
 
+scp /home/alfa/vmshare/aerostat_server_db_fetch/mongo_ws_example .
+
 cmake .. && cmake --build . && make main
 
 cd .. && rm -rf ./build && mkdir build && cd build

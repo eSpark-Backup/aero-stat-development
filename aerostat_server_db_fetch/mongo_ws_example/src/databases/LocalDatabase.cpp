@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "logger/logger.h"
 
 LocalTextDatabase::LocalTextDatabase() : isConnected_(false) {}
 
@@ -15,7 +16,8 @@ bool LocalTextDatabase::connect(const std::string& filePath) {
     filePath_ = filePath;
     std::ofstream file(filePath_, std::ios::app); // Open in append mode to ensure file exists
     if (!file.is_open()) {
-        std::cerr << "Error: Could not open file at " << filePath_ << std::endl;
+        // std::cerr << "Error: Could not open file at " << filePath_ << std::endl;
+        LOG_ERROR("Could not open file at %s", filePath);
         return false;
     }
     isConnected_ = true;
@@ -25,14 +27,16 @@ bool LocalTextDatabase::connect(const std::string& filePath) {
 
 bool LocalTextDatabase::insert(const std::string& table, const std::vector<std::string>& data) {
     if (!isConnected_) {
-        std::cerr << "Error: Database is not connected!" << std::endl;
+        // std::cerr << "Error: Database is not connected!" << std::endl;
+        LOG_ERROR("Database is not connected!");
         return false;
     }
 
     try {
         std::ofstream file(filePath_, std::ios::app); // Open in append mode
         if (!file.is_open()) {
-            std::cerr << "Error: Could not open file for writing." << std::endl;
+            // std::cerr << "Error: Could not open file for writing." << std::endl;
+            LOG_ERROR("Could not open file for writing.");    
             return false;
         }
 
@@ -42,7 +46,8 @@ bool LocalTextDatabase::insert(const std::string& table, const std::vector<std::
         file.close();
         return true;
     } catch (const std::exception& e) {
-        std::cerr << "Error inserting data into file: " << e.what() << std::endl;
+        // std::cerr << "Error inserting data into file: " << e.what() << std::endl;
+        LOG_ERROR("Error inserting data into file.");    
         return false;
     }
 }
@@ -51,14 +56,16 @@ std::vector<std::string> LocalTextDatabase::query(const std::string& table) {
     std::vector<std::string> results;
 
     if (!isConnected_) {
-        std::cerr << "Error: Database is not connected!" << std::endl;
+        // std::cerr << "Error: Database is not connected!" << std::endl;
+        LOG_ERROR("Database is not connected!");    
         return results;
     }
 
     try {
         std::ifstream file(filePath_);
         if (!file.is_open()) {
-            std::cerr << "Error: Could not open file for reading." << std::endl;
+            // std::cerr << "Error: Could not open file for reading." << std::endl;
+            LOG_ERROR("Could not open file for reading.");    
             return results;
         }
 
@@ -70,7 +77,9 @@ std::vector<std::string> LocalTextDatabase::query(const std::string& table) {
         }
         file.close();
     } catch (const std::exception& e) {
-        std::cerr << "Error querying file: " << e.what() << std::endl;
+        // std::cerr << "Error querying file: " << e.what() << std::endl;
+        LOG_ERROR("Error querying file.");    
+
     }
 
     return results;
