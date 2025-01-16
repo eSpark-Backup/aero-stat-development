@@ -50,7 +50,7 @@ void WebSocketProtocol::sendData(const std::string& message) {
     }
 }
 
-void WebSocketProtocol::startReading(void) {
+void WebSocketProtocol::startListening(void) {
     if (isRunning) {
         // std::cerr << "WebSocketProtocol is already listening!" << std::endl;
         LOG_WARNING("WebSocketProtocol is already listening!");
@@ -90,11 +90,22 @@ void WebSocketProtocol::listen() {
             LOG_INFO("WebSocket opened, ID: %s", (data->id).c_str());
             wsConnections[data->id] = ws;
         },
-        .message = [](auto *ws, std::string_view message, uWS::OpCode opCode) {
+        .message = [this](auto *ws, std::string_view message, uWS::OpCode opCode) {
             /* This is the opposite of what you probably want; compress if message is LARGER than 16 kb
              * the reason we do the opposite here; compress if SMALLER than 16 kb is to allow for 
              * benchmarking of large message sending without compression */
-            ws->send(message, opCode, message.length() < 16 * 1024);
+            // ws->send(message, opCode, message.length() < 16 * 1024);
+            auto *data = (PerSocketData *) ws->getUserData();
+
+            ProtocolEventParams event = {
+                .type = ProtocolEvent::MESSAGE_RECEIVED,
+                .eventData = {.messageReceived = {.message = ""}}
+            };
+
+            strncpy(event.eventData.messageReceived.message, message.data(), message.size());
+            strncpy(event.eventData.messageReceived.connectionId, (data->id).data(), (data->id).size());
+            this->triggerEvent(event);  // Trigger the callback with the event data
+            
         },
         .dropped = [](auto */*ws*/, std::string_view /*message*/, uWS::OpCode /*opCode*/) {
             /* A message was dropped due to set maxBackpressure and closeOnBackpressureLimit limit */
@@ -141,4 +152,8 @@ std::string WebSocketProtocol::receiveData(void) {
 
 std::string WebSocketProtocol::generateUniqueId() {
     return "conn-" + std::to_string(connectionCounter++);
+}
+
+void WebSocketProtocol::setEventCallback(EventCallbackType callback) {
+    eventCallback = callback;
 }

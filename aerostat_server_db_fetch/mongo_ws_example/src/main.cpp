@@ -5,10 +5,30 @@
 #include <chrono>
 #include "logger/logger.h"
 
+void handleProtocolEvent(const ProtocolEventParams& eventParams) {
+    switch (eventParams.type) {
+        case ProtocolEvent::MESSAGE_RECEIVED:
+            LOG_INFO("Message received from : %s : %s", eventParams.eventData.messageReceived.connectionId , eventParams.eventData.messageReceived.message );
+            break;
+        case ProtocolEvent::CONNECTED:
+            LOG_INFO("Connected to %s, %d" , eventParams.eventData.connected.host , ":" , eventParams.eventData.connected.port );
+            break;
+        case ProtocolEvent::DISCONNECTED:
+            LOG_INFO("Disconnected. Reason: %s" , eventParams.eventData.disconnected.reason );
+            break;
+        case ProtocolEvent::ERROR_OCCURRED:
+            LOG_INFO("Error occurred: %s" , eventParams.eventData.errorOccurred.errorMessage );
+            break;
+        default:
+            LOG_INFO("Unknown event" );
+            break;
+    }
+}
+
 int main() {
     Logger& logger = Logger::getInstance();
     logger.setLogLevel(Logger::DEBUG);
-    logger.setLogFile();
+    // logger.setLogFile();
 
     try {
         DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost:27017/alfacor01");
@@ -19,7 +39,9 @@ int main() {
         auto protocol = CommunicationProtocolFactory::createProtocol(ProtocolType::UWS);
         auto db = DatabaseFactory::createDatabase(dbConfig.type);
 
-        protocol->startReading();
+        protocol->setEventCallback(handleProtocolEvent);
+
+        protocol->startListening();
 
         std::this_thread::sleep_for(std::chrono::seconds(10));
 

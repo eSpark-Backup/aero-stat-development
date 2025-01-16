@@ -72,7 +72,7 @@ std::vector<std::string> LocalTextDatabase::query(const std::string& table) {
         std::string line;
         while (std::getline(file, line)) {
             // if (line.find(table + ": ") == 0) { // Check if line starts with "table: "
-                results.push_back(line.substr(table.length() + 2)); // Extract data after "table: "
+                results.push_back(line); // Extract data after "table: "
             // }
         }
         file.close();

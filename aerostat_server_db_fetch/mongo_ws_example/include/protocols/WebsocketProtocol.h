@@ -17,9 +17,10 @@ public:
     WebSocketProtocol(const std::string& url);
     ~WebSocketProtocol() override;
 
-    void startReading(void) override;
+    void startListening(void) override;
     void sendData(const std::string& message) override;
     std::string receiveData(void) override;
+    void setEventCallback(EventCallbackType callback) override;
 
 private:
     std::string url;
