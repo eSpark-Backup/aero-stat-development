@@ -13,6 +13,7 @@ public:
         VERBOSE,
         DEBUG,
         INFO,
+        SUCCESS,
         WARNING,
         ERROR,
     };

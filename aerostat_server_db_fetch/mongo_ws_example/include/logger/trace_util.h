@@ -30,11 +30,13 @@
 #define trace_debug(X, reg...) trace_color(Logger::DEBUG, COLOR_FONT_WHITE, X, ##reg)
 #define trace_information(X, reg...) trace_color(Logger::INFO, COLOR_FONT_BLUE, X, ##reg)
 #define trace_warning(X, reg...) trace_color(Logger::WARNING, COLOR_FONT_YELLOW, X, ##reg)
+#define trace_success(X, reg...) trace_color(Logger::SUCCESS, COLOR_FONT_GREEN, X, ##reg)
 #define trace_error(X, reg...) trace_color(Logger::ERROR, COLOR_FONT_RED, X, ##reg)
-#define trace_verbose(X, reg...) trace_color(Logger::VERBOSE, COLOR_FONT_GREEN, X, ##reg)
+#define trace_verbose(X, reg...) trace_color(Logger::VERBOSE, COLOR_BG_MAGENTA, X, ##reg)
 
 #define LOG_DEBUG trace_debug
 #define LOG_INFO trace_information
 #define LOG_WARNING trace_warning
+#define LOG_SUCCESS trace_success
 #define LOG_ERROR trace_error
 #define LOG_VERBOSE trace_verbose

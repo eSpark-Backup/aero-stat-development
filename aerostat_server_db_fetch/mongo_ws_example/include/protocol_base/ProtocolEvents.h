@@ -9,7 +9,7 @@ enum class ProtocolEvent {
 
 // Event-specific data structures
 struct MessageReceived {
-    char message[256]; 
+    char message[1024*16]; 
     char connectionId[64];
 };
 

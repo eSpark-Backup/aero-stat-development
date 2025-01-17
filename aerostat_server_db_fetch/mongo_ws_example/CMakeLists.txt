@@ -67,7 +67,7 @@ find_package(bsoncxx REQUIRED)
 find_package(Threads REQUIRED)
 
 # Include directories for MongoDB C++ Driver
-include_directories(${INCLUDE_DIR} ${CURL_INCLUDE_DIR} /usr/local/include/mongocxx/v_noabi /usr/local/include/bsoncxx/v_noabi)
+include_directories(${INCLUDE_DIR} ${LIB_DIR} ${CURL_INCLUDE_DIR} /usr/local/include/mongocxx/v_noabi /usr/local/include/bsoncxx/v_noabi)
 
 # Specify the executable
 set(EXECUTABLE main)

@@ -102,6 +102,7 @@ std::string Logger::logLevelToString(LogLevel level) {
         case INFO: return "INFO";
         case WARNING: return "WARNING";
         case ERROR: return "ERROR";
+        case SUCCESS: return "SUCCESS";
         case VERBOSE: return "VERBOSE";
         default: return "UNKNOWN";
     }
