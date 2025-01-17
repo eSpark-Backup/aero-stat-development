@@ -4,6 +4,8 @@
 #include "logger/logger.h"
 #include "protocol_base/CommunicationProtocolFactory.h"
 #include "alfa_util/alfa_info.h"
+#include <string>
+
 
 int main() {
     Logger& logger = Logger::getInstance();
@@ -19,10 +21,12 @@ int main() {
         DatabaseConfig dbConfig = mongoConfig;
         // DatabaseConfig dbConfig = localDbConfig;
 
+        std::unique_ptr<MessageHandler> messageHandler = std::make_unique<MessageHandler>();
+
         auto protocol = CommunicationProtocolFactory::createProtocol(ProtocolType::UWS);
         auto db = DatabaseFactory::createDatabase(dbConfig);
 
-        ApplicationHandler appHandler(std::move(db), std::move(protocol));
+        ApplicationHandler appHandler(std::move(db), std::move(protocol), std::move(messageHandler));
         
         appHandler.start();
 

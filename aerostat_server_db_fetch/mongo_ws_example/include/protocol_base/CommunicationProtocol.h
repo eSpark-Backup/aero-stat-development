@@ -5,7 +5,7 @@
 #include "ProtocolEvents.h"
 #include <functional>
 
-using EventCallbackType = void (*)(const ProtocolEventParams&);
+using EventCallbackType = std::function<void(const ProtocolEventParams&)>;
 
 class CommunicationProtocol {
 public:

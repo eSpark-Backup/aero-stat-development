@@ -5,21 +5,27 @@
 #include <iostream>
 #include "protocol_base/CommunicationProtocolFactory.h"
 #include "database_factory/DatabaseFactory.h"
+#include "message_handler/message_handler.h"
+#include "config_manager/config_manager.h"
 
 class Database;
 class CommunicationProtocol;
 
 class ApplicationHandler {
 public:
-    ApplicationHandler(std::unique_ptr<Database> db, std::unique_ptr<CommunicationProtocol> protocol)
-        : db_(std::move(db)), protocol_(std::move(protocol)) {
+    ApplicationHandler(std::unique_ptr<Database> db, std::unique_ptr<CommunicationProtocol> protocol, std::unique_ptr<MessageHandler> messageHandler)
+        : db_(std::move(db)), protocol_(std::move(protocol)), messageHandler_(std::move(messageHandler))  {
     }
 
+    void handleProtocolEvent(const ProtocolEventParams& eventParams);
+
     void start();
+    std::unique_ptr<MessageHandler> messageHandler_;
+    std::unique_ptr<CommunicationProtocol> protocol_; // Unique pointer to Protocol
+    ConfigManager configManager_;
 
 private:
     std::unique_ptr<Database> db_;                // Unique pointer to Database
-    std::unique_ptr<CommunicationProtocol> protocol_; // Unique pointer to Protocol
 };
 
 
