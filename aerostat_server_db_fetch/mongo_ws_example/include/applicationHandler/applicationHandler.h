@@ -22,7 +22,6 @@ public:
     void start();
     std::unique_ptr<MessageHandler> messageHandler_;
     std::unique_ptr<CommunicationProtocol> protocol_; // Unique pointer to Protocol
-    ConfigManager configManager_;
 
 private:
     std::unique_ptr<Database> db_;                // Unique pointer to Database

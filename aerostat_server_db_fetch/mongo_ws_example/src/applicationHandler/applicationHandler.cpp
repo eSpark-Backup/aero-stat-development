@@ -35,22 +35,20 @@ void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventPar
 
 void ApplicationHandler::start() {
     //Setters
-    messageHandler_->registerMethodHandler("alfa.server.setting.set", handleServerSettingsSet);
-    messageHandler_->registerMethodHandler("alfa.phase.setting.set", NULL);
-    messageHandler_->registerMethodHandler("alfa.db.setting.set", NULL);
-    messageHandler_->registerMethodHandler("alfa.playback.settings.set", NULL);
-    messageHandler_->registerMethodHandler("alfa.braodcast.data.set", NULL);
-    messageHandler_->registerMethodHandler("alfa.relay.item.set", NULL);
-    messageHandler_->registerMethodHandler("alfa.fan.item.set", NULL);
+    messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerSettingsSet); //modbus/tcp server connection information
+    messageHandler_->registerMethodHandler("alfa.server.settings.set", NULL); //phase related relay/fan/light input from frontend
+    messageHandler_->registerMethodHandler("alfa.phase.settings.set", NULL); //phase type setting from front end
+    messageHandler_->registerMethodHandler("alfa.playback.settings.set", NULL); //playback start time, end time related settings
+    messageHandler_->registerMethodHandler("alfa.braodcast.settings.set", NULL); //either to disable broadcast, change message interval
 
     //Getters
-    messageHandler_->registerMethodHandler("alfa.server.setting.get", handleServerSettingsGet);
+    messageHandler_->registerMethodHandler("alfa.server.connection.settings.get", handleServerSettingsGet); //relay/fan/light related fetching
+    messageHandler_->registerMethodHandler("alfa.info.get", handleVersionGet); //version/build/branch/commit related information
+    /* luxury items
     messageHandler_->registerMethodHandler("alfa.modbus.reading.get", NULL);
     messageHandler_->registerMethodHandler("alfa.tcp.reading.get", NULL);
-    messageHandler_->registerMethodHandler("alfa.modbus.status.get", NULL);
-    messageHandler_->registerMethodHandler("alfa.tcp.status.get", NULL);
     messageHandler_->registerMethodHandler("alfa.db.status.get", NULL);
-    messageHandler_->registerMethodHandler("alfa.version.get", handleVersionGet);
+    */
     
     try {
         LOG_INFO("Application Starting");
@@ -68,6 +66,27 @@ void ApplicationHandler::start() {
         }
 
         protocol_->sendData("Hello from ApplicationHandler!");
+
+        /*
+            T1
+            thread that will start reading from the modbus/tcp 
+            update db and localdata with some interval.
+        /* 
+
+
+        /*
+            T2
+            thread that will handle the broadcasting to the 
+            frontend based on phase type maybe on callback
+            or interval.
+        */
+
+        /*
+            T3
+            thread that will handle the playback request and
+            read information from db and broadcast to FE
+            pauses T2 only.
+        */
 
     } catch (const std::exception& ex) {
         LOG_ERROR("Application Exception");

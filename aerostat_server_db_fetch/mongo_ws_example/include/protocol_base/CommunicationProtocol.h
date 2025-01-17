@@ -13,7 +13,7 @@ public:
     
     virtual void startListening(void){}
     virtual void sendData(const std::string& message){}
-    virtual std::string receiveData(void){}
+    virtual std::string receiveData(void){ return "";}
     virtual void setEventCallback(EventCallbackType callback){};
 
 protected:

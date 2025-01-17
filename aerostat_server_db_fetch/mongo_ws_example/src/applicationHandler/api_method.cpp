@@ -1,34 +1,82 @@
 #include "applicationHandler/api_method.h"
 #include "alfa_util/alfa_util_version.h"
+#include "config_manager/config_manager.h"
 
 json handleServerSettingsSet(const json& parsedJson) {
+    ConfigManager& configManager = ConfigManager::getInstance();
+    ServerConfig newConfig;
+
     json response = {
         {"error", nullptr},
     };
 
     try {
+        // Iterate through the servers in the JSON
         for (const auto& server : parsedJson["servers"]) {
             for (const auto& [protocol, servers] : server.items()) {
-                LOG_INFO("Protocol: %s", protocol.c_str());
-                for (const auto& serverConfig : servers) {
-                    LOG_INFO("  Name: %s", serverConfig["name"].get<std::string>().c_str());
-                    LOG_INFO("  IP: %s", serverConfig["ip"].get<std::string>().c_str());
+                // LOG_INFO("Protocol: %s", protocol.c_str());
 
+                // Determine the correct vector to populate based on protocol
+                std::vector<ServerSetting>* serverList = nullptr;
+
+                if (protocol == "tcp") {
+                    serverList = &newConfig.tcp;
+                } else if (protocol == "modbus") {
+                    serverList = &newConfig.modbus;
+                } else {
+                    LOG_WARNING("Unknown protocol: %s", protocol.c_str());
+                    continue;
+                }
+
+                // Populate the server settings
+                for (const auto& serverConfig : servers) {
+                    ServerSetting setting;
+                    setting.name = serverConfig["name"].get<std::string>();
+                    setting.ip = serverConfig["ip"].get<std::string>();
+
+                    // LOG_INFO("  Name: %s", setting.name.c_str());
+                    // LOG_INFO("  IP: %s", setting.ip.c_str());
+
+                    // Populate the ports
                     for (const auto& port : serverConfig["ports"]) {
-                        LOG_INFO("    Port: %s, Name: %s",
-                                 port["port"].get<std::string>().c_str(),
-                                 port["name"].get<std::string>().c_str());
+                        PortSetting portSetting;
+                        portSetting.port = port["port"].get<std::string>();
+                        portSetting.name = port["name"].get<std::string>();
+
+                        // LOG_INFO("    Port: %s, Name: %s", portSetting.port.c_str(), portSetting.name.c_str());
+                        setting.ports.push_back(portSetting);
                     }
+
+                    // Populate additional data if available
+                    if (serverConfig.contains("data")) {
+                        for (const auto& [key, value] : serverConfig["data"].items()) {
+                            std::map<std::string, std::string> innerMap;
+                            for (const auto& [innerKey, innerValue] : value.items()) {
+                                innerMap[innerKey] = innerValue.get<std::string>();
+                            }
+                            setting.data[key] = innerMap;
+                        }
+                    }
+
+                    // Add the setting to the appropriate list
+                    serverList->emplace_back(std::move(setting));
                 }
             }
         }
+
+        // Save the populated configuration
+        configManager.saveServerConfig(newConfig);
+        configManager.reportConfigs();
+
     } catch (const std::exception& e) {
         // Handle parsing or processing errors
         response["error"] = e.what();
+        LOG_ERROR("Error parsing server settings: %s", e.what());
     }
 
     return response;
 }
+
 
 json handleServerSettingsGet(const json& parsedJson) {
     json response = {

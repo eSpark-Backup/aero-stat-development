@@ -5,6 +5,12 @@
 #include <vector>
 #include <string>
 #include "logger/logger.h"
+#include <map>
+
+struct Data {
+    float temperature;
+    float humidity;
+};
 
 struct PortSetting {
     std::string port;
@@ -19,6 +25,8 @@ struct ServerSetting {
     std::string name;
     std::string ip;
     std::vector<PortSetting> ports;
+
+    std::map<std::string, std::map<std::string, std::string>> data;
 
     // Helper to print server settings
     void print() const {
@@ -47,6 +55,14 @@ struct ServerConfig {
 
 class ConfigManager {
 public:
+    // ConfigManager(const ConfigManager&) = delete;
+    // ConfigManager& operator=(const ConfigManager&) = delete;
+
+    static ConfigManager& getInstance() {
+        static ConfigManager instance; // Guaranteed to be thread-safe in C++11 and later
+        return instance;
+    }
+
     void saveServerConfig(const ServerConfig& newConfig) {
         serverConfig = newConfig;
     }
@@ -61,6 +77,8 @@ public:
     }
 
 private:
+    ConfigManager(){};
+    ~ConfigManager(){};
     ServerConfig serverConfig; 
 };
 
