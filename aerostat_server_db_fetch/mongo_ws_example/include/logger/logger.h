@@ -5,6 +5,7 @@
 #include <mutex>
 #include <fstream>
 #include <memory>
+#include "trace_util.h"
 
 class Logger {
 public:
@@ -58,10 +59,6 @@ private:
     }
 };
 
-#define LOG_DEBUG(message, ...) Logger::getInstance().log(Logger::DEBUG, message, ##__VA_ARGS__)
-#define LOG_INFO(message, ...) Logger::getInstance().log(Logger::INFO, message, ##__VA_ARGS__)
-#define LOG_WARNING(message, ...) Logger::getInstance().log(Logger::WARNING, message, ##__VA_ARGS__)
-#define LOG_ERROR(message, ...) Logger::getInstance().log(Logger::ERROR, message, ##__VA_ARGS__)
-#define LOG_VERBOSE(message, ...) Logger::getInstance().log(Logger::VERBOSE, message, ##__VA_ARGS__)
+
 
 #endif // LOGGER_H

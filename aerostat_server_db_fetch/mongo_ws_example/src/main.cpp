@@ -3,11 +3,14 @@
 #include "database_factory/DatabaseFactory.h"
 #include "logger/logger.h"
 #include "protocol_base/CommunicationProtocolFactory.h"
+#include "alfa_util/alfa_info.h"
 
 int main() {
     Logger& logger = Logger::getInstance();
     logger.setLogLevel(Logger::DEBUG);
     // logger.setLogFile();
+
+    printBuildInfo();
 
     try {
         DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost:27017/alfacor01");
