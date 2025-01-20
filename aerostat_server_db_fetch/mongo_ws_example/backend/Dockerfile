@@ -18,7 +18,16 @@ RUN mkdir build
 # Set the working directory to the build directory
 WORKDIR /home/backend/build
 
-# Run CMake to configure and build the project
-RUN cmake .. && cmake --build . && make main
+# Run CMake to configure and build the project in Release mode
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && make main
 
-RUN make run
+# Set the working directory to the bin directory where the executable is located
+WORKDIR /home/backend/bin
+
+# Run the application
+RUN ./main
+
+# Optional: Uncomment if you need to install gdb or any debugging tools
+# RUN apt-get update
+# RUN apt-get install -y gdb
+# RUN gdb ../bin/main

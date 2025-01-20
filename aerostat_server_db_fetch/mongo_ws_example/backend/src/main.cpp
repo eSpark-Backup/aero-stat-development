@@ -15,7 +15,7 @@ int main() {
     printBuildInfo();
 
     try {
-        DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost:27017/alfacor01");
+        DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://a6admin:Passw0rd!!@mongodb:27017/alfacor01");
         DatabaseConfig localDbConfig(DatabaseType::LOCAL_DB, "local_database_test.txt");
 
         DatabaseConfig dbConfig = mongoConfig;

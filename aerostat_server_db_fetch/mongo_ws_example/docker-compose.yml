@@ -1,0 +1,30 @@
+version: '3'
+services:
+  database:
+    image: mongo:latest
+    container_name: alfaops-database
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=a6admin
+      - MONGO_INITDB_ROOT_PASSWORD=Passw0rd!!
+    ports:
+      - 27017:27017
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: /backend
+      dockerfile: Dockerfile
+    container_name: alfaops-backend
+    environment:
+      - DB_CONNECTION_STRING=mongodb://a6admin:Passw0rd!!@mongodb:27017
+    depends_on:
+      - database
+    ports:
+      - 9001:9001
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
