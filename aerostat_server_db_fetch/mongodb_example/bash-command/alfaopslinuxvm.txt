@@ -37,3 +37,17 @@ hull_pressure_sensor_readings
 lift_sensor_readings
 relay_status
 weather_sensor_readings
+
+
+phase1
+
+adams_sensor
+ballonet_pressure
+digital_compass
+helium_pressure
+weather_station
+
+phase2
+
+
+

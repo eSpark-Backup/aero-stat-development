@@ -1,9 +1,12 @@
 #include <memory>
 #include <iostream>
-#include "applicationHandler/applicationHandler.h"
+#include <thread>
 #include "logger/logger.h"
 #include "nlohmann/json.hpp"
 #include "applicationHandler/api_method.h"
+#include "applicationHandler/applicationHandler.h"
+#include "sensorsManager/base/sensorManager.h"
+#include "sensorsManager/sensors/weatherStation.h"
 
 void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventParams) {
     switch (eventParams.type) {
@@ -30,6 +33,35 @@ void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventPar
         default:
             LOG_ERROR("Unknown event" );
             break;
+    }
+}
+
+/*
+    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Thread 1 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    - Reads sensors, update FE and DB
+*/
+void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& configManager) {
+    while (true) {
+        // Get the list of sensor IDs
+        auto sensorIds = sensorManager.getSensorIDs();
+
+        // Iterate over all sensor IDs
+        for (const auto& sensorId : sensorIds) {
+            auto sensorData = sensorManager.readSensorData<WeatherStation>(sensorId);
+            // auto weatherData = std::static_pointer_cast<weatherStationData>(sensorData);
+            if (sensorData) {
+                LOG_DEBUG("Reading data from sensor: %s", sensorId.c_str());
+                auto concreteData = std::static_pointer_cast<SensorData>(sensorData);
+                // concreteData->print();  // Output weather data
+
+                configManager.saveSensorData(sensorId, concreteData);
+            } else {
+                std::cerr << "Failed to read data from sensor: weatherStation1\n";
+            }
+        }
+        ServerConfig serverInformation = configManager.getServerConfig();
+        serverInformation.print();
+        std::this_thread::sleep_for(std::chrono::seconds(1));  // Adjust time as needed
     }
 }
 
@@ -65,15 +97,22 @@ void ApplicationHandler::start() {
             return;
         }
 
-        protocol_->sendData("Hello from ApplicationHandler!");
-
         /*
             T1
             thread that will start reading from the modbus/tcp 
             update db and localdata with some interval.
-        /* 
+        */
+         
+        SensorManager& sensorManager = SensorManager::getInstance();
+        ConfigManager& configManager = ConfigManager::getInstance();
 
+        sensorManager.registerSensor<WeatherStation>("weatherStation", "weatherStation 1");
+        sensorManager.registerSensor<WeatherStation>("weatherStation2", "weatherStation 2");
 
+        std::thread sensorReadingThread(continuouslyReadSensorData, std::ref(sensorManager), std::ref(configManager));
+
+        sensorReadingThread.join();
+        
         /*
             T2
             thread that will handle the broadcasting to the 

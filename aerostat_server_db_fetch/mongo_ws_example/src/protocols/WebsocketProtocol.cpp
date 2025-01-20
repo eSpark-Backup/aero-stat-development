@@ -58,7 +58,12 @@ void WebSocketProtocol::startListening(void) {
     }
     LOG_INFO("Starting Websocket Reading thread!");
     isRunning = true;
-    listeningThread = std::make_unique<std::thread>(&WebSocketProtocol::listen, this);
+    try {
+        listeningThread = std::make_unique<std::thread>(&WebSocketProtocol::listen, this);
+    } catch (const std::exception& e) {
+        std::cerr << "Error creating thread: " << e.what() << std::endl;
+    }
+
 }
 
 void WebSocketProtocol::listen() {
