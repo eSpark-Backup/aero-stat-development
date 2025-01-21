@@ -18,7 +18,7 @@ struct PortSetting {
     std::string name;
 
     void print() const {
-        LOG_INFO("Port : %s, Name : %s", port.c_str(), name.c_str());
+        LOG_INFO("          Port : %s, Name : %s", port.c_str(), name.c_str());
     }
 };
 
@@ -30,7 +30,7 @@ struct ServerSetting {
     std::map<std::string, std::map<std::string, std::string>> data;
 
     void print() const {
-        LOG_INFO("Name : %s, IP : %s", name.c_str(), ip.c_str());
+        LOG_INFO("      Name : %s, IP : %s", name.c_str(), ip.c_str());
 
         // Print ports
         for (const auto& port : ports) {
@@ -38,16 +38,16 @@ struct ServerSetting {
         }
 
         // Print sensor data
-        LOG_INFO("Sensor Data:");
+        LOG_INFO("          Sensor Data:");
         for (const auto& sensorEntry : data) {
             const std::string& sensorId = sensorEntry.first;
             const auto& sensorData = sensorEntry.second;
 
-            LOG_INFO("Sensor ID: %s", sensorId.c_str());
+            LOG_INFO("              Sensor ID: %s", sensorId.c_str());
             for (const auto& dataEntry : sensorData) {
                 const std::string& key = dataEntry.first;
                 const std::string& value = dataEntry.second;
-                LOG_INFO("  %s: %s", key.c_str(), value.c_str());
+                LOG_INFO("                  %s: %s", key.c_str(), value.c_str());
             }
         }
     }
@@ -62,11 +62,12 @@ struct ServerConfig {
     std::vector<ServerSetting> modbus;
 
     void print() const {
-        LOG_INFO("TCP Servers:");
+        LOG_INFO("SERVER INFORAMATION PRINT");
+        LOG_INFO("  TCP Servers:");
         for (const auto& server : tcp) {
             server.print();
         }
-        LOG_INFO("MODBUS Servers:");
+        LOG_INFO("  MODBUS Servers:");
         for (const auto& server : modbus) {
             server.print();
         }
@@ -96,9 +97,16 @@ public:
         serverConfig.print();
     }
 
-    void saveSensorData(const std::string& sensorId, const std::shared_ptr<SensorData>& data) {
+    void saveSensorDataTcp(const std::string& sensorId, const std::shared_ptr<SensorData>& data) {
         // Here, we would associate the sensor data with the relevant server setting
         for (auto& server : serverConfig.tcp) {
+            server.addSensorData(sensorId, data);  // Save sensor data in a TCP server
+        }
+    }
+
+    void saveSensorDataModbus(const std::string& sensorId, const std::shared_ptr<SensorData>& data) {
+        // Here, we would associate the sensor data with the relevant server setting
+        for (auto& server : serverConfig.modbus) {
             server.addSensorData(sensorId, data);  // Save sensor data in a TCP server
         }
     }

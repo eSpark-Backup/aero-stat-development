@@ -1,9 +1,15 @@
 #include "applicationHandler/api_method.h"
 #include "alfa_util/alfa_util_version.h"
 #include "config_manager/config_manager.h"
+#include "sensorsManager/base/sensorManager.h"
 
-json handleServerSettingsSet(const json& parsedJson) {
+//Include Sensors
+#include "sensorsManager/sensors/tcp/weatherStationTcp.h"
+
+
+json handleServerConnectionSettingsSet(const json& parsedJson) {
     ConfigManager& configManager = ConfigManager::getInstance();
+    SensorManager& sensorManager = SensorManager::getInstance();
     ServerConfig newConfig;
 
     json response = {
@@ -18,11 +24,13 @@ json handleServerSettingsSet(const json& parsedJson) {
 
                 // Determine the correct vector to populate based on protocol
                 std::vector<ServerSetting>* serverList = nullptr;
-
+                sensorInterfaceType currentSensorIntType = sensorInterfaceType::SENSOR_INT_UNKNOWN;
                 if (protocol == "tcp") {
                     serverList = &newConfig.tcp;
+                    currentSensorIntType = sensorInterfaceType::SENSOR_INT_TCP;
                 } else if (protocol == "modbus") {
                     serverList = &newConfig.modbus;
+                    currentSensorIntType = sensorInterfaceType::SENSOR_INT_MODBUS;
                 } else {
                     LOG_WARNING("Unknown protocol: %s", protocol.c_str());
                     continue;
@@ -42,6 +50,8 @@ json handleServerSettingsSet(const json& parsedJson) {
                         PortSetting portSetting;
                         portSetting.port = port["port"].get<std::string>();
                         portSetting.name = port["name"].get<std::string>();
+                        std::string updatedName = portSetting.name + "_tcp";
+                        sensorManager.registerSensor(portSetting.name, currentSensorIntType, updatedName, portSetting.port);
 
                         // LOG_INFO("    Port: %s, Name: %s", portSetting.port.c_str(), portSetting.name.c_str());
                         setting.ports.push_back(portSetting);
@@ -78,7 +88,7 @@ json handleServerSettingsSet(const json& parsedJson) {
 }
 
 
-json handleServerSettingsGet(const json& parsedJson) {
+json handleServerConnectionSettingsGet(const json& parsedJson) {
     json response = {
         {"error", "Settings Get not implemented as return json is not implemented in API handlers"},
     };

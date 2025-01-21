@@ -1,9 +1,10 @@
-#include "databases/MongoDBDatabase.h"
 #include <iostream>
 #include <mongocxx/uri.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
 #include <mongocxx/exception/exception.hpp>
+#include <mongocxx/instance.hpp>
+#include "databases/MongoDBDatabase.h"
 #include "logger/logger.h"
 
 
@@ -15,15 +16,32 @@ MongoDBDatabase::~MongoDBDatabase() {
 
 bool MongoDBDatabase::connect(const std::string& connectionString) {
     try {
+        mongocxx::instance inst{};
+        // Create a MongoDB client using the provided connection string
         client_ = new mongocxx::client(mongocxx::uri(connectionString));
-        db_ = new mongocxx::database((*client_)[connectionString.substr(connectionString.find_last_of('/') + 1)]);
+
+        // Extract the database name from the connection string
+        auto lastSlashPos = connectionString.find_last_of('/');
+        if (lastSlashPos == std::string::npos || lastSlashPos == connectionString.size() - 1) {
+            LOG_ERROR("Invalid connection string: Database name is missing.");
+            return false;
+        }
+
+        // Get the database name and assign it to the db_ member
+        std::string dbName = connectionString.substr(lastSlashPos + 1);
+        db_ = new mongocxx::database((*client_)[dbName]);
+
+        const auto ping_cmd = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("ping", 1));
+        db_->run_command(ping_cmd.view());
+
+        LOG_INFO("Connected to MongoDB successfully: %s" , dbName.c_str());
         return true;
     } catch (const mongocxx::exception& e) {
-        // std::cerr << "Error connecting to MongoDB: " << e.what() << std::endl;
-        LOG_ERROR("Error connecting to MongoDB");
+        LOG_ERROR("Error connecting to MongoDB: %s" , std::string(e.what()).c_str());
         return false;
     }
 }
+
 
 bool MongoDBDatabase::insert(const std::string& table, const std::vector<std::string>& data) {
     if (!db_) {

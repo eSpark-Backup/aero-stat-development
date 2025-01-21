@@ -6,7 +6,10 @@
 #include "applicationHandler/api_method.h"
 #include "applicationHandler/applicationHandler.h"
 #include "sensorsManager/base/sensorManager.h"
-#include "sensorsManager/sensors/weatherStation.h"
+
+#include "sensorsManager/sensors/tcp/weatherStationTcp.h"
+#include "sensorsManager/sensors/modbus/weatherStationMod.h"
+
 
 void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventParams) {
     switch (eventParams.type) {
@@ -47,14 +50,31 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
 
         // Iterate over all sensor IDs
         for (const auto& sensorId : sensorIds) {
-            auto sensorData = sensorManager.readSensorData<WeatherStation>(sensorId);
+            LOG_DEBUG("Found Sensor and Reading %s", sensorId.c_str());
+            auto sensorData = sensorManager.readSensorData<void>(sensorId);
             // auto weatherData = std::static_pointer_cast<weatherStationData>(sensorData);
             if (sensorData) {
                 LOG_DEBUG("Reading data from sensor: %s", sensorId.c_str());
                 auto concreteData = std::static_pointer_cast<SensorData>(sensorData);
                 // concreteData->print();  // Output weather data
-
-                configManager.saveSensorData(sensorId, concreteData);
+                
+                auto sensor = sensorManager.getSensor(sensorId);
+                switch (sensor->getInterfaceType())
+                {
+                case sensorInterfaceType::SENSOR_INT_MODBUS:
+                    LOG_DEBUG("Saving Data from Interface MODBUS");
+                    configManager.saveSensorDataModbus(sensorId, concreteData);
+                    break;
+                case sensorInterfaceType::SENSOR_INT_TCP:
+                    LOG_DEBUG("Saving Data from Interface TCP");
+                    configManager.saveSensorDataTcp(sensorId, concreteData);
+                    break;
+                case sensorInterfaceType::SENSOR_INT_UNKNOWN:
+                    LOG_ERROR("Cannot save this Sensor Inteface type sensor data");
+                    break;
+                default:
+                    break;
+                }
             } else {
                 std::cerr << "Failed to read data from sensor: weatherStation1\n";
             }
@@ -66,15 +86,19 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
 }
 
 void ApplicationHandler::start() {
+    //Registering Sensors
+    WeatherStationTcp::registerType();
+    WeatherStationMod::registerType();
+
     //Setters
-    messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerSettingsSet); //modbus/tcp server connection information
+    messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information
     messageHandler_->registerMethodHandler("alfa.server.settings.set", NULL); //phase related relay/fan/light input from frontend
     messageHandler_->registerMethodHandler("alfa.phase.settings.set", NULL); //phase type setting from front end
     messageHandler_->registerMethodHandler("alfa.playback.settings.set", NULL); //playback start time, end time related settings
     messageHandler_->registerMethodHandler("alfa.braodcast.settings.set", NULL); //either to disable broadcast, change message interval
 
     //Getters
-    messageHandler_->registerMethodHandler("alfa.server.connection.settings.get", handleServerSettingsGet); //relay/fan/light related fetching
+    messageHandler_->registerMethodHandler("alfa.server.connection.settings.get", handleServerConnectionSettingsGet); //relay/fan/light related fetching
     messageHandler_->registerMethodHandler("alfa.info.get", handleVersionGet); //version/build/branch/commit related information
     /* luxury items
     messageHandler_->registerMethodHandler("alfa.modbus.reading.get", NULL);
@@ -93,7 +117,7 @@ void ApplicationHandler::start() {
             LOG_INFO("Database Connected!");
             protocol_->sendData("Connected to Database!");
         } else {
-            LOG_ERROR("Database Connected!");
+            LOG_ERROR("Database not Connected!");
             return;
         }
 
@@ -105,9 +129,6 @@ void ApplicationHandler::start() {
          
         SensorManager& sensorManager = SensorManager::getInstance();
         ConfigManager& configManager = ConfigManager::getInstance();
-
-        sensorManager.registerSensor<WeatherStation>("weatherStation", "weatherStation 1");
-        sensorManager.registerSensor<WeatherStation>("weatherStation2", "weatherStation 2");
 
         std::thread sensorReadingThread(continuouslyReadSensorData, std::ref(sensorManager), std::ref(configManager));
 

@@ -6,8 +6,8 @@
 
 using json = nlohmann::json;
 
-json handleServerSettingsSet(const json& parsedJson);
-json handleServerSettingsGet(const json& parsedJson);
+json handleServerConnectionSettingsSet(const json& parsedJson);
+json handleServerConnectionSettingsGet(const json& parsedJson);
 json handleVersionGet(const json& parsedJson);
 
 #endif //API_METHOD_H
