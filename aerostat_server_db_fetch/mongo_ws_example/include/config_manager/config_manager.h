@@ -60,6 +60,7 @@ struct ServerSetting {
 struct ServerConfig {
     std::vector<ServerSetting> tcp;
     std::vector<ServerSetting> modbus;
+    bool broadcastEnable;
 
     void print() const {
         LOG_INFO("SERVER INFORAMATION PRINT");

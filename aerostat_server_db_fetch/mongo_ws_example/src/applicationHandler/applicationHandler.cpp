@@ -6,6 +6,7 @@
 #include "applicationHandler/api_method.h"
 #include "applicationHandler/applicationHandler.h"
 #include "sensorsManager/base/sensorManager.h"
+#include "config_manager/configFormatter.h"
 
 #include "sensorsManager/sensors/tcp/weatherStationTcp.h"
 #include "sensorsManager/sensors/modbus/weatherStationMod.h"
@@ -50,11 +51,11 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
 
         // Iterate over all sensor IDs
         for (const auto& sensorId : sensorIds) {
-            LOG_DEBUG("Found Sensor and Reading %s", sensorId.c_str());
+            // LOG_DEBUG("Found Sensor and Reading %s", sensorId.c_str());
             auto sensorData = sensorManager.readSensorData<void>(sensorId);
             // auto weatherData = std::static_pointer_cast<weatherStationData>(sensorData);
             if (sensorData) {
-                LOG_DEBUG("Reading data from sensor: %s", sensorId.c_str());
+                // LOG_DEBUG("Reading data from sensor: %s", sensorId.c_str());
                 auto concreteData = std::static_pointer_cast<SensorData>(sensorData);
                 // concreteData->print();  // Output weather data
                 
@@ -79,8 +80,27 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
                 std::cerr << "Failed to read data from sensor: weatherStation1\n";
             }
         }
-        ServerConfig serverInformation = configManager.getServerConfig();
-        serverInformation.print();
+        // ServerConfig serverInformation = configManager.getServerConfig();
+        // serverInformation.print();
+        std::this_thread::sleep_for(std::chrono::seconds(1));  // Adjust time as needed
+    }
+}
+
+/*
+    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Thread 2 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    - Updates FE from either DB (during playback) or configManager (default)
+*/
+
+void ApplicationHandler::continuouslyUpdateFrontend(){
+    LOG_SUCCESS("FRONT END Update Thread Started");
+    ConfigManager& configManager = ConfigManager::getInstance();
+
+    while(1)
+    {
+        LOG_DEBUG("Updating Front End");
+        const ServerConfig& serverConfig = configManager.getServerConfig();
+        std::string jsonOutput = ConfigFormatter::dataToJson(serverConfig);
+        protocol_->sendData(jsonOutput);
         std::this_thread::sleep_for(std::chrono::seconds(1));  // Adjust time as needed
     }
 }
@@ -95,7 +115,7 @@ void ApplicationHandler::start() {
     messageHandler_->registerMethodHandler("alfa.server.settings.set", NULL); //phase related relay/fan/light input from frontend
     messageHandler_->registerMethodHandler("alfa.phase.settings.set", NULL); //phase type setting from front end
     messageHandler_->registerMethodHandler("alfa.playback.settings.set", NULL); //playback start time, end time related settings
-    messageHandler_->registerMethodHandler("alfa.braodcast.settings.set", NULL); //either to disable broadcast, change message interval
+    messageHandler_->registerMethodHandler("alfa.braodcast.settings.set", handleBroadcastSetting); //either to disable broadcast, change message interval
 
     //Getters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.get", handleServerConnectionSettingsGet); //relay/fan/light related fetching
@@ -131,8 +151,11 @@ void ApplicationHandler::start() {
         ConfigManager& configManager = ConfigManager::getInstance();
 
         std::thread sensorReadingThread(continuouslyReadSensorData, std::ref(sensorManager), std::ref(configManager));
+        sensorReadingThread.detach();
 
-        sensorReadingThread.join();
+        std::thread readingUpdateThread(&ApplicationHandler::continuouslyUpdateFrontend, this);
+        readingUpdateThread.detach();
+
         
         /*
             T2

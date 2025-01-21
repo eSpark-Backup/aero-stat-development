@@ -52,7 +52,7 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
                         portSetting.name = port["name"].get<std::string>();
                         std::string updatedName = portSetting.name + "_tcp";
                         sensorManager.registerSensor(portSetting.name, currentSensorIntType, updatedName, portSetting.port);
-
+                        
                         // LOG_INFO("    Port: %s, Name: %s", portSetting.port.c_str(), portSetting.name.c_str());
                         setting.ports.push_back(portSetting);
                     }
@@ -112,6 +112,36 @@ json handleVersionGet(const json& parsedJson) {
     };
 
     LOG_SUCCESS("Version information retrieved successfully");
+
+    return response;
+}
+
+json handleBroadcastSetting(const json& parsedJson) {
+    ConfigManager& configManager = ConfigManager::getInstance();
+
+    json response = {
+        {"error", nullptr},
+        {"result", {
+            {"enabled", false}  
+        }}
+    };
+
+    try {
+        if (parsedJson.contains("enable") && parsedJson["enable"].is_boolean()) {
+            bool enableValue = parsedJson["enable"].get<bool>();
+            ServerConfig newConfig = configManager.getServerConfig();
+            newConfig.broadcastEnable = enableValue;
+            configManager.saveServerConfig(newConfig);
+            response["result"]["enabled"] = newConfig.broadcastEnable;
+            LOG_SUCCESS("Broadcast settings updated successfully. Enabled: %s", enableValue ? "true" : "false");
+        } else {
+            response["error"] = "Invalid or missing 'enable' field";
+            LOG_ERROR("Invalid JSON: Missing or incorrect 'enable' field");
+        }
+    } catch (const std::exception& e) {
+        response["error"] = std::string("Exception occurred: ") + e.what();
+        LOG_ERROR("Exception while processing JSON: %s", e.what());
+    }
 
     return response;
 }

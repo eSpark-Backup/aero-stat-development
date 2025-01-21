@@ -18,7 +18,7 @@ public:
     }
 
     void handleProtocolEvent(const ProtocolEventParams& eventParams);
-
+    void continuouslyUpdateFrontend();
     void start();
     std::unique_ptr<MessageHandler> messageHandler_;
     std::unique_ptr<CommunicationProtocol> protocol_; // Unique pointer to Protocol
