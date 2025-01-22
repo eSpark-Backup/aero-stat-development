@@ -19,6 +19,13 @@ public:
 
     void registerSensor(const std::string& id, sensorInterfaceType interfaceType, const std::string& type, const std::string& port) {
         try {
+            // Check if the sensor is already registered
+            if (sensors_.find(port) != sensors_.end()) {
+                std::cout << "Sensor with port: " << port << " is already registered. Skipping registration." << std::endl;
+                return;
+            }
+
+            // If not registered, create and register the sensor
             auto sensor = SensorFactory::instance().createSensor(interfaceType, type, port);
             sensors_[port] = sensor;
             sensorIDs_.push_back(port);

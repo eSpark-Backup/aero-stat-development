@@ -128,6 +128,11 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
     }
 }
 
+/*
+    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Thread 4 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    - checks change in server settings and update/register sensors accordingly
+*/
+
 
 void ApplicationHandler::start() {
     //Registering Sensors
@@ -195,6 +200,12 @@ void ApplicationHandler::start() {
             thread that will handle the playback request and
             read information from db and broadcast to FE
             pauses T2 only.
+        */
+
+       /*
+            T4
+            thread that will do checks change in server settings 
+            and update/register sensors accordingly
         */
 
     } catch (const std::exception& ex) {

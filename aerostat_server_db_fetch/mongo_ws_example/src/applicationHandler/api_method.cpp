@@ -9,7 +9,9 @@
 
 json handleServerConnectionSettingsSet(const json& parsedJson) {
     ConfigManager& configManager = ConfigManager::getInstance();
-    
+    SensorManager& sensorManager = SensorManager::getInstance();
+    sensorInterfaceType currentSensorIntType = sensorInterfaceType::SENSOR_INT_UNKNOWN;
+
     // Load the current configuration
     ServerConfig currentConfig = configManager.getServerConfig();
     ServerConfig newConfig = currentConfig; // Start with a copy of the current configuration
@@ -26,8 +28,10 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
 
                 if (protocol == "tcp") {
                     serverList = &newConfig.tcp; // Update only the `tcp` servers
+                    currentSensorIntType = sensorInterfaceType::SENSOR_INT_TCP;
                 } else if (protocol == "modbus") {
                     serverList = &newConfig.modbus; // Update only the `modbus` servers
+                    currentSensorIntType = sensorInterfaceType::SENSOR_INT_MODBUS;
                 } else {
                     LOG_WARNING("Unknown protocol: %s", protocol.c_str());
                     continue;
@@ -45,6 +49,10 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
                         PortSetting portSetting;
                         portSetting.port = port["port"].get<std::string>();
                         portSetting.name = port["name"].get<std::string>();
+
+                        //register a sensor here
+                        std::string updatedName = portSetting.name + "_" + protocol;
+                        sensorManager.registerSensor(portSetting.name, currentSensorIntType, updatedName, portSetting.port);
                         setting.ports.push_back(std::move(portSetting));
                     }
 
