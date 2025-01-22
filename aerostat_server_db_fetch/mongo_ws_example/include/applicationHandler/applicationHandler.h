@@ -3,10 +3,10 @@
 
 #include <memory>
 #include <iostream>
-#include "protocol_base/CommunicationProtocolFactory.h"
-#include "database_factory/DatabaseFactory.h"
-#include "message_handler/message_handler.h"
-#include "config_manager/config_manager.h"
+#include "protocolBase/CommunicationProtocolFactory.h"
+#include "databaseFactory/DatabaseFactory.h"
+#include "messageHandler/messageHandler.h"
+#include "configManager/configManager.h"
 
 class Database;
 class CommunicationProtocol;

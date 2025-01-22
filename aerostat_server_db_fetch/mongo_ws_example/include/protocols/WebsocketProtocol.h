@@ -1,7 +1,7 @@
 #ifndef WS_PROTOCOL_H
 #define WS_PROTOCOL_H
 
-#include "../protocol_base/CommunicationProtocol.h"
+#include "../protocolBase/CommunicationProtocol.h"
 #include <App.h>
 #include <string>
 #include <thread>

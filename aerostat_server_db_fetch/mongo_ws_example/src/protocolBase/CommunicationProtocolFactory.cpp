@@ -1,4 +1,4 @@
-#include "protocol_base/CommunicationProtocolFactory.h"
+#include "protocolBase/CommunicationProtocolFactory.h"
 #include "protocols/WebsocketProtocol.h"
 #include <stdexcept>
 #include "logger/logger.h"

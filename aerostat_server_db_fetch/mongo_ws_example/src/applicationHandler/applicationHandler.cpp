@@ -3,10 +3,10 @@
 #include <thread>
 #include "logger/logger.h"
 #include "nlohmann/json.hpp"
-#include "applicationHandler/api_method.h"
+#include "applicationHandler/apiMethod.h"
 #include "applicationHandler/applicationHandler.h"
 #include "sensorsManager/base/sensorManager.h"
-#include "config_manager/configFormatter.h"
+#include "configManager/configFormatter.h"
 
 //TCP SENSOR INCLUDES
 #include "sensorsManager/sensors/tcp/weatherStationTcp.h"

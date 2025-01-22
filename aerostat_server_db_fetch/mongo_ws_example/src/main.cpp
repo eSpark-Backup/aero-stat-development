@@ -1,9 +1,9 @@
 #include <iostream>
 #include "applicationHandler/applicationHandler.h"
-#include "database_factory/DatabaseFactory.h"
+#include "databaseFactory/DatabaseFactory.h"
 #include "logger/logger.h"
-#include "protocol_base/CommunicationProtocolFactory.h"
-#include "alfa_util/alfa_info.h"
+#include "protocolBase/CommunicationProtocolFactory.h"
+#include "alfaUtil/alfaInfo.h"
 #include <string>
 
 

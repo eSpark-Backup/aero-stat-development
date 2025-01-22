@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "alfa_util/alfa_info.h"
-#include "alfa_util/alfa_util_version.h"
+#include "alfaUtil/alfaInfo.h"
+#include "alfaUtil/alfaUtilVersion.h"
 #include "logger/logger.h"
 
 void printBuildInfo(void) {

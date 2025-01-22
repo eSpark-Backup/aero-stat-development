@@ -1,6 +1,6 @@
-#include "applicationHandler/api_method.h"
-#include "alfa_util/alfa_util_version.h"
-#include "config_manager/config_manager.h"
+#include "applicationHandler/apiMethod.h"
+#include "alfaUtil/alfaUtilVersion.h"
+#include "configManager/configManager.h"
 #include "sensorsManager/base/sensorManager.h"
 
 

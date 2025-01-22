@@ -1,7 +1,7 @@
 #ifndef MONGODB_DATABASE_H
 #define MONGODB_DATABASE_H
 
-#include "database_factory/Database.h"
+#include "databaseFactory/Database.h"
 #include <mongocxx/client.hpp>
 #include <mongocxx/database.hpp>
 #include <mongocxx/collection.hpp>

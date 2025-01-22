@@ -1,7 +1,7 @@
 #ifndef LOCAL_TEXT_DATABASE_H
 #define LOCAL_TEXT_DATABASE_H
 
-#include "database_factory/Database.h"
+#include "databaseFactory/Database.h"
 #include <string>
 #include <vector>
 

@@ -1,4 +1,4 @@
-#include "database_factory/DatabaseFactory.h"
+#include "databaseFactory/DatabaseFactory.h"
 #include "databases/MongoDBDatabase.h"
 #include "databases/LocalDatabase.h"
 #include <stdexcept>
