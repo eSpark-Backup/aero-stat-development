@@ -87,7 +87,7 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
         }
         // ServerConfig serverInformation = configManager.getServerConfig();
         // serverInformation.print();
-        std::this_thread::sleep_for(std::chrono::seconds(1));  // Adjust time as needed
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Adjust time as needed
     }
 }
 
@@ -149,7 +149,7 @@ void ApplicationHandler::start() {
 
     //Setters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information
-    messageHandler_->registerMethodHandler("alfa.server.settings.set", NULL); //phase related relay/fan/light input from frontend
+    messageHandler_->registerMethodHandler("alfa.actuator.settings.set", handleActuatorSetting); //phase related relay/fan/light input from frontend
     messageHandler_->registerMethodHandler("alfa.phase.settings.set", handlePhaseSetting); //phase type setting from front end
     messageHandler_->registerMethodHandler("alfa.playback.settings.set", NULL); //playback start time, end time related settings
     messageHandler_->registerMethodHandler("alfa.braodcast.settings.set", handleBroadcastSetting); //either to disable broadcast, change message interval
@@ -177,6 +177,20 @@ void ApplicationHandler::start() {
             LOG_ERROR("Database not Connected!");
             return;
         }
+
+        std::string jsonData = R"({
+            "timestamp": "2025-01-22 20:58:57",
+            "data": {
+                "Aerostat Heading": 128.00,
+                "Air Temp": 18.80,
+                "Baro Pres": 29.29,
+                "Wind Angle": 158.40,
+                "Wind Speed": 1.90
+            },
+            "unit": "grouped"
+        })";
+
+        db_->insert("test_collection_name", jsonData);
 
         /*
             T1

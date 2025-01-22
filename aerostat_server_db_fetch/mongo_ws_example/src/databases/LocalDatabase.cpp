@@ -23,29 +23,36 @@ bool LocalTextDatabase::connect(const std::string& filePath) {
     return true;
 }
 
-bool LocalTextDatabase::insert(const std::string& table, const std::vector<std::string>& data) {
+bool LocalTextDatabase::insert(const std::string& table, const std::string& jsonData) {
     if (!isConnected_) {
-        // std::cerr << "Error: Database is not connected!" << std::endl;
         LOG_ERROR("Database is not connected!");
         return false;
     }
 
     try {
+        nlohmann::json json = nlohmann::json::parse(jsonData);
+
         std::ofstream file(filePath_, std::ios::app); // Open in append mode
         if (!file.is_open()) {
-            // std::cerr << "Error: Could not open file for writing." << std::endl;
-            LOG_ERROR("Could not open file for writing.");    
+            LOG_ERROR("Could not open file for writing.");
             return false;
         }
 
-        for (const auto& item : data) {
-            file << table << ": " << item << std::endl; // Store data in "table: data" format
+        std::string timestamp = json["timestamp"];
+        auto data = json["data"];
+        
+        std::ostringstream line;
+        line << timestamp << " - ";
+        for (auto& [key, value] : data.items()) {
+            line << key << ": " << value << "\t";
         }
+        file << line.str() << std::endl;
+
         file.close();
+        LOG_SUCCESS("Data inserted to LOCALDB Collection successfully");
         return true;
     } catch (const std::exception& e) {
-        // std::cerr << "Error inserting data into file: " << e.what() << std::endl;
-        LOG_ERROR("Error inserting data into file.");    
+        LOG_ERROR("Error inserting data into file: {}", e.what());
         return false;
     }
 }

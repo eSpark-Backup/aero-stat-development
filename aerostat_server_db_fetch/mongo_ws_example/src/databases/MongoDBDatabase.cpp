@@ -1,4 +1,6 @@
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <mongocxx/uri.hpp>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
@@ -42,25 +44,47 @@ bool MongoDBDatabase::connect(const std::string& connectionString) {
     }
 }
 
-
-bool MongoDBDatabase::insert(const std::string& table, const std::vector<std::string>& data) {
+bool MongoDBDatabase::insert(const std::string& table, const std::string& jsonData) {
     if (!db_) {
-        // std::cerr << "Database is not connected!" << std::endl;
         LOG_ERROR("Database is not connected!");
         return false;
     }
 
     try {
+        // Parse JSON input
+        nlohmann::json json = nlohmann::json::parse(jsonData);
         auto collection = (*db_)[table];
-        for (const auto& item : data) {
-            bsoncxx::builder::stream::document document{};
-            document << "data" << item;
-            collection.insert_one(document.view());
+
+        // Start building the BSON document
+        bsoncxx::builder::stream::document document{};
+        document << "_id" << bsoncxx::oid()  // Automatically generate an ObjectId
+                 << "timestamp" << json["timestamp"].get<std::string>()
+                 << "unit" << json["unit"].get<std::string>();
+
+        // Create a nested BSON document for the "value" field
+        bsoncxx::builder::stream::document valueDoc{};
+        for (const auto& [key, value] : json["data"].items()) {
+            if (value.is_number_integer()) {
+                valueDoc << key << value.get<int>();
+            } else if (value.is_number_float()) {
+                valueDoc << key << value.get<double>();
+            } else if (value.is_string()) {
+                valueDoc << key << value.get<std::string>();
+            } else {
+                LOG_ERROR("Unsupported data type for key: {}", key);
+                return false;
+            }
         }
+
+        // Add the nested "value" object to the main document
+        document << "value" << valueDoc.view();
+
+        // Insert the document into the collection
+        collection.insert_one(document.view());
+        LOG_SUCCESS("Data inserted to MONGODB Collection successfully");
         return true;
-    } catch (const mongocxx::exception& e) {
-        // std::cerr << "Error inserting data into MongoDB: " << e.what() << std::endl;
-        LOG_ERROR("Error inserting data into MongoDB");
+    } catch (const std::exception& e) {
+        LOG_ERROR("Error inserting data into MongoDB: {}", e.what());
         return false;
     }
 }

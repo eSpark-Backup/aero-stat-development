@@ -157,3 +157,10 @@ json handlePhaseSetting(const json& parseJson) {
         };
     }
 }
+
+json handleActuatorSetting(const json& parseJson)
+{
+    return {
+        {"error", std::string("method not fully implemented")}
+    };
+}
