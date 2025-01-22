@@ -60,6 +60,7 @@ struct ServerSetting {
 struct ServerConfig {
     std::vector<ServerSetting> tcp;
     std::vector<ServerSetting> modbus;
+    std::string phaseType = "tcp";
     bool broadcastEnable;
 
     void print() const {
@@ -89,7 +90,7 @@ public:
         serverConfig = newConfig;
     }
 
-    const ServerConfig& getServerConfig() const {
+    ServerConfig& getServerConfig() {
         return serverConfig;
     }
 

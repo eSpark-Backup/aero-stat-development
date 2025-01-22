@@ -16,7 +16,7 @@ public:
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
-            "weather_station_mod",
+            "weather_station_modbus",
             [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<WeatherStationMod>(name, interfaceType); }
         );
     }

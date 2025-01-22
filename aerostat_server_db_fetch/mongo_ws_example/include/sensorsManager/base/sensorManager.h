@@ -22,11 +22,12 @@ public:
             auto sensor = SensorFactory::instance().createSensor(interfaceType, type, port);
             sensors_[port] = sensor;
             sensorIDs_.push_back(port);
-            std::cout << "Registered sensor with ID: " << id << " and type: " << type << "port : "<< port <<std::endl;
+            std::cout << "Registered sensor with ID: " << id << ", type: " << type << ", port: " << port << std::endl;
         } catch (const std::exception& e) {
             std::cerr << "Error registering sensor: " << e.what() << std::endl;
         }
     }
+
 
     std::shared_ptr<Sensor> getSensor(const std::string& id) {
         auto it = sensors_.find(id);

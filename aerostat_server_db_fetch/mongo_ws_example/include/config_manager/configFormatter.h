@@ -13,8 +13,8 @@ using json = nlohmann::json;
 class ConfigFormatter {
 public:
 
-    static std::string dataToJson(const ServerConfig& serverConfig) {
-        json j;
+    static json tcpDataToJson(const ServerConfig& serverConfig) {
+        json tcpJson;
 
         // Process TCP servers
         for (const auto& tcpServer : serverConfig.tcp) {
@@ -29,8 +29,14 @@ public:
                 serverDataJson[sensor.first] = sensorJson;
             }
 
-            j["tcp"][tcpServer.name] = serverDataJson;
+            tcpJson[tcpServer.name] = serverDataJson;
         }
+
+        return tcpJson;
+    }
+
+    static json modbusDataToJson(const ServerConfig& serverConfig) {
+        json modbusJson;
 
         // Process MODBUS servers
         for (const auto& modbusServer : serverConfig.modbus) {
@@ -45,11 +51,23 @@ public:
                 serverDataJson[sensor.first] = sensorJson;
             }
 
-            j["modbus"][modbusServer.name] = serverDataJson;
+            modbusJson[modbusServer.name] = serverDataJson;
         }
+
+        return modbusJson;
+    }
+
+    static std::string dataToJson(const ServerConfig& serverConfig) {
+        json j;
+
+        // Use the separate functions to build JSON
+        j["tcp"] = tcpDataToJson(serverConfig);
+        j["modbus"] = modbusDataToJson(serverConfig);
 
         return j.dump(4); // Pretty print with 4 spaces
     }
+
+
 
     // Convert the server configuration to JSON format
     static std::string toJson(const ServerConfig& serverConfig) {

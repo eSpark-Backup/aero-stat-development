@@ -9,8 +9,10 @@
 
 json handleServerConnectionSettingsSet(const json& parsedJson) {
     ConfigManager& configManager = ConfigManager::getInstance();
-    SensorManager& sensorManager = SensorManager::getInstance();
-    ServerConfig newConfig;
+    
+    // Load the current configuration
+    ServerConfig currentConfig = configManager.getServerConfig();
+    ServerConfig newConfig = currentConfig; // Start with a copy of the current configuration
 
     json response = {
         {"error", nullptr},
@@ -20,61 +22,39 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
         // Iterate through the servers in the JSON
         for (const auto& server : parsedJson["servers"]) {
             for (const auto& [protocol, servers] : server.items()) {
-                // LOG_INFO("Protocol: %s", protocol.c_str());
-
-                // Determine the correct vector to populate based on protocol
                 std::vector<ServerSetting>* serverList = nullptr;
-                sensorInterfaceType currentSensorIntType = sensorInterfaceType::SENSOR_INT_UNKNOWN;
+
                 if (protocol == "tcp") {
-                    serverList = &newConfig.tcp;
-                    currentSensorIntType = sensorInterfaceType::SENSOR_INT_TCP;
+                    serverList = &newConfig.tcp; // Update only the `tcp` servers
                 } else if (protocol == "modbus") {
-                    serverList = &newConfig.modbus;
-                    currentSensorIntType = sensorInterfaceType::SENSOR_INT_MODBUS;
+                    serverList = &newConfig.modbus; // Update only the `modbus` servers
                 } else {
                     LOG_WARNING("Unknown protocol: %s", protocol.c_str());
                     continue;
                 }
 
-                // Populate the server settings
+                // Clear and populate the server settings for the given protocol
+                serverList->clear();
                 for (const auto& serverConfig : servers) {
                     ServerSetting setting;
                     setting.name = serverConfig["name"].get<std::string>();
                     setting.ip = serverConfig["ip"].get<std::string>();
-
-                    // LOG_INFO("  Name: %s", setting.name.c_str());
-                    // LOG_INFO("  IP: %s", setting.ip.c_str());
 
                     // Populate the ports
                     for (const auto& port : serverConfig["ports"]) {
                         PortSetting portSetting;
                         portSetting.port = port["port"].get<std::string>();
                         portSetting.name = port["name"].get<std::string>();
-                        std::string updatedName = portSetting.name + "_tcp";
-                        sensorManager.registerSensor(portSetting.name, currentSensorIntType, updatedName, portSetting.port);
-                        
-                        // LOG_INFO("    Port: %s, Name: %s", portSetting.port.c_str(), portSetting.name.c_str());
-                        setting.ports.push_back(portSetting);
+                        setting.ports.push_back(std::move(portSetting));
                     }
 
-                    // Populate additional data if available
-                    if (serverConfig.contains("data")) {
-                        for (const auto& [key, value] : serverConfig["data"].items()) {
-                            std::map<std::string, std::string> innerMap;
-                            for (const auto& [innerKey, innerValue] : value.items()) {
-                                innerMap[innerKey] = innerValue.get<std::string>();
-                            }
-                            setting.data[key] = innerMap;
-                        }
-                    }
-
-                    // Add the setting to the appropriate list
+                    // Add the server setting to the list
                     serverList->emplace_back(std::move(setting));
                 }
             }
         }
 
-        // Save the populated configuration
+        // Save only the updated tcp and modbus settings back to the config
         configManager.saveServerConfig(newConfig);
         configManager.reportConfigs();
 
@@ -86,7 +66,6 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
 
     return response;
 }
-
 
 json handleServerConnectionSettingsGet(const json& parsedJson) {
     json response = {
@@ -144,4 +123,32 @@ json handleBroadcastSetting(const json& parsedJson) {
     }
 
     return response;
+}
+
+json handlePhaseSetting(const json& parseJson) {
+
+    try {
+        ConfigManager& configManager = ConfigManager::getInstance();    
+        if (parseJson.contains("phaseType") && parseJson["phaseType"].is_string()) {
+            configManager.getServerConfig().phaseType = parseJson["phaseType"].get<std::string>();
+        } else {
+            return {
+                {"error", "Invalid or missing 'phaseType' in input JSON"},
+                {"result", nullptr}
+            };
+        }
+
+        return {
+            {"error", nullptr},  
+            {"result", {
+                {"phaseType", configManager.getServerConfig().phaseType}
+            }}
+        };
+
+    } catch (const std::exception& ex) {
+        return {
+            {"error", std::string("Exception occurred: ") + ex.what()},
+            {"result", nullptr}
+        };
+    }
 }

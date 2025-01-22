@@ -80,8 +80,8 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
                 std::cerr << "Failed to read data from sensor: weatherStation1\n";
             }
         }
-        // ServerConfig serverInformation = configManager.getServerConfig();
-        // serverInformation.print();
+        ServerConfig serverInformation = configManager.getServerConfig();
+        serverInformation.print();
         std::this_thread::sleep_for(std::chrono::seconds(1));  // Adjust time as needed
     }
 }
@@ -91,19 +91,43 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
     - Updates FE from either DB (during playback) or configManager (default)
 */
 
-void ApplicationHandler::continuouslyUpdateFrontend(){
-    LOG_SUCCESS("FRONT END Update Thread Started");
+void ApplicationHandler::continuouslyUpdateFrontend() {
+    LOG_SUCCESS("Frontend Update Thread Started");
     ConfigManager& configManager = ConfigManager::getInstance();
 
-    while(1)
-    {
-        LOG_DEBUG("Updating Front End");
-        const ServerConfig& serverConfig = configManager.getServerConfig();
-        std::string jsonOutput = ConfigFormatter::dataToJson(serverConfig);
-        protocol_->sendData(jsonOutput);
-        std::this_thread::sleep_for(std::chrono::seconds(1));  // Adjust time as needed
+    while (true) {
+        if (configManager.getServerConfig().broadcastEnable) {
+            LOG_DEBUG("Updating Frontend");
+
+            const ServerConfig& serverConfig = configManager.getServerConfig();
+            json responseJson = {
+                {"method", "alfa.broadcast.settings.set"}, // Add the method field
+                {"data", {}} // Initialize empty data
+            };
+
+            // Populate the `data` field based on `phaseType`
+            if (serverConfig.phaseType == "tcp") {
+                responseJson["data"]["tcp"] = ConfigFormatter::tcpDataToJson(serverConfig);
+            } else if (serverConfig.phaseType == "modbus") {
+                responseJson["data"]["modbus"] = ConfigFormatter::modbusDataToJson(serverConfig);
+            } else {
+                responseJson = {
+                    {"method", "alfa.broadcast.settings.set"},
+                    {"error", "Invalid phaseType in configuration"}
+                };
+                LOG_ERROR("Invalid phaseType: %s", serverConfig.phaseType.c_str());
+            }
+
+            // Convert the JSON to a string and send it to the frontend
+            std::string jsonOutput = responseJson.dump(4); // Pretty print with 4 spaces
+            protocol_->sendData(jsonOutput);
+        }
+
+        // Sleep for 1 second before checking again
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
+
 
 void ApplicationHandler::start() {
     //Registering Sensors
@@ -113,7 +137,7 @@ void ApplicationHandler::start() {
     //Setters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information
     messageHandler_->registerMethodHandler("alfa.server.settings.set", NULL); //phase related relay/fan/light input from frontend
-    messageHandler_->registerMethodHandler("alfa.phase.settings.set", NULL); //phase type setting from front end
+    messageHandler_->registerMethodHandler("alfa.phase.settings.set", handlePhaseSetting); //phase type setting from front end
     messageHandler_->registerMethodHandler("alfa.playback.settings.set", NULL); //playback start time, end time related settings
     messageHandler_->registerMethodHandler("alfa.braodcast.settings.set", handleBroadcastSetting); //either to disable broadcast, change message interval
 
@@ -153,8 +177,6 @@ void ApplicationHandler::start() {
         std::thread sensorReadingThread(continuouslyReadSensorData, std::ref(sensorManager), std::ref(configManager));
         sensorReadingThread.detach();
 
-        std::thread readingUpdateThread(&ApplicationHandler::continuouslyUpdateFrontend, this);
-        readingUpdateThread.detach();
 
         
         /*
@@ -163,6 +185,10 @@ void ApplicationHandler::start() {
             frontend based on phase type maybe on callback
             or interval.
         */
+
+        std::thread readingUpdateThread(&ApplicationHandler::continuouslyUpdateFrontend, this);
+        readingUpdateThread.detach();
+
 
         /*
             T3

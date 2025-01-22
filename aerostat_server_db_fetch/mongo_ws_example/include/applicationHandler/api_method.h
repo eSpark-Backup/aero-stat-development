@@ -10,6 +10,7 @@ json handleServerConnectionSettingsSet(const json& parsedJson);
 json handleServerConnectionSettingsGet(const json& parsedJson);
 json handleVersionGet(const json& parsedJson);
 json handleBroadcastSetting(const json& parsedJson);
+json handlePhaseSetting(const json& parseJson);
 
 
 #endif //API_METHOD_H
