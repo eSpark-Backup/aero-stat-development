@@ -21,7 +21,7 @@ public:
         try {
             // Check if the sensor is already registered
             if (sensors_.find(port) != sensors_.end()) {
-                std::cout << "Sensor with port: " << port << " is already registered. Skipping registration." << std::endl;
+                std::cout << "Sensor with port: " << port << " ID : "<< id <<" is already registered. Skipping registration." << std::endl;
                 return;
             }
 

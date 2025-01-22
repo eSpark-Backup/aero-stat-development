@@ -3,9 +3,6 @@
 #include "config_manager/config_manager.h"
 #include "sensorsManager/base/sensorManager.h"
 
-//Include Sensors
-#include "sensorsManager/sensors/tcp/weatherStationTcp.h"
-
 
 json handleServerConnectionSettingsSet(const json& parsedJson) {
     ConfigManager& configManager = ConfigManager::getInstance();

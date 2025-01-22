@@ -31,4 +31,20 @@ struct weatherStationData : public SensorData {
     }
 };
 
+struct ballonetPressureData : public SensorData {
+    std::string status;
+    float pressure;
+    uint8_t flag;
+
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        data["pressure"] = std::to_string(pressure);
+        return data;
+    }
+
+    void print() const override {
+        LOG_WARNING("pressure: %f", pressure);
+    }
+};
+
 #endif //COMMON_SENSOR_DATA_TYPE

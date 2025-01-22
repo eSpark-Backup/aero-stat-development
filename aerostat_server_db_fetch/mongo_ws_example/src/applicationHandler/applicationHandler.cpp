@@ -8,8 +8,12 @@
 #include "sensorsManager/base/sensorManager.h"
 #include "config_manager/configFormatter.h"
 
+//TCP SENSOR INCLUDES
 #include "sensorsManager/sensors/tcp/weatherStationTcp.h"
+#include "sensorsManager/sensors/tcp/ballonetPressureTcp.h"
+//MODBUS SENSOR INCLUDES
 #include "sensorsManager/sensors/modbus/weatherStationMod.h"
+#include "sensorsManager/sensors/modbus/ballonetPressureMod.h"
 
 
 void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventParams) {
@@ -45,10 +49,10 @@ void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventPar
     - Reads sensors, update FE and DB
 */
 void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& configManager) {
+    LOG_WARNING("Data read thread started");
     while (true) {
         // Get the list of sensor IDs
         auto sensorIds = sensorManager.getSensorIDs();
-
         // Iterate over all sensor IDs
         for (const auto& sensorId : sensorIds) {
             // LOG_DEBUG("Found Sensor and Reading %s", sensorId.c_str());
@@ -63,11 +67,11 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
                 switch (sensor->getInterfaceType())
                 {
                 case sensorInterfaceType::SENSOR_INT_MODBUS:
-                    LOG_DEBUG("Saving Data from Interface MODBUS");
+                    // LOG_DEBUG("Saving Data from Interface MODBUS");
                     configManager.saveSensorDataModbus(sensorId, concreteData);
                     break;
                 case sensorInterfaceType::SENSOR_INT_TCP:
-                    LOG_DEBUG("Saving Data from Interface TCP");
+                    // LOG_DEBUG("Saving Data from Interface TCP");
                     configManager.saveSensorDataTcp(sensorId, concreteData);
                     break;
                 case sensorInterfaceType::SENSOR_INT_UNKNOWN:
@@ -80,8 +84,8 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
                 std::cerr << "Failed to read data from sensor: weatherStation1\n";
             }
         }
-        ServerConfig serverInformation = configManager.getServerConfig();
-        serverInformation.print();
+        // ServerConfig serverInformation = configManager.getServerConfig();
+        // serverInformation.print();
         std::this_thread::sleep_for(std::chrono::seconds(1));  // Adjust time as needed
     }
 }
@@ -101,7 +105,7 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
 
             const ServerConfig& serverConfig = configManager.getServerConfig();
             json responseJson = {
-                {"method", "alfa.broadcast.settings.set"}, // Add the method field
+                // {"method", "alfa.broadcast.settings.set"}, // Add the method field
                 {"data", {}} // Initialize empty data
             };
 
@@ -112,8 +116,8 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
                 responseJson["data"]["modbus"] = ConfigFormatter::modbusDataToJson(serverConfig);
             } else {
                 responseJson = {
-                    {"method", "alfa.broadcast.settings.set"},
-                    {"error", "Invalid phaseType in configuration"}
+                    {"error", "Invalid phaseType in configuration"},
+                    {"method", "alfa.broadcast.settings.set"}
                 };
                 LOG_ERROR("Invalid phaseType: %s", serverConfig.phaseType.c_str());
             }
@@ -138,6 +142,8 @@ void ApplicationHandler::start() {
     //Registering Sensors
     WeatherStationTcp::registerType();
     WeatherStationMod::registerType();
+    BallonetPressureTcp::registerType();
+    BallonetPressureMod::registerType();
 
     //Setters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information
