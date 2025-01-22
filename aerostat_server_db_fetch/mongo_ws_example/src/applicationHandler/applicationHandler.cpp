@@ -11,6 +11,7 @@
 //TCP SENSOR INCLUDES
 #include "sensorsManager/sensors/tcp/weatherStationTcp.h"
 #include "sensorsManager/sensors/tcp/ballonetPressureTcp.h"
+#include "sensorsManager/sensors/tcp/digitalCompassTcp.h"
 //MODBUS SENSOR INCLUDES
 #include "sensorsManager/sensors/modbus/weatherStationMod.h"
 #include "sensorsManager/sensors/modbus/ballonetPressureMod.h"
@@ -144,6 +145,7 @@ void ApplicationHandler::start() {
     WeatherStationMod::registerType();
     BallonetPressureTcp::registerType();
     BallonetPressureMod::registerType();
+    DigitalCompassTcp::registerType();
 
     //Setters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information

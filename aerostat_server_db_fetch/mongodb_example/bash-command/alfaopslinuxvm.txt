@@ -49,5 +49,26 @@ weather_station
 
 phase2
 
+hull_pressure
+ballonet_pressure
+ahrs
+load_cell
+ultrasonic
+temp_humidity
+weather_station
+relay
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

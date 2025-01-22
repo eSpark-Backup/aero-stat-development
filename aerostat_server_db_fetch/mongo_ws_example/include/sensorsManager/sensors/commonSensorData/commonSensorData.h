@@ -47,4 +47,27 @@ struct ballonetPressureData : public SensorData {
     }
 };
 
+struct digitalCompassData : public SensorData {
+    std::string status;
+    float magheading;
+    float pitch;
+    float roll;
+    uint8_t flag;
+
+    // Convert ParsedData to string
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        data["magnitude_heading"] = std::to_string(magheading);
+        data["pitch"] = std::to_string(pitch);;
+        data["roll"] = std::to_string(roll);
+        return data;
+    }
+    
+    void print() const override {
+        LOG_WARNING("magnitude_heading: %f", magheading);
+        LOG_WARNING("pitch: %f", pitch);
+        LOG_WARNING("roll: %f", roll);
+    }
+};
+
 #endif //COMMON_SENSOR_DATA_TYPE
