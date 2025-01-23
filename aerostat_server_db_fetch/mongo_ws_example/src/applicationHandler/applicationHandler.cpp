@@ -141,6 +141,7 @@ void ApplicationHandler::start() {
     AhrsMod::registerType();
     BallonetCurtainMod::registerType();
     AvionicsEnvMod::registerType();
+    RelayMod::registerType();
 
     WeatherStationTcp::registerType();
     BallonetPressureTcp::registerType();

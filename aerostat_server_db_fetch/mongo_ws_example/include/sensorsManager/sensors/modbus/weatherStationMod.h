@@ -41,6 +41,7 @@ public:
         data->airTemperature = disTemp(gen);
         data->windAngle = disWindAngle(gen);
         data->windSpeed = disWindSpeed(gen);
+        data->status = "connected";
 
         return data;
     }

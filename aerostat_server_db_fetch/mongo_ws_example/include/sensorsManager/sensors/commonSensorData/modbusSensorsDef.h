@@ -9,5 +9,6 @@
 #include "sensorsManager/sensors/modbus/ahrsMod.h"
 #include "sensorsManager/sensors/modbus/ballonetCurtainMod.h"
 #include "sensorsManager/sensors/modbus/avionicsEnvMod.h"
+#include "sensorsManager/sensors/modbus/relayMod.h"
 
 #endif //MODBUS_SENSORS_DEF_H

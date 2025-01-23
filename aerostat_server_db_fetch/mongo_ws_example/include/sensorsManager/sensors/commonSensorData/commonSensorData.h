@@ -14,20 +14,22 @@ struct weatherStationData : public SensorData {
 
     std::map<std::string, std::string> toMap() const override {
         std::map<std::string, std::string> data;
-        data["Heading"] = std::to_string(heading);
-        data["Barometric Pressure"] = std::to_string(barometricPressure);
-        data["Air Temperature"] = std::to_string(airTemperature);
-        data["Wind Angle"] = std::to_string(windAngle);
-        data["Wind Angle"] = std::to_string(windSpeed);
+        data["heading"] = std::to_string(heading);
+        data["barometric_pressure"] = std::to_string(barometricPressure);
+        data["air_temperature"] = std::to_string(airTemperature);
+        data["wind_angle"] = std::to_string(windAngle);
+        data["wind_angle"] = std::to_string(windSpeed);
+        data["connection_status"] = status;
         return data;
     }
 
     void print() const override {
-        LOG_WARNING("Heading: %f", heading);
-        LOG_WARNING("Barometric Pressure: %f", barometricPressure);
-        LOG_WARNING("Air Temperature: %f", airTemperature);
-        LOG_WARNING("Wind Angle: %f", windAngle);
-        LOG_WARNING("Wind Angle: %f", windSpeed);
+        LOG_WARNING("heading: %f", heading);
+        LOG_WARNING("barometric_pressure: %f", barometricPressure);
+        LOG_WARNING("air_temperature: %f", airTemperature);
+        LOG_WARNING("wind_angle: %f", windAngle);
+        LOG_WARNING("wind_angle: %f", windSpeed);
+        LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
 
@@ -39,11 +41,13 @@ struct ballonetPressureData : public SensorData {
     std::map<std::string, std::string> toMap() const override {
         std::map<std::string, std::string> data;
         data["pressure"] = std::to_string(pressure);
+        data["connection_status"] = status;
         return data;
     }
 
     void print() const override {
         LOG_WARNING("pressure: %f", pressure);
+        LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
 
@@ -60,6 +64,7 @@ struct digitalCompassData : public SensorData {
         data["magnitude_heading"] = std::to_string(magheading);
         data["pitch"] = std::to_string(pitch);;
         data["roll"] = std::to_string(roll);
+        data["connection_status"] = status;
         return data;
     }
     
@@ -67,6 +72,7 @@ struct digitalCompassData : public SensorData {
         LOG_WARNING("magnitude_heading: %f", magheading);
         LOG_WARNING("pitch: %f", pitch);
         LOG_WARNING("roll: %f", roll);
+        LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
 
@@ -238,5 +244,31 @@ struct avionicsEnvData : public SensorData {
     }
 };
 
+struct relayData : public SensorData {
+    std::string status;
+    bool primary_blower_value;
+    bool secondary_blower_value;
+    bool strobe_lights_value;
+    bool payload_power_value;
+    uint8_t flag;
+
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        data["primary_blower_value"] = std::to_string(primary_blower_value);
+        data["secondary_blower_value"] = std::to_string(secondary_blower_value);
+        data["strobe_lights_value"] = std::to_string(strobe_lights_value);
+        data["payload_power_value"] = std::to_string(payload_power_value);
+        data["connection_status"] = status;
+        return data;
+    }
+
+    void print() const override {
+        LOG_WARNING("primary_blower_value: %d", primary_blower_value);
+        LOG_WARNING("secondary_blower_value: %f", secondary_blower_value);
+        LOG_WARNING("strobe_lights_value: %f", strobe_lights_value);
+        LOG_WARNING("payload_power_value: %f", payload_power_value);
+        LOG_WARNING("connection_status: %s", status.c_str());
+    }
+};
 
 #endif //COMMON_SENSOR_DATA_TYPE

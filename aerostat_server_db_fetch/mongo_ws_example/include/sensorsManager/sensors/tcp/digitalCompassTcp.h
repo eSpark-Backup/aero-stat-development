@@ -39,6 +39,7 @@ public:
         data->magheading = dismagheading(gen);
         data->pitch = dispitch(gen);
         data->roll = disroll(gen);
+        data->status = "connected";
 
         return data;
     }

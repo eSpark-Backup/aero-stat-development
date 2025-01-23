@@ -57,6 +57,7 @@ public:
         data->hdop = dishdop(gen);
         data->vdop = disvdop(gen);
         data->position_accuracy = disposition_accuracy(gen);
+        data->status = "connected";
         return data;
     }
 

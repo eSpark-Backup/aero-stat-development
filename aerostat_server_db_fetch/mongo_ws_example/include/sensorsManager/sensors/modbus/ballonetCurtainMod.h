@@ -18,7 +18,7 @@ public:
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
-            "ballonet_curtain_modbus",
+            "ultrasonic_modbus",
             [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<BallonetCurtainMod>(name, interfaceType); }
         );
     }
@@ -35,6 +35,7 @@ public:
         
         // Assign random values to the fields
         data->height = disHeight(gen);
+        data->status = "connected";
 
         return data;
     }

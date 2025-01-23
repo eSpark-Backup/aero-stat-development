@@ -37,6 +37,7 @@ public:
         // Assign random values to the fields
         data->temperature = distemperature(gen);
         data->humidity = dishumidity(gen);
+        data->status = "connected";
 
         return data;
     }

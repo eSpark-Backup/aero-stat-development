@@ -18,7 +18,7 @@ public:
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
-            "ultrasonic_modbus",
+            "ballonet_pressure_modbus",
             [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<BallonetPressureMod>(name, interfaceType); }
         );
     }
@@ -35,6 +35,7 @@ public:
         
         // Assign random values to the fields
         data->pressure = disPressure(gen);
+        data->status = "connected";
 
         return data;
     }

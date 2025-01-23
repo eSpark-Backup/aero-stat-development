@@ -35,6 +35,7 @@ public:
         
         // Assign random values to the fields
         data->weight = disWeight(gen);
+        data->status = "connected";
 
         return data;
     }

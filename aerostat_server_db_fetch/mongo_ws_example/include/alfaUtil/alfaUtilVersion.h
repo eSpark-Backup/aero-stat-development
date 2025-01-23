@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define BUILD_DATE 1737637338
+#define BUILD_DATE 1737641757
 #define MAJOR 1
 #define MINOR 0
 #define BATCH 0
@@ -16,9 +16,9 @@ extern "C" {
 #define VERSION_STR TOSTRING(MAJOR) "." TOSTRING(MINOR) "." TOSTRING(BATCH)
 
 #define DEVELOPER "maaz@esparkconsultants.com"
-#define COMPILE_TIME "Thu Jan 23  6:02:18 PM PST 2025"
+#define COMPILE_TIME "Thu Jan 23  7:15:57 PM PST 2025"
 #define CURRENT_BRANCH "websocket-setup"
-#define COMMIT_HASH "a3216b3496b9b47f93defedc0588c7c7f7a8bfe1"
+#define COMMIT_HASH "51cfe8a30ee6ed23f9b33d11155e028b645a1702"
 
 #ifdef __cplusplus
 }
