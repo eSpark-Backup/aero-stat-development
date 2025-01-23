@@ -87,7 +87,46 @@ struct adamSensorData : public SensorData {
     void print() const override {
         LOG_WARNING("tension: %f", tension);
         LOG_WARNING("max_tension: %f", maxTension);
+        LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
+
+
+struct helliumPressureData : public SensorData {
+    std::string status;
+    float helliumPressure;
+    uint8_t flag;
+
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        data["hellium_pressure"] = std::to_string(helliumPressure);
+        data["connection_status"] = status;
+        return data;
+    }
+
+    void print() const override {
+        LOG_WARNING("hellium_pressure: %f", helliumPressure);
+        LOG_WARNING("connection_status: %s", status.c_str());
+    }
+};
+
+struct hullPressureData : public SensorData {
+    std::string status;
+    float hullPressure;
+    uint8_t flag;
+
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        data["hull_pressure"] = std::to_string(hullPressure);
+        data["connection_status"] = status;
+        return data;
+    }
+
+    void print() const override {
+        LOG_WARNING("hull_pressure: %f", hullPressure);
+        LOG_WARNING("connection_status: %s", status.c_str());
+    }
+};
+
 
 #endif //COMMON_SENSOR_DATA_TYPE

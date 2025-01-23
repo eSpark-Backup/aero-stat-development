@@ -16,7 +16,7 @@ void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventPar
         {
             try {
                 std::string messageResponse = messageHandler_->handleMessage(eventParams.eventData.messageReceived.message);
-                LOG_SUCCESS("Messag sent >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> :\n%s", messageResponse.c_str());
+                LOG_INFO("Messag sent >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> :\n%s", messageResponse.c_str());
                 protocol_->sendData(messageResponse);
             } catch (const json::exception& e) {
                 LOG_ERROR("JSON ERROR: %s", e.what());  // Added error detail
@@ -95,7 +95,7 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
 
     while (true) {
         if (configManager.getServerConfig().broadcastEnable) {
-            LOG_DEBUG("Updating Frontend");
+            // LOG_DEBUG("Updating Frontend");
 
             const ServerConfig& serverConfig = configManager.getServerConfig();
             json responseJson = {
@@ -136,10 +136,13 @@ void ApplicationHandler::start() {
     //Registering Sensors
     WeatherStationMod::registerType();
     BallonetPressureMod::registerType();
+    HulltPressureMod::registerType();
+
     WeatherStationTcp::registerType();
     BallonetPressureTcp::registerType();
     DigitalCompassTcp::registerType();
     AdamSensorTcp::registerType();
+    HelliumPressureTcp::registerType();
 
     //Setters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information
