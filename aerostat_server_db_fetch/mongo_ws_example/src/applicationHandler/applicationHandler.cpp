@@ -226,12 +226,6 @@ void ApplicationHandler::start() {
             pauses T2 only.
         */
 
-       /*
-            T4
-            thread that will do checks change in server settings 
-            and update/register sensors accordingly
-        */
-
     } catch (const std::exception& ex) {
         LOG_ERROR("Application Exception");
     }

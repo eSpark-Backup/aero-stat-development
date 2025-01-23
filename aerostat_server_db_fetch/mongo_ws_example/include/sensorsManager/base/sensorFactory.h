@@ -10,7 +10,7 @@
 
 class SensorFactory {
 public:
-    using SensorCreator = std::function<std::shared_ptr<Sensor>(const std::string&, sensorInterfaceType interfaceType)>;
+    using SensorCreator = std::function<std::shared_ptr<Sensor>(const std::string&, sensorInterfaceType interfaceType, const std::string& ip)>;
 
     // Register a sensor type with its creation function
     static SensorFactory& instance() {
@@ -23,10 +23,10 @@ public:
     }
 
     // Create a sensor dynamically based on type
-    std::shared_ptr<Sensor> createSensor(sensorInterfaceType interfaceType, const std::string& type, const std::string& port) const {
+    std::shared_ptr<Sensor> createSensor(sensorInterfaceType interfaceType, const std::string& type, const std::string& port, const std::string& ip) const {
         auto it = creators_.find(type);
         if (it != creators_.end()) {
-            return it->second(port, interfaceType);
+            return it->second(port, interfaceType, ip);
         }
 
         throw std::runtime_error("Sensor type '" + type + "' not registered.");

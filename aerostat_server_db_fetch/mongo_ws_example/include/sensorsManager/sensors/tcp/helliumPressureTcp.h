@@ -14,12 +14,12 @@
 
 class HelliumPressureTcp : public Sensor {
 public:
-    HelliumPressureTcp(const std::string& name, sensorInterfaceType interfaceType) : Sensor(interfaceType) , name_(name) {}
+    HelliumPressureTcp(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "hellium_pressure_tcp",
-            [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<HelliumPressureTcp>(name, interfaceType); }
+            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<HelliumPressureTcp>(name, interfaceType, ip); }
         );
     }
 
@@ -42,6 +42,7 @@ public:
 
 private:
     std::string name_;
+    std::string ip_;
 };
 
 #endif //HELLIUM_PRESSURE_SENSOR_H

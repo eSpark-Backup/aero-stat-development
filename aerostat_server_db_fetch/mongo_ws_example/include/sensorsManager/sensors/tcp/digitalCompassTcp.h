@@ -14,12 +14,12 @@
 
 class DigitalCompassTcp : public Sensor {
 public:
-    DigitalCompassTcp(const std::string& name, sensorInterfaceType interfaceType) : Sensor(interfaceType) , name_(name) {}
+    DigitalCompassTcp(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "digital_compass_tcp",
-            [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<DigitalCompassTcp>(name, interfaceType); }
+            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<DigitalCompassTcp>(name, interfaceType, ip); }
         );
     }
 
@@ -46,6 +46,7 @@ public:
 
 private:
     std::string name_;
+    std::string ip_;
 };
 
 #endif //DIGITAL_COMPASS_TCP_SESNOR_H

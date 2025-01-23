@@ -14,12 +14,12 @@
 
 class BallonetPressureTcp : public Sensor {
 public:
-    BallonetPressureTcp(const std::string& name, sensorInterfaceType interfaceType) : Sensor(interfaceType) , name_(name) {}
+    BallonetPressureTcp(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "ballonet_pressure_tcp",
-            [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<BallonetPressureTcp>(name, interfaceType); }
+            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<BallonetPressureTcp>(name, interfaceType, ip); }
         );
     }
 
@@ -42,6 +42,7 @@ public:
 
 private:
     std::string name_;
+    std::string ip_;
 };
 
 #endif //BALLONET_PRESSURE_TCP_SENSOR_H

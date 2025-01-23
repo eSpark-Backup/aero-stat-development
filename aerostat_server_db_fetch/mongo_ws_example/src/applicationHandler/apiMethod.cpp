@@ -49,7 +49,7 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
 
                         //register a sensor here
                         std::string updatedName = portSetting.name + "_" + protocol;
-                        sensorManager.registerSensor(portSetting.name, currentSensorIntType, updatedName, portSetting.port);
+                        sensorManager.registerSensor(portSetting.name, currentSensorIntType, updatedName, portSetting.port, setting.ip);
                         setting.ports.push_back(std::move(portSetting));
                     }
 

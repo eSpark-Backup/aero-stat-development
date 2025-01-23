@@ -14,12 +14,12 @@
 
 class AvionicsEnvMod : public Sensor {
 public:
-    AvionicsEnvMod(const std::string& name, sensorInterfaceType interfaceType) : Sensor(interfaceType) , name_(name) {}
+    AvionicsEnvMod(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "temp_humidity_modbus",
-            [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<AvionicsEnvMod>(name, interfaceType); }
+            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<AvionicsEnvMod>(name, interfaceType, ip); }
         );
     }
 
@@ -44,6 +44,7 @@ public:
 
 private:
     std::string name_;
+    std::string ip_;
 };
 
 #endif //AVIONICS_ENV_MODBUS_SENSOR_H

@@ -14,12 +14,12 @@
 
 class RelayMod : public Sensor {
 public:
-    RelayMod(const std::string& name, sensorInterfaceType interfaceType) : Sensor(interfaceType) , name_(name) {}
+    RelayMod(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "relay_modbus",
-            [](const std::string& name, sensorInterfaceType interfaceType) { return std::make_shared<RelayMod>(name, interfaceType); }
+            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<RelayMod>(name, interfaceType, ip); }
         );
     }
 
@@ -29,25 +29,26 @@ public:
         // Random number generation setup
         std::random_device rd;
         std::mt19937 gen(rd());
-        
-        // For floating point range [min, max]
-        std::uniform_real_distribution<> disprimary_blower_value(0, 1);
-        std::uniform_real_distribution<> dissecondary_blower_value(0, 1);
-        std::uniform_real_distribution<> disstrobe_lights_value(0, 1);
-        std::uniform_real_distribution<> dispayload_power_value(0, 1);
-        
-        // Assign random values to the fields
-        data->primary_blower_value = disprimary_blower_value(gen);
-        data->secondary_blower_value = dissecondary_blower_value(gen);
-        data->strobe_lights_value = disstrobe_lights_value(gen);
-        data->payload_power_value = dispayload_power_value(gen);
+
+        // For binary values [0, 1]
+        std::uniform_int_distribution<> disbinary(0, 1);
+
+        // Assign random binary values to the fields
+        data->primary_blower_value = disbinary(gen);
+        data->secondary_blower_value = disbinary(gen);
+        data->strobe_lights_value = disbinary(gen);
+        data->payload_power_value = disbinary(gen);
         data->status = "connected";
 
         return data;
     }
 
+    
+
+
 private:
     std::string name_;
+    std::string ip_;
 };
 
 #endif //RELAY_MODBUS_SENSOR_H

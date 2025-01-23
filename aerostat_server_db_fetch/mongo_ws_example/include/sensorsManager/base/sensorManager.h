@@ -17,7 +17,7 @@ public:
     //     sensorIDs_.push_back(id);
     // }
 
-    void registerSensor(const std::string& id, sensorInterfaceType interfaceType, const std::string& type, const std::string& port) {
+    void registerSensor(const std::string& id, sensorInterfaceType interfaceType, const std::string& type, const std::string& port, const std::string& ip) {
         try {
             // Check if the sensor is already registered
             if (sensors_.find(port) != sensors_.end()) {
@@ -26,10 +26,10 @@ public:
             }
 
             // If not registered, create and register the sensor
-            auto sensor = SensorFactory::instance().createSensor(interfaceType, type, port);
+            auto sensor = SensorFactory::instance().createSensor(interfaceType, type, port, ip);
             sensors_[port] = sensor;
             sensorIDs_.push_back(port);
-            LOG_SUCCESS("Registered sensor with ID: %s, type: %s, port: %s", id.c_str(), type.c_str(), port.c_str());
+            LOG_SUCCESS("Registered sensor with ID: %s, type: %s, port: %s, IP : %s", id.c_str(), type.c_str(), port.c_str(), ip.c_str());
         } catch (const std::exception& e) {
             LOG_ERROR("Error registering sensor: %s", (e.what()));
         }
