@@ -8,6 +8,7 @@
 #include <random>
 #include "sensorsManager/base/sensorBase.h"
 #include "sensorsManager/sensors/commonSensorData/commonSensorData.h"
+#include "sensorsManager/base/tcpConnectionManager.h"
 #include "sensorsManager/base/sensorFactory.h"
 #include "logger/trace_util.h"
 
@@ -15,6 +16,7 @@
 class WeatherStationTcp : public Sensor {
 public:
     WeatherStationTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
+
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
@@ -36,6 +38,11 @@ public:
         std::uniform_real_distribution<> disTemp(-30.0, 50.0);
         std::uniform_real_distribution<> disWindAngle(0.0, 360.0);
         std::uniform_real_distribution<> disWindSpeed(0.0, 50.0);
+        
+        TcpConnectionManager connectionMan;
+        std::string ipToConnect = this->connectionParams_.ip;
+        connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
+
         
         // Assign random values to the fields
         data->heading = disHeading(gen);
