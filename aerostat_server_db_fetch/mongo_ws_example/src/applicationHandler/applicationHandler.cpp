@@ -137,6 +137,10 @@ void ApplicationHandler::start() {
     WeatherStationMod::registerType();
     BallonetPressureMod::registerType();
     HulltPressureMod::registerType();
+    LoadcellMod::registerType();
+    AhrsMod::registerType();
+    BallonetCurtainMod::registerType();
+    AvionicsEnvMod::registerType();
 
     WeatherStationTcp::registerType();
     BallonetPressureTcp::registerType();

@@ -5,5 +5,9 @@
 #include "sensorsManager/sensors/modbus/weatherStationMod.h"
 #include "sensorsManager/sensors/modbus/ballonetPressureMod.h"
 #include "sensorsManager/sensors/modbus/hullPressureMod.h"
+#include "sensorsManager/sensors/modbus/loadcellMod.h"
+#include "sensorsManager/sensors/modbus/ahrsMod.h"
+#include "sensorsManager/sensors/modbus/ballonetCurtainMod.h"
+#include "sensorsManager/sensors/modbus/avionicsEnvMod.h"
 
 #endif //MODBUS_SENSORS_DEF_H
