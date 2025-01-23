@@ -3,6 +3,7 @@
 
 // Base Sensor class (abstract)
 #include <memory>
+#include <string>
 
 enum class sensorInterfaceType {
     SENSOR_INT_MODBUS,
@@ -16,10 +17,15 @@ struct SensorData {
     virtual void print() const = 0;
 };
 
+struct ConnectionParams {
+    std::string ip = "0.0.0.0";
+    std::string port = "0000";
+};
+
 class Sensor {
 public:
-    explicit Sensor(sensorInterfaceType interfaceType) 
-        : interfaceType_(interfaceType) {}
+    explicit Sensor(sensorInterfaceType interfaceType, const ConnectionParams connectionParameter) 
+        : interfaceType_(interfaceType), connectionParams_(connectionParameter) {}
 
     virtual ~Sensor() = default;
     
@@ -30,6 +36,7 @@ public:
     // Abstract method to read data from the sensor
     virtual std::shared_ptr<void> readData() const = 0;  // Return type is shared_ptr to void for flexibility
     sensorInterfaceType interfaceType_;
+    ConnectionParams connectionParams_;
 };
 
 

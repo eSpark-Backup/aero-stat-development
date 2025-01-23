@@ -14,12 +14,12 @@
 
 class RelayMod : public Sensor {
 public:
-    RelayMod(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
+    RelayMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "relay_modbus",
-            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<RelayMod>(name, interfaceType, ip); }
+            [](const std::string& name, sensorInterfaceType interfaceType,  const ConnectionParams cp) { return std::make_shared<RelayMod>(name, interfaceType, cp); }
         );
     }
 

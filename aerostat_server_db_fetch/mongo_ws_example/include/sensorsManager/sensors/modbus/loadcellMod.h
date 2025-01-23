@@ -14,12 +14,12 @@
 
 class LoadcellMod : public Sensor {
 public:
-    LoadcellMod(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
+    LoadcellMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "load_cell_modbus",
-            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<LoadcellMod>(name, interfaceType, ip); }
+            [](const std::string& name, sensorInterfaceType interfaceType,  const ConnectionParams cp) { return std::make_shared<LoadcellMod>(name, interfaceType, cp); }
         );
     }
 

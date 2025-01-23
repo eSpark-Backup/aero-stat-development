@@ -26,7 +26,8 @@ public:
             }
 
             // If not registered, create and register the sensor
-            auto sensor = SensorFactory::instance().createSensor(interfaceType, type, port, ip);
+            ConnectionParams _cp = {ip, port};
+            auto sensor = SensorFactory::instance().createSensor(interfaceType, type, port, _cp);
             sensors_[port] = sensor;
             sensorIDs_.push_back(port);
             LOG_SUCCESS("Registered sensor with ID: %s, type: %s, port: %s, IP : %s", id.c_str(), type.c_str(), port.c_str(), ip.c_str());
@@ -47,6 +48,7 @@ public:
     template <typename T>
     std::shared_ptr<void> readSensorData(const std::string& id) {
         auto sensor = getSensor(id);
+        // LOG_WARNING("SENSOR IP %s and PORT %s", (sensor->connectionParams_.ip.c_str()), (sensor->connectionParams_.port.c_str()));
         if (sensor) {
             return sensor->readData();
         }

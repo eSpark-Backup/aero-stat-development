@@ -14,12 +14,12 @@
 
 class HulltPressureMod : public Sensor {
 public:
-    HulltPressureMod(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
+    HulltPressureMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "hull_pressure_modbus",
-            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<HulltPressureMod>(name, interfaceType, ip); }
+            [](const std::string& name, sensorInterfaceType interfaceType,  const ConnectionParams cp) { return std::make_shared<HulltPressureMod>(name, interfaceType, cp); }
         );
     }
 

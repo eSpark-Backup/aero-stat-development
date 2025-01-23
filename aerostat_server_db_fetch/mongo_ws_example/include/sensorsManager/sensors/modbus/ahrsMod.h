@@ -14,12 +14,12 @@
 
 class AhrsMod : public Sensor {
 public:
-    AhrsMod(const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) : Sensor(interfaceType) , name_(name), ip_(ip) {}
+    AhrsMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
             "ahrs_modbus",
-            [](const std::string& name, sensorInterfaceType interfaceType, const std::string& ip) { return std::make_shared<AhrsMod>(name, interfaceType, ip); }
+            [](const std::string& name, sensorInterfaceType interfaceType,  const ConnectionParams cp) { return std::make_shared<AhrsMod>(name, interfaceType, cp); }
         );
     }
 
