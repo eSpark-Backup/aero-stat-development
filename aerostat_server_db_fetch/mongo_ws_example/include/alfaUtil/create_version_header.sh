@@ -4,7 +4,7 @@
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 
 # Set the output filename
-header_filename="${SCRIPT_DIR}/alfa_util_version.h"
+header_filename="${SCRIPT_DIR}/alfaUtilVersion.h"
 
 # Get the build date and compile time
 build_date=$(date +%s) # Unix timestamp

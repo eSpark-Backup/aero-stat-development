@@ -8,14 +8,7 @@
 #include "sensorsManager/base/sensorManager.h"
 #include "configManager/configFormatter.h"
 
-//TCP SENSOR INCLUDES
-#include "sensorsManager/sensors/tcp/weatherStationTcp.h"
-#include "sensorsManager/sensors/tcp/ballonetPressureTcp.h"
-#include "sensorsManager/sensors/tcp/digitalCompassTcp.h"
-//MODBUS SENSOR INCLUDES
-#include "sensorsManager/sensors/modbus/weatherStationMod.h"
-#include "sensorsManager/sensors/modbus/ballonetPressureMod.h"
-
+#include "sensorsManager/sensors/commonSensorData/sensorsDef.h"
 
 void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventParams) {
     switch (eventParams.type) {
@@ -141,11 +134,12 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
 
 void ApplicationHandler::start() {
     //Registering Sensors
-    WeatherStationTcp::registerType();
     WeatherStationMod::registerType();
-    BallonetPressureTcp::registerType();
     BallonetPressureMod::registerType();
+    WeatherStationTcp::registerType();
+    BallonetPressureTcp::registerType();
     DigitalCompassTcp::registerType();
+    AdamSensorTcp::registerType();
 
     //Setters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information
@@ -178,19 +172,19 @@ void ApplicationHandler::start() {
             return;
         }
 
-        std::string jsonData = R"({
-            "timestamp": "2025-01-22 20:58:57",
-            "data": {
-                "Aerostat Heading": 128.00,
-                "Air Temp": 18.80,
-                "Baro Pres": 29.29,
-                "Wind Angle": 158.40,
-                "Wind Speed": 1.90
-            },
-            "unit": "grouped"
-        })";
+        // std::string jsonData = R"({
+        //     "timestamp": "2025-01-22 20:58:57",
+        //     "data": {
+        //         "Aerostat Heading": 128.00,
+        //         "Air Temp": 18.80,
+        //         "Baro Pres": 29.29,
+        //         "Wind Angle": 158.40,
+        //         "Wind Speed": 1.90
+        //     },
+        //     "unit": "grouped"
+        // })";
 
-        db_->insert("test_collection_name", jsonData);
+        // db_->insert("test_collection_name", jsonData);
 
         /*
             T1

@@ -21,7 +21,7 @@ public:
         try {
             // Check if the sensor is already registered
             if (sensors_.find(port) != sensors_.end()) {
-                std::cout << "Sensor with port: " << port << " ID : "<< id <<" is already registered. Skipping registration." << std::endl;
+                LOG_WARNING("Sensor with port: %s, ID : %s,  is already registered. Skipping registration.", port.c_str(), id.c_str());
                 return;
             }
 
@@ -29,9 +29,9 @@ public:
             auto sensor = SensorFactory::instance().createSensor(interfaceType, type, port);
             sensors_[port] = sensor;
             sensorIDs_.push_back(port);
-            std::cout << "Registered sensor with ID: " << id << ", type: " << type << ", port: " << port << std::endl;
+            LOG_SUCCESS("Registered sensor with ID: %s, type: %s, port: %s", id.c_str(), type.c_str(), port.c_str());
         } catch (const std::exception& e) {
-            std::cerr << "Error registering sensor: " << e.what() << std::endl;
+            LOG_ERROR("Error registering sensor: %s", (e.what()));
         }
     }
 

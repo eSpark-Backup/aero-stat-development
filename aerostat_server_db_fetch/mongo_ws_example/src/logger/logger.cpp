@@ -84,10 +84,19 @@ void Logger::log(LogLevel level, const std::string& message) {
 }
 
 std::string Logger::formatLogMessage(LogLevel level, const std::string& message) {
+    constexpr int timeWidth = 10;       // Fixed width for the timestamp
+    constexpr int levelWidth = 10;     // Fixed width for the log level
+    constexpr int messageIndent = 0;  // Indent for the message
+
     std::ostringstream oss;
-    oss << "[" << getCurrentTime() << "] [" << logLevelToString(level) << "] " << message;
+    oss << std::left
+        << "[" << std::setw(timeWidth - 2) << getCurrentTime() << "] " // Adjust for the square brackets
+        << "[" << std::setw(levelWidth - 2) << logLevelToString(level) << "] " 
+        << std::string(messageIndent, ' ') << message;
+
     return oss.str();
 }
+
 
 std::string Logger::getCurrentTime() {
     std::time_t now = std::time(nullptr);

@@ -70,4 +70,24 @@ struct digitalCompassData : public SensorData {
     }
 };
 
+struct adamSensorData : public SensorData {
+    std::string status;
+    float tension;
+    float maxTension;
+    uint8_t flag;
+
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        data["tension"] = std::to_string(tension);
+        data["max_tension"] = std::to_string(maxTension);
+        data["connection_status"] = status;
+        return data;
+    }
+
+    void print() const override {
+        LOG_WARNING("tension: %f", tension);
+        LOG_WARNING("max_tension: %f", maxTension);
+    }
+};
+
 #endif //COMMON_SENSOR_DATA_TYPE
