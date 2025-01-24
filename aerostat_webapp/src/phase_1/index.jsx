@@ -235,7 +235,7 @@ function Phase1() {
     if (errors.length > 0) {
       return;
     }
-
+    console.log(typeof (form?.weather));
     const newForm = {
       method: "alfa.server.connection.settings.set",
       servers: [
@@ -246,23 +246,23 @@ function Phase1() {
               ip: form?.rawtcp_host_ip,
               ports: [
                 {
-                  port: toString(form?.weather),
+                  port: form?.weather,
                   name: "weather_station"
                 },
                 {
-                  port: toString(form?.hmr),
+                  port: form?.hmr,
                   name: "digital_compass"
                 },
                 {
-                  port: toString(form?.ballonet),
+                  port: form?.ballonet,
                   name: "ballonet_pressure"
                 },
                 {
-                  port: toString(form?.helium),
+                  port: form?.helium,
                   name: "hellium_pressure"
                 },
                 {
-                  port: toString(form?.adam),
+                  port: form?.adam,
                   name: "adam_sensor"
                 }
               ]
