@@ -7,10 +7,12 @@ import { formatDateTime, processData, processDataArray } from "../Js_parsing";
 import { fetchDataUtil, updateConfigUtil } from "../utils";
 import "./phase1.css";
 import { WebSocketContext } from "../App";
+import useWebSocket from "react-use-websocket";
 
 function Phase1() {
 
-  const { readyState, sendJsonMessage, lastMessage } = useContext(WebSocketContext);
+  const { readyState, sendJsonMessage, onMessage, lastMessage } = useContext(WebSocketContext);
+  const [activateWebSocket, setActivateWebSocket] = useState(false);
 
   const connectionStatus = {
     0: 'Connecting',
@@ -95,13 +97,16 @@ function Phase1() {
       value === undefined ||
       value === "none" ||
       value === null ||
-      (typeof value === "string" && value.trim() === "") ||
+      (value.trim() === "") ||
       isNaN(value)
     );
   };
 
-  const fetchData = async () => {
-    if (!lastMessage) return;
+  const fetchData = (message) => {
+    const data = JSON.parse(message.data);
+    console.log("WebSocket Data:", data?.data);
+    // console.log(JSON.parse(onMessage.data))
+
     try {
       console.log("IN TRY")
       const data = JSON.parse(lastMessage.data);
@@ -208,11 +213,19 @@ function Phase1() {
 
   useEffect(() => {
     if (!startFetchingFromFile && (startFetchData || phase1Start)) {
-      console.log("HELLO")
-      const interval = setInterval(fetchData, 1500);
-      return () => clearInterval(interval);
+      // console.log("HELLO")
+      // const interval = setInterval(fetchData, 1500);
+      // return () => clearInterval(interval);
+      setActivateWebSocket(true);
+    }
+    else {
+      setActivateWebSocket(false);
     }
   }, [startFetchingFromFile, startFetchData, phase1Start]);
+
+  useWebSocket("ws://localhost:9001", {
+    onMessage: activateWebSocket ? fetchData : undefined,
+  });
 
   const [errorValues, setErrorValues] = useState([]);
 
