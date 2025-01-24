@@ -41,21 +41,22 @@ weather_sensor_readings
 
 phase1
 
-adams_sensor
-ballonet_pressure
-digital_compass
-helium_pressure
-weather_station
+adams_sensor 				---done
+ballonet_pressure			---done
+digital_compass				---done
+helium_pressure				---done
+weather_station				---done
+fan_light
 
 phase2
 
-hull_pressure
-ballonet_pressure
-ahrs
-load_cell
-ultrasonic
-temp_humidity
-weather_station
+hull_pressure				---done
+ballonet_pressure			---done	
+weather_station				---done	
+load_cell				---done
+ahrs					---done
+ultrasonic				---done
+temp_humidity				---done
 relay
 
 
