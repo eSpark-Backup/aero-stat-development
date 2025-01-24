@@ -18,7 +18,7 @@ struct weatherStationData : public SensorData {
         data["barometric_pressure"] = std::to_string(barometricPressure);
         data["air_temperature"] = std::to_string(airTemperature);
         data["wind_angle"] = std::to_string(windAngle);
-        data["wind_angle"] = std::to_string(windSpeed);
+        data["wind_speed"] = std::to_string(windSpeed);
         data["connection_status"] = status;
         return data;
     }
@@ -28,7 +28,7 @@ struct weatherStationData : public SensorData {
         LOG_WARNING("barometric_pressure: %f", barometricPressure);
         LOG_WARNING("air_temperature: %f", airTemperature);
         LOG_WARNING("wind_angle: %f", windAngle);
-        LOG_WARNING("wind_angle: %f", windSpeed);
+        LOG_WARNING("wind_speed: %f", windSpeed);
         LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
