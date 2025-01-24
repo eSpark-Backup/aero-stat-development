@@ -25,6 +25,17 @@ void Logger::setLogLevel(LogLevel level) {
     logLevel = level;
 }
 
+void Logger::setLogLevel(std::string level_string) {
+    for (int i = LogLevel::NONE; i <= LogLevel::ERROR; i++) { 
+        if (logLevelToString(static_cast<LogLevel>(i)) == level_string) {
+            setLogLevel(static_cast<LogLevel>(i)); 
+            return; 
+        }
+    }
+    throw std::invalid_argument("Invalid log level: " + level_string);
+}
+
+
 void Logger::setLogFile() {
     std::lock_guard<std::mutex> lock(mutex);
 
@@ -107,6 +118,7 @@ std::string Logger::getCurrentTime() {
 
 std::string Logger::logLevelToString(LogLevel level) {
     switch (level) {
+        case NONE: return "NONE";
         case DEBUG: return "DEBUG";
         case INFO: return "INFO";
         case WARNING: return "WARNING";

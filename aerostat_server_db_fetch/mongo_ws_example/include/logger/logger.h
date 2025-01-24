@@ -10,6 +10,7 @@
 class Logger {
 public:
     enum LogLevel {
+        NONE,
         VERBOSE,
         DEBUG,
         INFO,
@@ -19,8 +20,12 @@ public:
     };
 
     static Logger& getInstance();
-
+    std::string logLevelToString(LogLevel level);
     void setLogLevel(LogLevel level);
+    LogLevel getLogLevel(){
+        return logLevel;
+    }
+    void setLogLevel(std::string level_string);
     void setLogFile();
     void log(LogLevel level, const std::string& message);
 
@@ -35,7 +40,7 @@ public:
     }
 
 private:
-    LogLevel logLevel = INFO;
+    LogLevel logLevel = DEBUG;
     std::ofstream logFile;
     std::mutex mutex;
 
@@ -46,7 +51,6 @@ private:
 
     std::string formatLogMessage(LogLevel level, const std::string& message);
     std::string getCurrentTime();
-    std::string logLevelToString(LogLevel level);
 
     template<typename... Args>
     std::string formatString(const std::string& format, Args... args) {

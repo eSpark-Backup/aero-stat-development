@@ -36,6 +36,30 @@ public:
         }
     }
 
+    void unregisterSensor(const std::string& port) {
+        try {
+            // Check if the sensor exists
+            auto it = sensors_.find(port);
+            if (it == sensors_.end()) {
+                LOG_WARNING("Sensor with port: %s is not registered. Cannot unregister.", port.c_str());
+                return;
+            }
+
+            // Remove the sensor from the map
+            sensors_.erase(it);
+
+            // Remove the port from the sensorIDs_ list
+            auto idIt = std::find(sensorIDs_.begin(), sensorIDs_.end(), port);
+            if (idIt != sensorIDs_.end()) {
+                sensorIDs_.erase(idIt);
+            }
+
+            LOG_SUCCESS("Unregistered sensor with port: %s", port.c_str());
+        } catch (const std::exception& e) {
+            LOG_ERROR("Error unregistering sensor with port: %s. Details: %s", port.c_str(), e.what());
+        }
+    }
+
 
     std::shared_ptr<Sensor> getSensor(const std::string& id) {
         auto it = sensors_.find(id);

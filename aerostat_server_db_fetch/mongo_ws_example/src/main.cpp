@@ -31,7 +31,7 @@ int main() {
         appHandler.start();
 
     } catch (const std::exception& ex) {
-        LOG_ERROR("Exception Error: ");
+        LOG_ERROR("Exception Error: %s", std::string(ex.what()).c_str());
         return 1;
     }
 

@@ -2,6 +2,8 @@
 #include "alfaUtil/alfaUtilVersion.h"
 #include "configManager/configManager.h"
 #include "sensorsManager/base/sensorManager.h"
+#include "logger/logger.h"
+#include <stdexcept>
 
 
 json handleServerConnectionSettingsSet(const json& parsedJson) {
@@ -49,6 +51,7 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
 
                         //register a sensor here
                         std::string updatedName = portSetting.name + "_" + protocol;
+                        sensorManager.unregisterSensor(portSetting.port);
                         sensorManager.registerSensor(portSetting.name, currentSensorIntType, updatedName, portSetting.port, setting.ip);
                         setting.ports.push_back(std::move(portSetting));
                     }
@@ -163,4 +166,20 @@ json handleActuatorSetting(const json& parseJson)
     return {
         {"error", std::string("method not fully implemented")}
     };
+}
+
+json handleLoggerSetting(const json& parseJson)
+{
+    /*pasrse json and get log level*/
+    try {
+        if (parseJson.contains("log_level") && parseJson["log_level"].is_string()) {
+            std::string logLevel = parseJson["log_level"];
+            Logger::getInstance().setLogLevel(logLevel);
+            return {{"error", nullptr}, {"log_level" , Logger::getInstance().logLevelToString(Logger::getInstance().getLogLevel())}};
+        } else {
+            return {{"error", "Invalid or missing 'log_level'"}};
+        }
+    } catch (const std::exception& e) {
+        return {{"error", std::string("Exception occurred: ") + e.what()}};
+    }
 }

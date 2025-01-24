@@ -155,6 +155,7 @@ void ApplicationHandler::start() {
     messageHandler_->registerMethodHandler("alfa.phase.settings.set", handlePhaseSetting); //phase type setting from front end
     messageHandler_->registerMethodHandler("alfa.playback.settings.set", NULL); //playback start time, end time related settings
     messageHandler_->registerMethodHandler("alfa.braodcast.settings.set", handleBroadcastSetting); //either to disable broadcast, change message interval
+    messageHandler_->registerMethodHandler("alfa.server.logger.set", handleLoggerSetting); //playback start time, end time related settings
 
     //Getters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.get", handleServerConnectionSettingsGet); //relay/fan/light related fetching
