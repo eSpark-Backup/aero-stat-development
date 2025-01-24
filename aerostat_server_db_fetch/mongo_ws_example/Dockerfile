@@ -1,4 +1,4 @@
-FROM espark1maaz/alfaops-backend
+FROM maaz3073/test_docker_repo:1.0.0
 
 # Set the working directory inside the container
 WORKDIR /home/backend
@@ -21,4 +21,13 @@ WORKDIR /home/backend/build
 # Run CMake to configure and build the project
 RUN cmake .. && cmake --build . && make main
 
-RUN make run
+# RUN make run
+
+# COMMAND TO BUILD IMAGE AND RUN BACKEND
+#==========================================
+#
+# docker build -t alfa-be .
+# docker run -it -p 9001:9001 alfa-be
+#
+# make run
+#==========================================

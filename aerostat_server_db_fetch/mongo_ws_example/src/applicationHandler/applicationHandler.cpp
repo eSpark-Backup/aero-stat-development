@@ -177,7 +177,6 @@ void ApplicationHandler::start() {
             protocol_->sendData("Connected to Database!");
         } else {
             LOG_ERROR("Database not Connected!");
-            return;
         }
 
         // std::string jsonData = R"({

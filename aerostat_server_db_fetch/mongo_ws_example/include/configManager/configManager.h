@@ -61,7 +61,7 @@ struct ServerConfig {
     std::vector<ServerSetting> tcp;
     std::vector<ServerSetting> modbus;
     std::string phaseType = "tcp";
-    bool broadcastEnable;
+    bool broadcastEnable = true;
 
     void print() const {
         LOG_INFO("SERVER INFORAMATION PRINT");

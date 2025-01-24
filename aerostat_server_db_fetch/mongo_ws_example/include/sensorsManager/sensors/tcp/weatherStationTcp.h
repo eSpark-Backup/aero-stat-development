@@ -39,9 +39,9 @@ public:
         std::uniform_real_distribution<> disWindAngle(0.0, 360.0);
         std::uniform_real_distribution<> disWindSpeed(0.0, 50.0);
         
-        TcpConnectionManager connectionMan;
-        std::string ipToConnect = this->connectionParams_.ip;
-        connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
+        // TcpConnectionManager connectionMan;
+        // std::string ipToConnect = this->connectionParams_.ip;
+        // connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
 
         
         // Assign random values to the fields
