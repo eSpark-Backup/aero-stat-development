@@ -21,16 +21,17 @@ const Sidebar = ({
     if (phase === newPhase) {
       return
     }
-    try {
-      const result = await updateToggle(true);
-      if (result) {
-        setPhase(newPhase);
-      } else {
-        console.error("updateToggle failed or returned an invalid response.");
-      }
-    } catch (error) {
-      console.error("Error during updateToggle:", error);
-    }
+    // try {
+    //   const result = await updateToggle(true);
+    //   if (result) {
+    //     setPhase(newPhase);
+    //   } else {
+    //     console.error("updateToggle failed or returned an invalid response.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error during updateToggle:", error);
+    // }
+    setPhase(newPhase);
   };
 
   return (

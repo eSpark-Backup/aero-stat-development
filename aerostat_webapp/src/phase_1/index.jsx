@@ -6,8 +6,18 @@ import { ThemeContext } from "../ThemeHandler";
 import { formatDateTime, processData, processDataArray } from "../Js_parsing";
 import { fetchDataUtil, updateConfigUtil } from "../utils";
 import "./phase1.css";
+import { WebSocketContext } from "../App";
 
 function Phase1() {
+
+  const { readyState, sendJsonMessage, lastMessage } = useContext(WebSocketContext);
+
+  const connectionStatus = {
+    0: 'Connecting',
+    1: 'Connected',
+    2: 'Closing',
+    3: 'Closed',
+  }[readyState];
   const lastPerfectResponses = useRef({
     adams: {
       max_tension: parseFloat(700).toFixed(2),
@@ -91,102 +101,114 @@ function Phase1() {
   };
 
   const fetchData = async () => {
-    const data = await fetchDataUtil();
-    console.log(data)
+    if (!lastMessage) return;
+    try {
+      console.log("IN TRY")
+      const data = JSON.parse(lastMessage.data);
+      console.log("WebSocket Data:", data?.data);
 
-    if (data) {
-      const parsedResponses = {
-        weather: {
-          air_temp: isInvalidValue(data?.port_data?.port_4002?.air_temp)
-            ? lastPerfectResponses.current.weather.air_temp
-            : parseFloat(data.port_data.port_4002.air_temp).toFixed(2),
-          baro_presssure: isInvalidValue(data?.port_data?.port_4002?.baro_presssure)
-            ? lastPerfectResponses.current.weather.baro_presssure
-            : parseFloat(data.port_data.port_4002.baro_presssure).toFixed(2),
-          heading: isInvalidValue(data?.port_data?.port_4002?.heading)
-            ? lastPerfectResponses.current.weather.heading
-            : parseFloat(data.port_data.port_4002.heading).toFixed(2),
-          wind_angle: isInvalidValue(data?.port_data?.port_4002?.wind_angle)
-            ? lastPerfectResponses.current.weather.wind_angle
-            : parseFloat(data.port_data.port_4002.wind_angle).toFixed(2),
-          wind_speed: isInvalidValue(data?.port_data?.port_4002?.wind_speed)
-            ? lastPerfectResponses.current.weather.wind_speed
-            : parseFloat(data.port_data.port_4002.wind_speed).toFixed(2),
-        },
-        digitalCompass: {
-          mag_heading: isInvalidValue(data?.port_data?.port_4003?.mag_heading)
-            ? lastPerfectResponses.current.digitalCompass.mag_heading
-            : parseFloat(data.port_data.port_4003.mag_heading).toFixed(2),
-          pitch: isInvalidValue(data?.port_data?.port_4003?.pitch)
-            ? lastPerfectResponses.current.digitalCompass.pitch
-            : parseFloat(data.port_data.port_4003.pitch).toFixed(2),
-          roll: isInvalidValue(data?.port_data?.port_4003?.roll)
-            ? lastPerfectResponses.current.digitalCompass.roll
-            : parseFloat(data.port_data.port_4003.roll).toFixed(2),
-        },
-        ballonet: {
-          bal_pressure: isInvalidValue(data?.port_data?.port_4004?.bal_pressure)
-            ? lastPerfectResponses.current.ballonet.bal_pressure
-            : parseFloat(data.port_data.port_4004.bal_pressure).toFixed(2),
-        },
-        helium: {
-          hel_pressure: isInvalidValue(data?.port_data?.port_4005?.hel_pressure)
-            ? lastPerfectResponses.current.helium.hel_pressure
-            : parseFloat(data.port_data.port_4005.hel_pressure).toFixed(2),
-        },
-        adams: {
-          max_tension: isInvalidValue(data?.port_data?.port_4006?.max_tension)
-            ? lastPerfectResponses.current.adams.max_tension
-            : parseFloat(data.port_data.port_4006.max_tension).toFixed(2),
-          tension: isInvalidValue(data?.port_data?.port_4006?.tension)
-            ? lastPerfectResponses.current.adams.tension
-            : parseFloat(data.port_data.port_4006.tension).toFixed(2),
-        },
-        time: formatDateTime(),
-        loading: data?.connection_status,
-        port_4002: data?.port_data?.port_4002?.connectionstatus
-          ? data?.port_data?.port_4002?.connectionstatus
-          : "Disconnected",
-        port_4003: data?.port_data?.port_4003?.connectionstatus
-          ? data?.port_data?.port_4003?.connectionstatus
-          : "Disconnected",
-        port_4004: data?.port_data?.port_4004?.connectionstatus
-          ? data?.port_data?.port_4004?.connectionstatus
-          : "Disconnected",
-        port_4005: data?.port_data?.port_4005?.connectionstatus
-          ? data?.port_data?.port_4005?.connectionstatus
-          : "Disconnected",
-        port_4006: data?.port_data?.port_4006?.connectionstatus
-          ? data?.port_data?.port_4006?.connectionstatus
-          : "Disconnected",
-      };
+      if (data) {
+        console.log("IN IF")
+        const parsedResponses = {
+          weather: {
+            air_temp: isInvalidValue(data?.data?.tcp?.tcp1[4002]?.air_temperature)
+              ? lastPerfectResponses.current.weather.air_temp
+              : parseFloat(data?.data?.tcp?.tcp1[4002]?.air_temperature).toFixed(2),
+            baro_presssure: isInvalidValue(data?.data?.tcp?.tcp1[4002]?.barometric_pressure)
+              ? lastPerfectResponses.current.weather.baro_presssure
+              : parseFloat(data?.data?.tcp?.tcp1[4002]?.barometric_pressure).toFixed(2),
+            heading: isInvalidValue(data?.data?.tcp?.tcp1[4002]?.heading)
+              ? lastPerfectResponses.current.weather.heading
+              : parseFloat(data?.data?.tcp?.tcp1[4002]?.heading).toFixed(2),
+            wind_angle: isInvalidValue(data?.data?.tcp?.tcp1[4002]?.wind_angle)
+              ? lastPerfectResponses.current.weather.wind_angle
+              : parseFloat(data?.data?.tcp?.tcp1[4002]?.wind_angle).toFixed(2),
+            wind_speed: isInvalidValue(data?.port_data?.port_4002?.wind_speed)
+              ? lastPerfectResponses.current.weather.wind_speed
+              : parseFloat(data.port_data.port_4002.wind_speed).toFixed(2),
+          },
+          digitalCompass: {
+            mag_heading: isInvalidValue(data?.data?.tcp?.tcp1[4003]?.magnitude_heading)
+              ? lastPerfectResponses.current.digitalCompass.mag_heading
+              : parseFloat(data?.data?.tcp?.tcp1[4003]?.magnitude_heading).toFixed(2),
+            pitch: isInvalidValue(data?.data?.tcp?.tcp1[4003]?.pitch)
+              ? lastPerfectResponses.current.digitalCompass.pitch
+              : parseFloat(data?.data?.tcp?.tcp1[4003]?.pitch).toFixed(2),
+            roll: isInvalidValue(data?.data?.tcp?.tcp1[4003]?.roll)
+              ? lastPerfectResponses.current.digitalCompass.roll
+              : parseFloat(data?.data?.tcp?.tcp1[4003]?.roll).toFixed(2),
+          },
+          ballonet: {
+            bal_pressure: isInvalidValue(data?.data?.tcp?.tcp1[4004]?.pressure)
+              ? lastPerfectResponses.current.ballonet.bal_pressure
+              : parseFloat(data?.data?.tcp?.tcp1[4004]?.pressure).toFixed(2),
+          },
+          helium: {
+            hel_pressure: isInvalidValue(data?.data?.tcp?.tcp1[4005]?.hellium_pressure)
+              ? lastPerfectResponses.current.helium.hel_pressure
+              : parseFloat(data?.data?.tcp?.tcp1[4005]?.hellium_pressure).toFixed(2),
+          },
+          adams: {
+            max_tension: isInvalidValue(data?.data?.tcp?.tcp1[4006]?.max_tension)
+              ? lastPerfectResponses.current.adams.max_tension
+              : parseFloat(data?.data?.tcp?.tcp1[4006]?.max_tension).toFixed(2),
+            tension: isInvalidValue(data?.data?.tcp?.tcp1[4006]?.tension)
+              ? lastPerfectResponses.current.adams.tension
+              : parseFloat(data?.data?.tcp?.tcp1[4006]?.tension).toFixed(2),
+          },
+          time: formatDateTime(),
+          loading: data?.connection_status,
+          port_4002: data?.data?.tcp?.tcp1[4002]?.connection_status
+            ? data?.data?.tcp?.tcp1[4002]?.connection_status
+            : "Disconnected",
+          port_4003: data?.data?.tcp?.tcp1[4003]?.connection_status
+            ? data?.data?.tcp?.tcp1[4003]?.connection_status
+            : "Disconnected",
+          port_4004: data?.data?.tcp?.tcp1[4004]?.connection_status
+            ? data?.data?.tcp?.tcp1[4004]?.connection_status
+            : "Disconnected",
+          port_4005: data?.data?.tcp?.tcp1[4005]?.connection_status
+            ? data?.data?.tcp?.tcp1[4005]?.connection_status
+            : "Disconnected",
+          port_4006: data?.data?.tcp?.tcp1[4006]?.connection_status
+            ? data?.data?.tcp?.tcp1[4006]?.connection_status
+            : "Disconnected",
+        };
 
-      lastPerfectResponses.current = {
-        ...lastPerfectResponses.current,
-        weather: parsedResponses.weather,
-        digitalCompass: parsedResponses.digitalCompass,
-        ballonet: parsedResponses.ballonet,
-        helium: parsedResponses.helium,
-        adams: parsedResponses.adams,
-      };
+        lastPerfectResponses.current = {
+          ...lastPerfectResponses.current,
+          weather: parsedResponses.weather,
+          digitalCompass: parsedResponses.digitalCompass,
+          ballonet: parsedResponses.ballonet,
+          helium: parsedResponses.helium,
+          adams: parsedResponses.adams,
+        };
 
-      setResponses(parsedResponses);
-    } else {
-      setResponses({
-        ...lastPerfectResponses.current,
-        time: formatDateTime(),
-        port_4002: "Disconnected",
-        port_4003: "Disconnected",
-        port_4004: "Disconnected",
-        port_4005: "Disconnected",
-        port_4006: "Disconnected",
-        loading: "Disconnected",
-      });
+        setResponses(parsedResponses);
+      }
+      else {
+        console.log("IN ELSE")
+        setResponses({
+          ...lastPerfectResponses.current,
+          time: formatDateTime(),
+          port_4002: "Disconnected",
+          port_4003: "Disconnected",
+          port_4004: "Disconnected",
+          port_4005: "Disconnected",
+          port_4006: "Disconnected",
+          loading: "Disconnected",
+        });
+      }
+    }
+    catch (error) {
+      console.log("IN CATCH")
+      console.error("Error parsing WebSocket data:", error);
     }
   };
 
   useEffect(() => {
     if (!startFetchingFromFile && (startFetchData || phase1Start)) {
+      console.log("HELLO")
       const interval = setInterval(fetchData, 1500);
       return () => clearInterval(interval);
     }
@@ -215,14 +237,81 @@ function Phase1() {
     }
 
     const newForm = {
-      rawtcp_host_ip: form?.rawtcp_host_ip,
-      weather: Number(form?.weather),
-      hmr: Number(form?.hmr),
-      ballonet: Number(form?.ballonet),
-      helium: Number(form?.helium),
-      adam: Number(form?.adam),
-      ebox: Number(form?.ebox),
-      modbustcp_host_ip: form?.modbustcp_host_ip,
+      method: "alfa.server.connection.settings.set",
+      servers: [
+        {
+          tcp: [
+            {
+              name: "tcp1",
+              ip: form?.rawtcp_host_ip,
+              ports: [
+                {
+                  port: toString(form?.weather),
+                  name: "weather_station"
+                },
+                {
+                  port: toString(form?.hmr),
+                  name: "digital_compass"
+                },
+                {
+                  port: toString(form?.ballonet),
+                  name: "ballonet_pressure"
+                },
+                {
+                  port: toString(form?.helium),
+                  name: "hellium_pressure"
+                },
+                {
+                  port: toString(form?.adam),
+                  name: "adam_sensor"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "modbus": [
+            {
+              "name": "modbus1",
+              "ip": "192.168.2.98",
+              "ports": [
+                {
+                  "port": "5001",
+                  "name": "hull_pressure"
+                },
+                {
+                  "port": "5002",
+                  "name": "ballonet_pressure"
+                },
+                {
+                  "port": "5003",
+                  "name": "ahrs"
+                },
+                {
+                  "port": "5004",
+                  "name": "ultrasonic"
+                },
+                {
+                  "port": "5005",
+                  "name": "load_cell"
+                },
+                {
+                  "port": "5006",
+                  "name": "temp_humidity"
+                },
+                {
+                  "port": "5007",
+                  "name": "weather_station"
+                },
+                {
+                  "port": "4196",
+                  "name": "relay"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     };
     try {
       setStartFetchData(true);
@@ -230,15 +319,10 @@ function Phase1() {
       setOpenModal(false);
       setStartFetchingFromFile(false);
       setErrorValues([]);
-      const result = await updateConfigUtil(newForm);
-      if (!result) {
-        setStartFetchingFromFile(false);
-        setStartFetchData(false);
-        setPhase1Start(false)
-      }
-      console.log("Form successfully posted:", result);
+      sendJsonMessage(newForm);
+      console.log("Form successfully posted:", newForm);
     } catch (error) {
-      console.log("In catch");
+      console.log("In catch", error);
       setOpenModal(false);
       setErrorValues([]);
     }
