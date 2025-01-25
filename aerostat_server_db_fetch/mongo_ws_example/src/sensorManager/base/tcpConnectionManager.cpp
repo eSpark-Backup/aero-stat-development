@@ -1,6 +1,25 @@
 #include <iostream>
+#include <cmath>
 #include "sensorsManager/base/tcpConnectionManager.h"
 #include "logger/logger.h"
+
+std::string TcpConnectionManager::strip(const std::string& str) {
+    auto start = str.begin();
+    while (start != str.end() && std::isspace(*start)) {
+        ++start;
+    }
+
+    auto end = str.end();
+    do {
+        --end;
+    } while (end != start && std::isspace(*end));
+
+    return std::string(start, end + 1);
+}
+
+float TcpConnectionManager::formatFloat(float value) {
+    return std::ceil(value * 100.0) / 100.0;; // Round to 2 decimal places
+}
 
 #define MOCK_TCP_CONNECTION false
 #if MOCK_TCP_CONNECTION != true

@@ -10,13 +10,13 @@
 class Logger {
 public:
     enum LogLevel {
-        NONE,
         VERBOSE,
         DEBUG,
         INFO,
         SUCCESS,
         WARNING,
         ERROR,
+        NONE,
     };
 
     static Logger& getInstance();

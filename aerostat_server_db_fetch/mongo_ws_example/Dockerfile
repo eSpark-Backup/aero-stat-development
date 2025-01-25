@@ -27,7 +27,7 @@ RUN cmake .. && cmake --build . && make main
 #==========================================
 #
 # docker build -t alfa-be .
-# docker run -it -p 9001:9001 alfa-be
+# docker run -it --rm -p 9001:9001 alfa-be
 #
 # make run
 #==========================================

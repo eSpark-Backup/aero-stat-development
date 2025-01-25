@@ -16,10 +16,12 @@
 #define INVALID_SOCKET (-1)
 #endif
 
+
 class TcpConnectionManager {
     public:
     std::string connect_to_port(int port, std::string host);
-
+    std::string strip(const std::string& str);
+    float formatFloat(float value);
     static TcpConnectionManager& getInstance()
     {
         static TcpConnectionManager connectionManagerInstance;

@@ -80,7 +80,7 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
         }
         // ServerConfig serverInformation = configManager.getServerConfig();
         // serverInformation.print();
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Adjust time as needed
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // Adjust time as needed
     }
 }
 

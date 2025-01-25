@@ -26,7 +26,7 @@ void Logger::setLogLevel(LogLevel level) {
 }
 
 void Logger::setLogLevel(std::string level_string) {
-    for (int i = LogLevel::NONE; i <= LogLevel::ERROR; i++) { 
+    for (int i = LogLevel::VERBOSE; i <= LogLevel::NONE; i++) { 
         if (logLevelToString(static_cast<LogLevel>(i)) == level_string) {
             setLogLevel(static_cast<LogLevel>(i)); 
             return; 
@@ -42,7 +42,7 @@ void Logger::setLogFile() {
     // Fetch the current user's name
     const char* username = getlogin();
     if (!username) {
-        throw std::runtime_error("Failed to fetch username");
+        username = "unknown"; // Fallback value
     }
 
     // Get the current date and time
