@@ -9,7 +9,7 @@ const OptionBox = ({ option1, option2, selectedOption, handleChange, name, fetch
         <div className={`option-box ${theme === "light" ? "option-box-light" : "option-box-dark"}`}>
             <div
                 onClick={() => handleChange(name, option1)}
-                className={`${selectedOption.toLowerCase() === option1.toLowerCase() ? "selected" : "not-selected"
+                className={`${selectedOption?.toLowerCase() === option1.toLowerCase() ? "selected" : "not-selected"
                     } ${!fetchingStart ? "disable" : ""}`}
             >
                 {option1}
@@ -17,7 +17,7 @@ const OptionBox = ({ option1, option2, selectedOption, handleChange, name, fetch
             <div className={theme === "light" ? "breaker-light" : "breaker-dark"}><p>|</p></div>
             <div
                 onClick={() => handleChange(name, option2)}
-                className={`${selectedOption.toLowerCase() === option2.toLowerCase() ? "selected" : "not-selected"
+                className={`${selectedOption?.toLowerCase() === option2.toLowerCase() ? "selected" : "not-selected"
                     } ${!fetchingStart ? "disable" : ""}`}
             >
                 {option2}

@@ -65,7 +65,7 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
 
   return (
     <div className={`modal-bg ${open ? "active" : ""}`}>
-      <div className={phase === 1 ? `modal ${theme}` : "modal phase2"}>
+      <div className={`modal ${theme}`}>
         <div className={`modal-header ${theme}`}>
           <div>
             <p>Configuration</p>
@@ -161,6 +161,78 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
                   value={form.modbustcp_host_ip}
                   className={errorValues.includes("modbustcp_host_ip") ? "input-err" : ""}
                   onChange={(e) => handleChange(e.target.value, "modbustcp_host_ip")}
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>Hull Pressure</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"5001"}
+                  readOnly
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>Ballonet pressure</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"5002"}
+                  readOnly
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>ahrs</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"5003"}
+                  readOnly
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>Ultrasonic</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"5004"}
+                  readOnly
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>Load cell</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"5005"}
+                  readOnly
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>Temp humidity</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"5006"}
+                  readOnly
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>Weather station</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"5007"}
+                  readOnly
+                />
+              </div>
+              <div className={`modal-input ${theme}`}>
+                <p className={`${theme}`}>Relay</p>
+                <input
+                  placeholder="192.168.0.102"
+                  type="text"
+                  value={"4196"}
+                  readOnly
                 />
               </div>
               <div className={`modal-btn-group ${theme}`}>

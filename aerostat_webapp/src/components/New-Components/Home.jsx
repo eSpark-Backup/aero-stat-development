@@ -27,7 +27,7 @@ HighchartsGauge(Highcharts);
 const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, openModal, setOpenModal, handleOpenModal, fetchingStart, HandleBrowse, fileName, HandlePlay, HandleForward, HandleStop, playBtn, fwdBtn, StopBtn
 
 }) => {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme, phase } = useContext(ThemeContext);
   const width = useWindowWidth();
   const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
   const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
@@ -105,7 +105,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
 
 
   }, [sendData, fan1, fan2, light]);
-  
+
 
   return (
     <>
@@ -224,13 +224,35 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
               <div className="heading-box">
                 <ChildCard>
                   <div className="heading-box-content">
-                    <ChartChip
-                      name={"Heading"}
-                      value={parseFloat(
-                        response?.digitalCompass?.mag_heading
-                      ).toFixed(2)}
-                      unit={"°"}
-                    />
+                    <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
+                      <ChartChip
+                        name={"Heading"}
+                        value={parseFloat(
+                          response?.digitalCompass?.mag_heading
+                        ).toFixed(2)}
+                        unit={"°"}
+                      />
+                      <ChartChip
+                        name={"Longitude:"}
+                        value={phase === 1 ? "N/A" : response?.weather?.longitude}
+                        unit={"°"}
+                      />
+                      <ChartChip
+                        name={"Latitude:"}
+                        value={phase === 1 ? "N/A" : response?.weather?.latitude}
+                        unit={"°"}
+                      />
+                      <ChartChip
+                        name={"Altitude:"}
+                        value={phase === 1 ? "N/A" : response?.weather?.altitude}
+                        unit={"°"}
+                      />
+                      <ChartChip
+                        name={"Ground Speed:"}
+                        value={phase === 1 ? "N/A" : response?.weather?.ground_speed}
+                        unit={"°"}
+                      />
+                    </div>
                     <NewCompass
                       size={getCompassSize()}
                       needle1={response?.digitalCompass?.mag_heading}
@@ -254,6 +276,21 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                         value={parseFloat(
                           response?.digitalCompass?.pitch
                         ).toFixed(2)}
+                        unit={"°"}
+                      />
+                      <ChartChip
+                        name={"Yaw:"}
+                        value={phase === 1 ? "N/A" : response?.digitalCompass.yaw}
+                        unit={"°"}
+                      />
+                      <ChartChip
+                        name={"Position Accuracy:"}
+                        value={phase === 1 ? "N/A" : response?.digitalCompass.position_accuracy}
+                        unit={"°"}
+                      />
+                      <ChartChip
+                        name={"Humidity:"}
+                        value={phase === 1 ? "N/A" : response?.digitalCompass.humidity}
                         unit={"°"}
                       />
                     </div>
@@ -313,11 +350,13 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       )}
                     />
                     <ChartsData
-                      position={"around"}
+                      position={"between"}
                       graphValue={parseFloat(
                         response?.ballonet?.bal_pressure
                       ).toFixed(2)}
                       graphName={"Ballonet Air"}
+                      description1={"Ballonet Curtain"}
+                      value1={phase === 1 ? "N/A" : parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}
                     />
                   </div>
                 </div>
@@ -367,63 +406,123 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
       <div className="main2">
         <MainCard title={"Controls & Radio Link"}>
           <div className="control-box-card">
-            <div
-              className={`controls-box ${theme === "light" ? "controls-box-light" : "controls-box-dark"
-                }`}
-            >
-              <h2>Fan Control</h2>
-              <div
-                className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-              >
-                <p>
-                  Fan 1 <span>(Left direction)</span>
-                </p>
-                <OptionBox
-                  fetchingStart={fetchingStart}
-                  handleChange={handleChange}
-                  name="fan1"
-                  option1={"Continuous"}
-                  option2={"Pressured"}
-                  selectedOption={fan1}
-                />
-              </div>
-              <div
-                className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-              >
-                <p>
-                  Fan 2 <span>(Right direction)</span>
-                </p>
-                <OptionBox
-                  fetchingStart={fetchingStart}
-                  handleChange={handleChange}
-                  name="fan2"
-                  option1={"Continuous"}
-                  option2={"Off"}
-                  selectedOption={fan2}
-                />
-              </div>
-              {/* <h2 style={{ textAlign: "center" }}>Strobe Lights Control</h2> */}
-              {/* <div className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"}`}>
-                                <p>Strobe Control</p>
-                                <OptionBox fetchingStart={fetchingStart} handleChange={handleChange} name="strobe" option1={"Continuous"} option2={"Off"} selectedOption={strobe} />
-                            </div> */}
-              <div
-                className={`strobe fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-              >
-                <p>Strobe Lights Control</p>
-                <OptionBox
-                  fetchingStart={fetchingStart}
-                  handleChange={handleChange}
-                  name="light"
-                  option1={"On"}
-                  option2={"Off"}
-                  selectedOption={light}
-                />
-              </div>
-            </div>
+            {
+              phase === 1
+                ?
+                <div
+                  className={`controls-box ${theme === "light" ? "controls-box-light" : "controls-box-dark"
+                    }`}
+                >
+                  <h2>Fan Control</h2>
+                  <div
+                    className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                      }`}
+                  >
+                    <p>
+                      Fan 1 <span>(Left direction)</span>
+                    </p>
+                    <OptionBox
+                      fetchingStart={fetchingStart}
+                      handleChange={handleChange}
+                      name="fan1"
+                      option1={"Continuous"}
+                      option2={"Pressured"}
+                      selectedOption={fan1}
+                    />
+                  </div>
+                  <div
+                    className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                      }`}
+                  >
+                    <p>
+                      Fan 2 <span>(Right direction)</span>
+                    </p>
+                    <OptionBox
+                      fetchingStart={fetchingStart}
+                      handleChange={handleChange}
+                      name="fan2"
+                      option1={"Continuous"}
+                      option2={"Off"}
+                      selectedOption={fan2}
+                    />
+                  </div>
+                  <div
+                    className={`strobe fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                      }`}
+                  >
+                    <p>Strobe Lights Control</p>
+                    <OptionBox
+                      fetchingStart={fetchingStart}
+                      handleChange={handleChange}
+                      name="light"
+                      option1={"On"}
+                      option2={"Off"}
+                      selectedOption={light}
+                    />
+                  </div>
+                </div>
+                :
+                <div className={`controls-box ${theme === "light" ? "controls-box-light" : "controls-box-dark"
+                  }`}>
+                  <h2>Relay Controls</h2>
+                  <div
+                    className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                      }`}
+                  >
+                    <p>
+                      Primary Blower
+                    </p>
+                    <OptionBox
+                      fetchingStart={fetchingStart}
+                      option1={"On"}
+                      option2={"Off"}
+                      selectedOption={response?.relay?.primary_blower}
+                    />
+                  </div>
+                  <div
+                    className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                      }`}
+                  >
+                    <p>
+                      Secondary Blower
+                    </p>
+                    <OptionBox
+                      fetchingStart={fetchingStart}
+                      option1={"On"}
+                      option2={"Off"}
+                      selectedOption={response?.relay?.secondary_blower}
+                    />
+                  </div>
+                  <div
+                    className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                      }`}
+                  >
+                    <p>
+                      Strobe Lights
+                    </p>
+                    <OptionBox
+                      fetchingStart={fetchingStart}
+                      option1={"On"}
+                      option2={"Off"}
+                      selectedOption={response?.relay?.strobe_lights}
+                    />
+                  </div>
+                  <div
+                    className={`fan-box ${theme === "light" ? "fan-box-light" : "fan-box-dark"
+                      }`}
+                  >
+                    <p>
+                      Payload Power
+                    </p>
+                    <OptionBox
+                      fetchingStart={fetchingStart}
+                      option1={"On"}
+                      option2={"Off"}
+                      selectedOption={response?.relay?.payload_power}
+                    />
+                  </div>
+                </div>
+            }
             <div
               className={`log-detail ${theme === "light" ? "log-detail-light" : "log-detail-dark"
                 }`}
@@ -449,15 +548,15 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
               <div className="log-box-content">
                 <div
                   className={`log-input-box ${theme === "light"
-                      ? "log-input-box-light"
-                      : "log-input-box-dark"
+                    ? "log-input-box-light"
+                    : "log-input-box-dark"
                     }`}
                 >
                   <p>Log File</p>
                   <div
                     className={`file-name-box ${theme === "light"
-                        ? "file-name-box-light"
-                        : "file-name-box-dark"
+                      ? "file-name-box-light"
+                      : "file-name-box-dark"
                       }`}
                   >
                     {fileName ? fileName : ""}
@@ -530,6 +629,6 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
       />
     </>
   );
-};
+}
 
 export default Home;

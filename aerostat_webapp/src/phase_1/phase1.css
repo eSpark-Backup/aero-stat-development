@@ -476,7 +476,8 @@ input[type=number] {
     height: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 16px 8px;
+    padding: 5px 8px;
+    align-items: center;
 }
 
 .pitch-box-content {
@@ -486,6 +487,7 @@ input[type=number] {
     justify-content: space-between;
     padding: 3px 0px;
     column-gap: 14px;
+    align-items: center;
 }
 
 .pitch-roll-chips {

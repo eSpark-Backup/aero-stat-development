@@ -7,9 +7,7 @@ import ThemeHandler from './ThemeHandler.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeHandler>
-      {/* <SocketProvider> */}
       <App />
-      {/* </SocketProvider> */}
     </ThemeHandler>
   </StrictMode>,
 )

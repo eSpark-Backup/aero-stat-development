@@ -5,6 +5,7 @@ import logowhite from "../../assets/logo-white.svg";
 import close from "../../assets/close.svg";
 import close2 from "../../assets/close-dark.svg";
 import { updateToggle } from "../../utils";
+import { WebSocketContext } from "../../App";
 
 const Sidebar = ({
   open,
@@ -15,22 +16,27 @@ const Sidebar = ({
   fwdBtn,
 }) => {
   const { theme } = useContext(ThemeContext);
-  const { phase, setPhase } = useContext(ThemeContext);
+  const { phase, setPhase,setPhase1Start } = useContext(ThemeContext);
+  const { sendJsonMessage } = useContext(WebSocketContext);
 
   const changePhase = async (newPhase) => {
     if (phase === newPhase) {
       return
     }
-    // try {
-    //   const result = await updateToggle(true);
-    //   if (result) {
-    //     setPhase(newPhase);
-    //   } else {
-    //     console.error("updateToggle failed or returned an invalid response.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error during updateToggle:", error);
-    // }
+    console.log(newPhase)
+    if (newPhase === 2) {
+      sendJsonMessage({
+        "method": "alfa.phase.settings.set",
+        "phaseType": "modbus"
+      })
+      setPhase1Start(false)
+    }
+    else {
+      sendJsonMessage({
+        "method": "alfa.phase.settings.set",
+        "phaseType": "tcp"
+      })
+    }
     setPhase(newPhase);
   };
 
