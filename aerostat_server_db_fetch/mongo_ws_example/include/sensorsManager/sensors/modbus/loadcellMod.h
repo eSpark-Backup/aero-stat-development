@@ -34,7 +34,12 @@ public:
         std::uniform_real_distribution<> disWeight(0.0, 360.0);
         
         // Assign random values to the fields
-        data->weight = disWeight(gen);
+        data->tension = disWeight(gen);
+        if(data->tension > data->maxTension)
+        {
+            data->maxTension = data->tension;
+        }
+        else
         data->status = "connected";
 
         return data;

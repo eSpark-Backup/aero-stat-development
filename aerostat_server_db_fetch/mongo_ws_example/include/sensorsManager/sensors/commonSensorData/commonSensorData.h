@@ -40,13 +40,13 @@ struct ballonetPressureData : public SensorData {
 
     std::map<std::string, std::string> toMap() const override {
         std::map<std::string, std::string> data;
-        data["pressure"] = std::to_string(pressure);
+        data["bal_pressure"] = std::to_string(pressure);
         data["connection_status"] = status;
         return data;
     }
 
     void print() const override {
-        LOG_WARNING("pressure: %f", pressure);
+        LOG_WARNING("bal_pressure: %f", pressure);
         LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
@@ -137,18 +137,21 @@ struct hullPressureData : public SensorData {
 /* Load cell modbus sensor data struct */
 struct loadcellData : public SensorData {
     std::string status;
-    float weight;
+    float tension;
+    float maxTension = 0;
     uint8_t flag;
 
     std::map<std::string, std::string> toMap() const override {
         std::map<std::string, std::string> data;
-        data["weight"] = std::to_string(weight);
+        data["tension"] = std::to_string(tension);
+        data["max_tension"] = std::to_string(maxTension);
         data["connection_status"] = status;
         return data;
     }
 
     void print() const override {
-        LOG_WARNING("weight: %f", weight);
+        LOG_WARNING("tension: %f", tension);
+        LOG_WARNING("max_tension: %f", maxTension);
         LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
@@ -212,13 +215,13 @@ struct ballonetCurtainData : public SensorData {
 
     std::map<std::string, std::string> toMap() const override {
         std::map<std::string, std::string> data;
-        data["height"] = std::to_string(height);
+        data["ballonet_height"] = std::to_string(height);
         data["connection_status"] = status;
         return data;
     }
 
     void print() const override {
-        LOG_WARNING("height: %f", height);
+        LOG_WARNING("ballonet_height: %f", height);
         LOG_WARNING("connection_status: %s", status.c_str());
     }
 };
