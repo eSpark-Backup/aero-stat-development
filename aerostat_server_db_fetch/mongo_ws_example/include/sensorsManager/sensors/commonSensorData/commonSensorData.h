@@ -3,6 +3,20 @@
 
 #include "sensorsManager/base/sensorBase.h"
 
+#define LOAD_CELL_REGISTER 0x9C40
+#define ULTRASONIC_REGISTER 0x0101
+#define PRESSURE_SENSOR_REGISTER 0x0004
+#define WIND_DIRECTION_REGISTER  0x0001
+#define WIND_SPEED_REGISTER  0x0002
+#define WIND_TEMPERATURE_REGISTER  0x0004
+#define WIND_HUMIDITY_REGISTER  0x0006
+#define AIR_PRESSURE_REGISTER  0x0008
+struct RegisterInfo {
+    int address;
+    int count;
+    std::string data_type;
+};
+
 struct weatherStationData : public SensorData {
     std::string status;
     float heading;
