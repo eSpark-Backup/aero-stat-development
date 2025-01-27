@@ -20,7 +20,9 @@
 
 class WeatherStationTcp : public Sensor {
 public:
-    WeatherStationTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
+    WeatherStationTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
+        data = std::make_shared<weatherStationData>();
+    }
 
 
     static void registerType() {
@@ -30,13 +32,12 @@ public:
         );
     }
 
-    std::shared_ptr<void> readData() const override {
-        auto data = std::make_shared<weatherStationData>();
+    std::shared_ptr<void> readData() override {
         
         // std::string ipToConnect = this->connectionParams_.ip;
 
         // TcpConnectionManager connectionMan;
-        // std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
+        std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
 
         // data = std::make_unique<weatherStationData>(readWeatherSData(nmeaData));
         // if(connectionMan.port_flag == false)
@@ -194,6 +195,7 @@ private:
     }
     std::string name_;
     std::string ip_;
+    std::shared_ptr<weatherStationData> data;
 };
 
 #endif //WEATHER_STATION_TCP_SENSOR_H

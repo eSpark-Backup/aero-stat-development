@@ -14,7 +14,9 @@
 
 class AdamSensorTcp : public Sensor {
 public:
-    AdamSensorTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
+    AdamSensorTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
+        data = std::make_shared<adamSensorData>();
+    }
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
@@ -23,21 +25,22 @@ public:
         );
     }
 
-    std::shared_ptr<void> readData() const override {
-        auto data = std::make_shared<adamSensorData>();
-
+    std::shared_ptr<void> readData() override {
         // Random number generation setup
         std::random_device rd;
         std::mt19937 gen(rd());
         
         // For floating point range [min, max]
         std::uniform_real_distribution<> disTension(0.0, 360.0);
-        std::uniform_real_distribution<> disMaxTension(0.0, 360.0);
         
         // Assign random values to the fields
         data->tension = disTension(gen);
-        data->maxTension = disMaxTension(gen);
+        if(data->tension > data->maxTension)
+        {
+            data->maxTension = data->tension;
+        }
         data->status = "connected";
+        // data->print();
 
         return data;
     }
@@ -45,6 +48,7 @@ public:
 private:
     std::string name_;
     std::string ip_;
+    std::shared_ptr<adamSensorData> data;
 };
 
 #endif //ADAM_SENSOR_TCP_H

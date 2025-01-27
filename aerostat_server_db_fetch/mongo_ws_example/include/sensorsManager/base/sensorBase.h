@@ -34,7 +34,7 @@ public:
     }
 
     // Abstract method to read data from the sensor
-    virtual std::shared_ptr<void> readData() const = 0;  // Return type is shared_ptr to void for flexibility
+    virtual std::shared_ptr<void> readData() = 0;  // Return type is shared_ptr to void for flexibility
     sensorInterfaceType interfaceType_;
     ConnectionParams connectionParams_;
 };

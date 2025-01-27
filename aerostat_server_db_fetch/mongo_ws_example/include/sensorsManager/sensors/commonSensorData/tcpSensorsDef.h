@@ -7,5 +7,6 @@
 #include "sensorsManager/sensors/tcp/digitalCompassTcp.h"
 #include "sensorsManager/sensors/tcp/adamSensorTcp.h"
 #include "sensorsManager/sensors/tcp/helliumPressureTcp.h"
+#include "sensorsManager/sensors/tcp/fanLightTcp.h"
 
 #endif //TCP_SENSORS_DEF_H

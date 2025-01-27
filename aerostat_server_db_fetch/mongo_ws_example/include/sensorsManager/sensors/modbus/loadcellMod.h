@@ -14,7 +14,9 @@
 
 class LoadcellMod : public Sensor {
 public:
-    LoadcellMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
+    LoadcellMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
+        data = std::make_shared<loadcellData>();
+    }
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
@@ -23,9 +25,7 @@ public:
         );
     }
 
-    std::shared_ptr<void> readData() const override {
-        auto data = std::make_shared<loadcellData>();
-
+    std::shared_ptr<void> readData() override {
         // Random number generation setup
         std::random_device rd;
         std::mt19937 gen(rd());
@@ -39,8 +39,8 @@ public:
         {
             data->maxTension = data->tension;
         }
-        else
         data->status = "connected";
+        // data->print();
 
         return data;
     }
@@ -48,6 +48,7 @@ public:
 private:
     std::string name_;
     std::string ip_;
+    std::shared_ptr<loadcellData> data;
 };
 
 #endif //LOADCELL_MODBUS_SENSOR_H

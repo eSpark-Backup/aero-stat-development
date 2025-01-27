@@ -274,4 +274,28 @@ struct relayData : public SensorData {
     }
 };
 
+struct fanLightData : public SensorData {
+    std::string status;
+    bool fan_one;
+    bool fan_two;
+    bool strobe_lights_value;
+    uint8_t flag;
+
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        data["fan_one"] = std::to_string(fan_one);
+        data["fan_two"] = std::to_string(fan_two);
+        data["strobe_lights_value"] = std::to_string(strobe_lights_value);
+        data["connection_status"] = status;
+        return data;
+    }
+
+    void print() const override {
+        LOG_WARNING("fan_one: %d", fan_one);
+        LOG_WARNING("fan_two: %f", fan_two);
+        LOG_WARNING("strobe_lights_value: %f", strobe_lights_value);
+        LOG_WARNING("connection_status: %s", status.c_str());
+    }
+};
+
 #endif //COMMON_SENSOR_DATA_TYPE

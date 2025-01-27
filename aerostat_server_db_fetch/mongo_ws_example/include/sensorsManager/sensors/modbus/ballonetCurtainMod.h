@@ -14,7 +14,9 @@
 
 class BallonetCurtainMod : public Sensor {
 public:
-    BallonetCurtainMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
+    BallonetCurtainMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
+        data = std::make_shared<ballonetCurtainData>();
+    }
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
@@ -23,8 +25,7 @@ public:
         );
     }
 
-    std::shared_ptr<void> readData() const override {
-        auto data = std::make_shared<ballonetCurtainData>();
+    std::shared_ptr<void> readData() override {
 
         // Random number generation setup
         std::random_device rd;
@@ -43,6 +44,7 @@ public:
 private:
     std::string name_;
     std::string ip_;
+    std::shared_ptr<ballonetCurtainData> data;
 };
 
 #endif //BALLONET_CURTAIN_MODBUS_SENSOR_H

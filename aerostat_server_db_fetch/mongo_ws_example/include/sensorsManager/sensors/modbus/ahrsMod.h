@@ -14,7 +14,9 @@
 
 class AhrsMod : public Sensor {
 public:
-    AhrsMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
+    AhrsMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
+        data = std::make_shared<ahrsData>();
+    }
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
@@ -23,8 +25,7 @@ public:
         );
     }
 
-    std::shared_ptr<void> readData() const override {
-        auto data = std::make_shared<ahrsData>();
+    std::shared_ptr<void> readData() override {
 
         // Random number generation setup
         std::random_device rd;
@@ -64,6 +65,7 @@ public:
 private:
     std::string name_;
     std::string ip_;
+    std::shared_ptr<ahrsData> data;
 };
 
 #endif //AHRS_MODBUS_SENSOR_H

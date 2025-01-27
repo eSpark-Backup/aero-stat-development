@@ -14,7 +14,9 @@
 
 class HelliumPressureTcp : public Sensor {
 public:
-    HelliumPressureTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {}
+    HelliumPressureTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
+        data = std::make_shared<helliumPressureData>();
+    }
 
     static void registerType() {
         SensorFactory::instance().registerSensorType(
@@ -23,8 +25,7 @@ public:
         );
     }
 
-    std::shared_ptr<void> readData() const override {
-        auto data = std::make_shared<helliumPressureData>();
+    std::shared_ptr<void> readData() override {
 
         // Random number generation setup
         std::random_device rd;
@@ -43,6 +44,7 @@ public:
 private:
     std::string name_;
     std::string ip_;
+    std::shared_ptr<helliumPressureData> data;
 };
 
 #endif //HELLIUM_PRESSURE_SENSOR_H
