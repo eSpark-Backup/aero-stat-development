@@ -107,7 +107,7 @@ struct adamSensorData : public SensorData {
     }
 };
 
-
+#define HELPRES_OFFSET 0
 struct helliumPressureData : public SensorData {
     std::string status;
     float helliumPressure;

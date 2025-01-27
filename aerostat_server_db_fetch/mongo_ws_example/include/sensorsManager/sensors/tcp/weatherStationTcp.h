@@ -34,42 +34,42 @@ public:
 
     std::shared_ptr<void> readData() override {
         
-        // std::string ipToConnect = this->connectionParams_.ip;
+        std::string ipToConnect = this->connectionParams_.ip;
 
-        // TcpConnectionManager connectionMan;
-        // std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
+        TcpConnectionManager connectionMan;
+        std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
 
-        // data = std::make_unique<weatherStationData>(readWeatherSData(nmeaData));
-        // if(connectionMan.port_flag == false)
-        // {
-        //     data->barometricPressure = 0;
-        //     data->airTemperature = 0;
-        //     data->heading = 0;
-        //     data->windAngle = 0;
-        //     data->windSpeed = 0;
-        //     data->status = "disconnected";
-        // }
-        // else
-        // {
-        //     data->status = "connected";
-        // }       
+        data = std::make_unique<weatherStationData>(readWeatherSData(nmeaData));
+        if(connectionMan.port_flag == false)
+        {
+            data->barometricPressure = 0;
+            data->airTemperature = 0;
+            data->heading = 0;
+            data->windAngle = 0;
+            data->windSpeed = 0;
+            data->status = "disconnected";
+        }
+        else
+        {
+            data->status = "connected";
+        }       
 
-        std::random_device rd;
-        std::mt19937 gen(rd());
+        // std::random_device rd;
+        // std::mt19937 gen(rd());
         
-        // For floating point range [min, max]
-        std::uniform_real_distribution<> disHeading(0.0, 360.0);
-        std::uniform_real_distribution<> disPressure(900.0, 1100.0);
-        std::uniform_real_distribution<> disTemp(-30.0, 50.0);
-        std::uniform_real_distribution<> disWindAngle(0.0, 360.0);
-        std::uniform_real_distribution<> disWindSpeed(0.0, 50.0);
+        // // For floating point range [min, max]
+        // std::uniform_real_distribution<> disHeading(0.0, 360.0);
+        // std::uniform_real_distribution<> disPressure(900.0, 1100.0);
+        // std::uniform_real_distribution<> disTemp(-30.0, 50.0);
+        // std::uniform_real_distribution<> disWindAngle(0.0, 360.0);
+        // std::uniform_real_distribution<> disWindSpeed(0.0, 50.0);
 
-        data->heading = disHeading(gen);
-        data->barometricPressure = disPressure(gen);
-        data->airTemperature = disTemp(gen);
-        data->windAngle = disWindAngle(gen);
-        data->windSpeed = disWindSpeed(gen);
-        data->status = "connected";
+        // data->heading = disHeading(gen);
+        // data->barometricPressure = disPressure(gen);
+        // data->airTemperature = disTemp(gen);
+        // data->windAngle = disWindAngle(gen);
+        // data->windSpeed = disWindSpeed(gen);
+        // data->status = "connected";
 
         return data;
     }
