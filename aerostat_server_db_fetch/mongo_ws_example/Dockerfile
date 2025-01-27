@@ -19,15 +19,22 @@ RUN mkdir build
 WORKDIR /home/backend/build
 
 # Run CMake to configure and build the project
-RUN cmake .. && cmake --build . && make main
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && make main
+
+RUN apt install gdb -y
+
+RUN echo "file ../bin/main" > ~/.gdbinit && \
+    echo "run" >> ~/.gdbinit
+
+# Set GDB as the default command
+CMD ["gdb"]
 
 # RUN make run
 
 # COMMAND TO BUILD IMAGE AND RUN BACKEND
 #==========================================
 #
-# docker build -t alfa-be .
+# docker build -t alfa-be . --no-cache
 # docker run -it --rm -p 9001:9001 alfa-be
 #
-# make run
 #==========================================

@@ -15,7 +15,6 @@ public:
 
     static json tcpDataToJson(const ServerConfig& serverConfig) {
         json tcpJson;
-
         // Process TCP servers
         for (const auto& tcpServer : serverConfig.tcp) {
             json serverDataJson;
@@ -23,16 +22,11 @@ public:
             // Iterate through sensor data
             for (const auto& sensor : tcpServer.data) {
                 json sensorJson;
+
                 for (const auto& keyValue : sensor.second) {
-                    try {
-                        int intValue = std::stof(keyValue.second);
-                        sensorJson[keyValue.first] = intValue;
-                    } catch (const std::invalid_argument& e) {
-                        sensorJson[keyValue.first] = keyValue.second; // Default to 0 for invalid values
-                    } catch (...) {
-                        sensorJson[keyValue.first] = "N/A";
-                    }
+                    sensorJson[keyValue.first] = keyValue.second;
                 }
+
                 serverDataJson[sensor.first] = sensorJson;
             }
 

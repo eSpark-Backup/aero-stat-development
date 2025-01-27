@@ -37,7 +37,7 @@ public:
         // std::string ipToConnect = this->connectionParams_.ip;
 
         // TcpConnectionManager connectionMan;
-        std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
+        // std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
 
         // data = std::make_unique<weatherStationData>(readWeatherSData(nmeaData));
         // if(connectionMan.port_flag == false)

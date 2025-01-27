@@ -148,7 +148,7 @@ void ApplicationHandler::start() {
     DigitalCompassTcp::registerType();
     AdamSensorTcp::registerType();
     HelliumPressureTcp::registerType();
-    FanLightTcp::registerType();
+    // FanLightTcp::registerType();
 
     //Setters
     messageHandler_->registerMethodHandler("alfa.server.connection.settings.set", handleServerConnectionSettingsSet); //modbus/tcp server connection information
