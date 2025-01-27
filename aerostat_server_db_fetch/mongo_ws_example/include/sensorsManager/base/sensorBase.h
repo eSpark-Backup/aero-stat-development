@@ -35,6 +35,10 @@ public:
 
     // Abstract method to read data from the sensor
     virtual std::shared_ptr<void> readData() = 0;  // Return type is shared_ptr to void for flexibility
+    virtual bool writeData(const std::shared_ptr<void>& data) {
+        // Default implementation (optional)
+        return false; // Indicate that write is not supported by default
+    }
     sensorInterfaceType interfaceType_;
     ConnectionParams connectionParams_;
 };

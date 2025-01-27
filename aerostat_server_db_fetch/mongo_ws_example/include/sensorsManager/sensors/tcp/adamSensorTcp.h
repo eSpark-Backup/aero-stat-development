@@ -16,6 +16,7 @@ class AdamSensorTcp : public Sensor {
 public:
     AdamSensorTcp(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
         data = std::make_shared<adamSensorData>();
+        dataToWrite = std::make_shared<fanLightWriteData>();
     }
 
     static void registerType() {
@@ -45,10 +46,24 @@ public:
         return data;
     }
 
+    bool writeData(const std::shared_ptr<void>& data) override {
+        // Implementation for writing data
+        if (data) {
+            auto value = std::static_pointer_cast<fanLightWriteData>(data);
+            // Write `value` to the sensor
+            dataToWrite->fan_one = value->fan_one;
+            dataToWrite->fan_two = value->fan_two;
+            dataToWrite->strobe_light = value->strobe_light;
+            return true;
+        }
+        return false; // Indicate failure
+    }
+
 private:
     std::string name_;
     std::string ip_;
     std::shared_ptr<adamSensorData> data;
+    std::shared_ptr<fanLightWriteData> dataToWrite;
 };
 
 #endif //ADAM_SENSOR_TCP_H

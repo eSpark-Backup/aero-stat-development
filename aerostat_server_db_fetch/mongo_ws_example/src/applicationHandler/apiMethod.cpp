@@ -161,12 +161,135 @@ json handlePhaseSetting(const json& parseJson) {
     }
 }
 
-json handleActuatorSetting(const json& parseJson)
-{
-    return {
-        {"error", std::string("method not fully implemented")}
-    };
+json handleActuatorSetting(const json& parseJson) {
+    json response;
+    json settingsSet;
+    ConfigManager& configManager = ConfigManager::getInstance();
+    SensorManager& sensorManager = SensorManager::getInstance();    
+    ServerConfig currentConfig = configManager.getServerConfig();
+
+    // Check for the method key and validate it
+    if (!parseJson.contains("method") || parseJson["method"] != "alfa.actuator.settings.set") {
+        return {{"error", "Invalid or missing method"}};
+    }
+
+    // Initialize the data structures to store the settings
+    auto relayDataVar = std::make_shared<relayWriteData>();
+    auto fanLightDataVar = std::make_shared<fanLightWriteData>();
+    std::string modbusName;    
+    std::string modbusPortNumber;
+    std::string tcpName;    
+    std::string tcpPortNumber;
+    // Process the modbus settings if provided
+    bool relayStatesModified = false;
+    if (parseJson.contains("modbus") && !parseJson["modbus"].empty()) {
+        for (const auto& modbusSetting : parseJson["modbus"]) {
+            if (modbusSetting.contains("name")) {
+                modbusName = modbusSetting["name"];
+                for (const auto& modbusServer : currentConfig.modbus) {
+                    if (modbusServer.name == modbusName) {
+                        LOG_SUCCESS("Processing Modbus settings for: %s", modbusName.c_str());
+                        // Extract the port number (could be used later for writing)
+                        for (const auto& portSetting : modbusServer.ports) {
+                            // You can use portSetting.port here if needed
+                            modbusPortNumber = portSetting.port;
+                        }
+                    }
+                }
+            }
+
+            if (modbusSetting.contains("relay")) {
+                relayStatesModified = true;
+                const auto& relaySettings = modbusSetting["relay"];
+                for (size_t i = 0; i < relaySettings.size(); ++i) {
+                    int relayState = relaySettings[i];
+                    relayDataVar->relayStates[i] = relayState;
+                    LOG_SUCCESS("Relay settings processed: relay_%zu=%d", i, relayState);
+                    settingsSet["modbus"]["relay"][i] = relayState;
+                }
+            }
+        }
+    } else {
+        LOG_WARNING("No modbus settings provided or modbus data is empty.");
+    }
+
+    // Process the TCP fan and light settings if provided
+    bool fanLightDataModified = false;
+    if (parseJson.contains("tcp") && !parseJson["tcp"].empty()) {
+        for (const auto& tcpSetting : parseJson["tcp"]) {
+            if (tcpSetting.contains("name")) {
+                std::string tcpName = tcpSetting["name"];
+                for (const auto& tcpServer : currentConfig.tcp) {
+                    if (tcpServer.name == tcpName) {
+                        LOG_SUCCESS("Processing TCP settings for: %s", tcpName.c_str());
+                        // Extract the port number (could be used later for writing)
+                        for (const auto& portSetting : tcpServer.ports) {
+                            // You can use portSetting.port here if needed
+                            tcpPortNumber = portSetting.port;
+                        }
+                    }
+                }
+            }
+
+            if (tcpSetting.contains("fan")) {
+                const auto& fanSettings = tcpSetting["fan"];
+                if (fanSettings.size() > 0) {
+                    fanLightDataVar->fan_one = fanSettings[0] == 1;  // Set fan_one
+                    settingsSet["tcp"]["fan"]["fan_one"] = fanLightDataVar->fan_one ? "ON" : "OFF";
+                }
+                if (fanSettings.size() > 1) {
+                    fanLightDataVar->fan_two = fanSettings[1] == 1;  // Set fan_two
+                    settingsSet["tcp"]["fan"]["fan_two"] = fanLightDataVar->fan_two ? "ON" : "OFF";
+                }
+                fanLightDataModified = true;
+                LOG_SUCCESS("Fan settings processed: fan_one=%s, fan_two=%s",
+                            fanLightDataVar->fan_one ? "ON" : "OFF",
+                            fanLightDataVar->fan_two ? "ON" : "OFF");
+            }
+
+            if (tcpSetting.contains("strobe_light")) {
+                const auto& strobeSettings = tcpSetting["strobe_light"];
+                if (!strobeSettings.empty()) {
+                    fanLightDataVar->strobe_light = strobeSettings[0] == 1;  // Set strobe_light
+                    settingsSet["tcp"]["strobe_light"] = fanLightDataVar->strobe_light ? "ON" : "OFF";
+                    LOG_SUCCESS("Strobe light processed: %s",
+                                fanLightDataVar->strobe_light ? "ON" : "OFF");
+                    fanLightDataModified = true;
+                }
+            }
+        }
+    } else {
+        LOG_WARNING("No TCP fan or strobe light settings provided or tcp data is empty.");
+    }
+
+    // Write the modbus and TCP settings to their respective sensors if data is available
+    if (relayStatesModified) {
+        if (sensorManager.writeSensorData(modbusPortNumber, relayDataVar)) {
+            LOG_SUCCESS("Relay data successfully written to modbus sensor");
+        } else {
+            LOG_WARNING("Failed to write relay data to modbus sensor");
+        }
+    } else if (!relayStatesModified) {
+        LOG_WARNING("No relay data to write to modbus sensor.");
+    }
+
+    if (fanLightDataModified && (fanLightDataVar->fan_one || fanLightDataVar->fan_two || fanLightDataVar->strobe_light)) {
+        if (sensorManager.writeSensorData(tcpPortNumber, fanLightDataVar)) {
+            LOG_SUCCESS("Fan and light data successfully written to fanLight sensor");
+        } else {
+            LOG_WARNING("Failed to write fan and light data to fanLight sensor");
+        }
+    } else if (!fanLightDataModified) {
+        LOG_WARNING("No fan or light data to write to fanLight sensor.");
+    }
+
+    // Return the response
+    response["status"] = "success";
+    response["settings_set"] = settingsSet; // Return the settings that were set
+    return response;
 }
+
+
 
 json handleLoggerSetting(const json& parseJson)
 {

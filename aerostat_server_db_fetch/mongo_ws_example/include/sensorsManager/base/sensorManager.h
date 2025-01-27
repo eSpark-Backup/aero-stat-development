@@ -3,6 +3,7 @@
 #include <string>
 #include "sensorsManager/base/sensorBase.h"
 #include "sensorsManager/base/sensorFactory.h"
+#include "sensorsManager/sensors/commonSensorData/commonSensorData.h"
 
 class SensorManager {
 public:
@@ -77,6 +78,22 @@ public:
             return sensor->readData();
         }
         return nullptr;
+    }
+
+    bool writeSensorData(const std::string& id, const std::shared_ptr<void>& data) {
+        auto sensor = getSensor(id);
+        if (sensor) {
+            // Check if the sensor supports writing
+            auto readWriteSensor = getSensor(id);
+            if (readWriteSensor) {
+                return readWriteSensor->writeData(data);
+            } else {
+                LOG_WARNING("Sensor does not support writing: ID %s", id.c_str());
+                return false; // Sensor does not support writing
+            }
+        }
+        LOG_WARNING("Sensor not found: ID %s", id.c_str());
+        return false; // Sensor not found
     }
 
     std::vector<std::string> getSensorIDs() const {

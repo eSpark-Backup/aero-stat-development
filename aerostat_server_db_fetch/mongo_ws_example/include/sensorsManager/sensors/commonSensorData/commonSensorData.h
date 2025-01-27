@@ -76,6 +76,16 @@ struct digitalCompassData : public SensorData {
     }
 };
 
+struct fanLightWriteData {
+    bool fan_one;
+    bool fan_two;
+    bool strobe_light;
+};
+
+struct relayWriteData {
+    bool relayStates[4];
+};
+
 struct adamSensorData : public SensorData {
     std::string status;
     float tension;

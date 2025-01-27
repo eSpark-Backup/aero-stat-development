@@ -16,6 +16,7 @@ class RelayMod : public Sensor {
 public:
     RelayMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
         data = std::make_shared<relayData>();
+        dataToWrite = std::make_shared<relayWriteData>();
     }
 
     static void registerType() {
@@ -44,13 +45,26 @@ public:
         return data;
     }
 
-    
+    bool writeData(const std::shared_ptr<void>& data) override {
+        // Implementation for writing data
+        if (data) {
+            auto value = std::static_pointer_cast<relayWriteData>(data);
+            // Write `value` to the sensor
+            dataToWrite->relayStates[0] = value->relayStates[0];
+            dataToWrite->relayStates[1] = value->relayStates[1];
+            dataToWrite->relayStates[2] = value->relayStates[2];
+            dataToWrite->relayStates[3] = value->relayStates[3];
+            return true;
+        }
+        return false; // Indicate failure
+    }    
 
 
 private:
     std::string name_;
     std::string ip_;
     std::shared_ptr<relayData> data;
+    std::shared_ptr<relayWriteData> dataToWrite;
 };
 
 #endif //RELAY_MODBUS_SENSOR_H
