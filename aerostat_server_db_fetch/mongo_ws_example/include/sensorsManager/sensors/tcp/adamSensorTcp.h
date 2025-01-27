@@ -87,7 +87,7 @@ private:
     std::shared_ptr<fanLightWriteData> dataToWrite;
     adamSensorData readAdamsSensorData(const std::string& nmeaData) {
         TcpConnectionManager connectionMan;
-        float __max_tension = 0.0;
+        static float __max_tension = 0.0;
         adamSensorData parsedData;
         std::string m_msgStr;
         std::vector<std::string> msgsList;
