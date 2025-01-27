@@ -20,6 +20,8 @@ import { ThemeContext } from '../../ThemeHandler'
 import { useWindowWidth, sendDeviceCommands } from '../../utils'
 import Modal from '../Modal'
 import { formatDateTime } from '../../Js_parsing'
+import { WebSocketContext } from '../../App'
+import useWebSocket from 'react-use-websocket'
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -36,7 +38,19 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
   const [fan1, setFan1] = useState("Continuous");
   const [fan2, setFan2] = useState("Off");
   const [light, setLight] = useState("Off");
+  const [primary_blower, setPrimaryBlower] = useState("Off");
+  const [secondary_blower, setSecondaryBlower] = useState("Off");
+  const [strobe_light, setStrobeLight] = useState("Off");
+  const [payload_power, setPayloadPower] = useState("Off");
   const [sendData, setSendData] = useState(false);
+  const { sendJsonMessage, onMessage } = useContext(WebSocketContext);
+
+  useEffect(() => {
+    setPrimaryBlower(response?.relay?.primary_blower)
+    setSecondaryBlower(response?.relay?.secondary_blower)
+    setStrobeLight(response?.relay?.strobe_lights)
+    setPayloadPower(response?.relay?.payload_power)
+  }, [response])
 
   const handleChange = (name, value) => {
     if (fetchingStart) {
@@ -53,59 +67,110 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
           setLight(value);
           setSendData(true);
           break;
+        case 'primary_blower':
+          setPrimaryBlower(value);
+          setSendData(true);
+          break;
+        case 'secondary_blower':
+          setSecondaryBlower(value);
+          setSendData(true);
+          break;
+        case 'strobe_light':
+          setStrobeLight(value);
+          setSendData(true);
+          break;
+        case 'payload_power':
+          setPayloadPower(value);
+          setSendData(true);
+          break;
         default:
           break;
       }
     }
   };
 
+  // useEffect(() => {
+  //   let FansLight = {
+  //     Fans: null,
+  //     Lights: null
+  //   };
+  //   if (fan1 === "Continuous" && fan2 === "Continuous") {
+  //     FansLight.Fans = "@01DO00\r";
+  //   } else if (fan1 === "Continuous" && fan2 === "Off") {
+  //     FansLight.Fans = "@01DO02\r";
+  //   } else if (fan1 === "Pressured" && fan2 === "Continuous") {
+  //     FansLight.Fans = "@01DO01\r";
+  //   } else if (fan1 === "Pressured" && fan2 === "Off") {
+  //     FansLight.Fans = "@01DO03\r";
+  //   }
+  //   if (light === "Off") {
+  //     FansLight.Lights = "@01DO12\r";
+  //   }
+  //   else if (light === "On") {
+  //     FansLight.Lights = "@01DO11\r";
+  //   }
+  //   if (sendData) {
+  //     sendDeviceCommands(FansLight)
+  //       .then((response) => {
+  //         const result = response?.ButtonResponse.split(",");
+  //         setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
+  //         setFan2(result[3].toLowerCase() === "off" ? "Off" : "Continuous");
+  //         setLight(result[4].toLowerCase().startsWith("off") ? "Off" : "On");
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error sending device commands:', error);
+  //       })
+  //       .finally(() => setSendData(false));
+  //   }
+
+
+  // }, [sendData, fan1, fan2, light, primary_blower, secondary_blower, strobe_light, payload_power]);
+
   useEffect(() => {
-    let FansLight = {
-      Fans: null,
-      Lights: null
-    };
-    if (fan1 === "Continuous" && fan2 === "Continuous") {
-      FansLight.Fans = "@01DO00\r";
-    } else if (fan1 === "Continuous" && fan2 === "Off") {
-      FansLight.Fans = "@01DO02\r";
-    } else if (fan1 === "Pressured" && fan2 === "Continuous") {
-      FansLight.Fans = "@01DO01\r";
-    } else if (fan1 === "Pressured" && fan2 === "Off") {
-      FansLight.Fans = "@01DO03\r";
-    }
-    // if (strobe === "Continuous" && position === "Continuous") {
-    //     FansLight.Lights = "@01DO10\r";
-    // } else if (strobe === "Continuous" && position === "Off") {
-    //     FansLight.Lights = "@01DO12\r";
-    // } else if (strobe === "Off" && position === "Continuous") {
-    //     FansLight.Lights = "@01DO11\r";
-    // } else if (strobe === "Off" && position === "Off") {
-    //     FansLight.Lights = "@01DO13\r";
-    // }
-    if (light === "Off") {
-      FansLight.Lights = "@01DO12\r";
-    }
-    else if (light === "On") {
-      FansLight.Lights = "@01DO11\r";
+    let relayControls = {
+      "method": "alfa.actuator.settings.set",
+      "modbus": [
+        {
+          "name": "modbus1",
+          "relay": [
+            primary_blower === "On" ? 1 : 0,
+            secondary_blower === "On" ? 1 : 0,
+            strobe_light === "On" ? 1 : 0,
+            payload_power === "On" ? 1 : 0
+          ]
+        }
+      ],
+      "tcp": [
+        {
+          "name": "tcp1",
+          "fan": [
+            fan1 === "Pressured" ? 0 : 1,
+            fan2 === "Off" ? 0 : 1
+          ],
+          "strobe_light": [
+            light === "On" ? 1 : 0
+          ]
+        }
+      ]
     }
     if (sendData) {
-      sendDeviceCommands(FansLight)
-        .then((response) => {
-          const result = response?.ButtonResponse.split(",");
-          setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
-          setFan2(result[3].toLowerCase() === "off" ? "Off" : "Continuous");
-          setLight(result[4].toLowerCase().startsWith("off") ? "Off" : "On");
-          // setPosition(result[5].toLowerCase()?.startsWith("1") ? "Continuous" : "Off");
-        })
-        .catch((error) => {
-          console.error('Error sending device commands:', error);
-        })
-        .finally(() => setSendData(false));
+      sendJsonMessage(relayControls)
+      console.log("Controls successfully posted:", relayControls);
+      setSendData(false)
     }
+  }, [sendData, fan1, fan2, light, primary_blower, secondary_blower, strobe_light, payload_power]);
 
-
-  }, [sendData, fan1, fan2, light]);
-
+  useWebSocket("ws://localhost:9001", {
+    onMessage: (message) => {
+      let data = JSON.parse(message.data)
+      if (data?.status === "success") {
+        setFan1(data?.settings_set?.tcp?.fan?.fan_one === "OFF" ? "Pressured" : "Continuous")
+        setFan2(data?.settings_set?.tcp?.fan?.fan_two === "OFF" ? "Off" : "Continuous")
+        setLight(data?.settings_set?.tcp?.strobe_light === "OFF" ? "Off" : "On")
+        console.log(data?.status && data)
+      }
+    },
+  });
 
   return (
     <>
@@ -448,6 +513,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       option1={"Continuous"}
                       option2={"Pressured"}
                       selectedOption={fan1}
+                      phase={1}
                     />
                   </div>
                   <div
@@ -464,6 +530,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       option1={"Continuous"}
                       option2={"Off"}
                       selectedOption={fan2}
+                      phase={1}
                     />
                   </div>
                   <div
@@ -478,6 +545,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       option1={"On"}
                       option2={"Off"}
                       selectedOption={light}
+                      phase={1}
                     />
                   </div>
                 </div>
@@ -494,9 +562,12 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     </p>
                     <OptionBox
                       fetchingStart={fetchingStart}
+                      handleChange={handleChange}
+                      name={"primary_blower"}
                       option1={"On"}
                       option2={"Off"}
-                      selectedOption={response?.relay?.primary_blower}
+                      selectedOption={primary_blower}
+                      phase={2}
                     />
                   </div>
                   <div
@@ -508,9 +579,12 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     </p>
                     <OptionBox
                       fetchingStart={fetchingStart}
+                      handleChange={handleChange}
+                      name={"secondary_blower"}
                       option1={"On"}
                       option2={"Off"}
-                      selectedOption={response?.relay?.secondary_blower}
+                      selectedOption={secondary_blower}
+                      phase={2}
                     />
                   </div>
                   <div
@@ -522,9 +596,12 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     </p>
                     <OptionBox
                       fetchingStart={fetchingStart}
+                      handleChange={handleChange}
+                      name={"strobe_light"}
                       option1={"On"}
                       option2={"Off"}
-                      selectedOption={response?.relay?.strobe_lights}
+                      selectedOption={strobe_light}
+                      phase={2}
                     />
                   </div>
                   <div
@@ -536,9 +613,12 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     </p>
                     <OptionBox
                       fetchingStart={fetchingStart}
+                      handleChange={handleChange}
+                      name={"payload_power"}
                       option1={"On"}
                       option2={"Off"}
-                      selectedOption={response?.relay?.payload_power}
+                      selectedOption={payload_power}
+                      phase={2}
                     />
                   </div>
                 </div>

@@ -119,7 +119,6 @@ function Phase1() {
 
     try {
       const data = JSON.parse(message.data);
-      console.log("WebSocket Data:", data?.data);
       if (data) {
         const parsedResponses = {
           weather: {
