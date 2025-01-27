@@ -33,6 +33,7 @@ function Phase1() {
       humidity: parseFloat(0).toFixed(2),
       yaw: parseFloat(0).toFixed(2),
       position_accuracy: parseFloat(0).toFixed(2),
+      temperature: parseFloat(0).toFixed(2),
     },
     ebox: {
       InternalTemp: parseFloat(25.5).toFixed(2),
@@ -66,7 +67,7 @@ function Phase1() {
     port_4006: "Disconnected",
   });
 
-  const { theme, form, phase1Start, setPhase1Start, phase } = useContext(ThemeContext);
+  const { theme, form, phase1Start, setPhase1Start, phase, setIsPhase1Starts, setIsPhase2Starts } = useContext(ThemeContext);
   const [sidebar, setSidebar] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [responses, setResponses] = useState(lastPerfectResponses.current);
@@ -119,7 +120,6 @@ function Phase1() {
     try {
       const data = JSON.parse(message.data);
       console.log("WebSocket Data:", data?.data);
-      console.log("PHase ", phase)
       if (data) {
         const parsedResponses = {
           weather: {
@@ -164,6 +164,9 @@ function Phase1() {
             humidity: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5006]?.humidity)
               ? lastPerfectResponses.current.digitalCompass.humidity
               : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5006]?.humidity).toFixed(2),
+            temperature: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5006]?.temperature)
+              ? lastPerfectResponses.current.digitalCompass.temperature
+              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5006]?.temperature).toFixed(2),
             yaw: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.yaw)
               ? lastPerfectResponses.current.digitalCompass.yaw
               : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.yaw).toFixed(2),
@@ -399,6 +402,12 @@ function Phase1() {
         "enable": true
       })
       console.log("Form successfully posted:", newForm);
+      if (phase === 1) {
+        setIsPhase1Starts(true)
+      }
+      if (phase === 2) {
+        setIsPhase2Starts(true)
+      }
     } catch (error) {
       console.log("In catch", error);
       console.log(newForm)
@@ -443,6 +452,7 @@ function Phase1() {
           [fileData[currentIndex]],
           currentResult
         );
+        console.log(result)
         setCurrentResult(result);
         setResponses(result);
 

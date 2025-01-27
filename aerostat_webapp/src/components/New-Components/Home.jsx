@@ -160,6 +160,16 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       description={"Aerostat Heading"}
                     />
                   </div>
+                  {
+                    phase === 2 &&
+                    <>
+                      <ChartChip
+                        name={"Temperature:"}
+                        value={response?.digitalCompass.temperature === "NaN" || !response?.digitalCompass.temperature ? "N/A" : response?.digitalCompass.temperature}
+                        unit={"°"}
+                      />
+                    </>
+                  }
                 </div>
               </ChildCard>
             </div>
@@ -223,7 +233,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
             <div className="magnetometer-box">
               <div className="heading-box">
                 <ChildCard>
-                  <div className="heading-box-content">
+                  <div className={phase === 1 ? `heading-box-content` : `heading-box-content-phase2`}>
                     <div style={{ display: "flex", flexDirection: "column", rowGap: "10px" }}>
                       <ChartChip
                         name={"Heading"}
@@ -232,26 +242,30 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                         ).toFixed(2)}
                         unit={"°"}
                       />
-                      <ChartChip
-                        name={"Longitude:"}
-                        value={phase === 1 ? "N/A" : response?.weather?.longitude}
-                        unit={"°"}
-                      />
-                      <ChartChip
-                        name={"Latitude:"}
-                        value={phase === 1 ? "N/A" : response?.weather?.latitude}
-                        unit={"°"}
-                      />
-                      <ChartChip
-                        name={"Altitude:"}
-                        value={phase === 1 ? "N/A" : response?.weather?.altitude}
-                        unit={"°"}
-                      />
-                      <ChartChip
-                        name={"Ground Speed:"}
-                        value={phase === 1 ? "N/A" : response?.weather?.ground_speed}
-                        unit={"°"}
-                      />
+                      {phase === 2 &&
+                        <>
+                          <ChartChip
+                            name={"Longitude:"}
+                            value={response?.weather?.longitude === "NaN" || !response?.weather?.longitude ? "N/A" : `${response?.weather?.longitude}°`}
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Latitude:"}
+                            value={response?.weather?.latitude === "NaN" || !response?.weather?.latitude ? "N/A" : `${response?.weather?.latitude}°`}
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Altitude:"}
+                            value={response?.weather?.altitude === "NaN" || !response?.weather?.altitude ? "N/A" : `${response?.weather?.altitude}m`}
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Ground Speed:"}
+                            value={response?.weather?.ground_speed === "NaN" || !response?.weather?.ground_speed ? "N/A" : `${response?.weather?.ground_speed}m/s`}
+                            unit={""}
+                          />
+                        </>
+                      }
                     </div>
                     <NewCompass
                       size={getCompassSize()}
@@ -262,7 +276,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
               </div>
               <div className="heading-box2">
                 <ChildCard>
-                  <div className="pitch-box-content">
+                  <div className={phase === 1 ? `pitch-box-content` : `pitch-box-content-phase2`}>
                     <div className="pitch-roll-chips">
                       <ChartChip
                         name={"Roll:"}
@@ -278,21 +292,26 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                         ).toFixed(2)}
                         unit={"°"}
                       />
-                      <ChartChip
-                        name={"Yaw:"}
-                        value={phase === 1 ? "N/A" : response?.digitalCompass.yaw}
-                        unit={"°"}
-                      />
-                      <ChartChip
-                        name={"Position Accuracy:"}
-                        value={phase === 1 ? "N/A" : response?.digitalCompass.position_accuracy}
-                        unit={"°"}
-                      />
-                      <ChartChip
-                        name={"Humidity:"}
-                        value={phase === 1 ? "N/A" : response?.digitalCompass.humidity}
-                        unit={"°"}
-                      />
+                      {
+                        phase === 2 &&
+                        <>
+                          <ChartChip
+                            name={"Yaw:"}
+                            value={response?.digitalCompass.yaw === "NaN" || !response?.digitalCompass.yaw ? "N/A" : `${response?.digitalCompass.yaw}°`}
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Position Accuracy:"}
+                            value={response?.digitalCompass.position_accuracy === "NaN" || !response?.digitalCompass.position_accuracy ? "N/A" : `${response?.digitalCompass.position_accuracy}m`}
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Humidity:"}
+                            value={response?.digitalCompass.humidity === "NaN" || !response?.digitalCompass.humidity ? "N/A" : `${response?.digitalCompass.humidity}%`}
+                            unit={""}
+                          />
+                        </>
+                      }
                     </div>
                     <NewRollMeter
                       roll={response?.digitalCompass?.roll}
@@ -350,13 +369,14 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       )}
                     />
                     <ChartsData
-                      position={"between"}
+                      position={phase === 1 ? "around" : "between"}
                       graphValue={parseFloat(
                         response?.ballonet?.bal_pressure
                       ).toFixed(2)}
                       graphName={"Ballonet Air"}
-                      description1={"Ballonet Curtain"}
-                      value1={phase === 1 ? "N/A" : parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}
+                      description1={phase === 2 && "Ballonet Curtain"}
+                      // value1={response?.ballonet?.ballonet_height === "NaN" ? "N/A" : `${parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}m`}
+                      value1={phase === 2 && (response?.ballonet?.ballonet_height === "NaN" || !response?.ballonet?.ballonet_height) ? "N/A" : phase === 2 && response?.ballonet?.ballonet_height ? response?.ballonet?.ballonet_height : ""}
                     />
                   </div>
                 </div>
@@ -566,11 +586,11 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     id="fileInput"
                     style={{ display: "none" }}
                     onChange={HandleBrowse}
-                    disabled={!playBtn && StopBtn ? true : false}
+                    disabled={phase === 2 || (!playBtn && StopBtn) ? true : false}
                   />
                   <label
                     htmlFor="fileInput"
-                    className={`custom-file-input ${theme} ${!playBtn && StopBtn ? "disable" : ""
+                    className={`custom-file-input ${theme} ${phase === 2 || (!playBtn && StopBtn) ? "disable" : ""
                       }`}
                   >
                     Browse
@@ -582,8 +602,8 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       }`}
                   >
                     <button
-                      className={`upper-part ${!playBtn ? "disable" : ""}`}
-                      disabled={!playBtn}
+                      className={`upper-part ${phase === 2 || !playBtn ? "disable" : ""}`}
+                      disabled={phase === 2 || !playBtn}
                       onClick={HandlePlay}
                     >
                       <img src={play} alt="" />
@@ -594,8 +614,8 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       }`}
                   >
                     <button
-                      className={`upper-part ${!fwdBtn ? "disable" : ""}`}
-                      disabled={!fwdBtn}
+                      className={`upper-part ${phase === 2 || !fwdBtn ? "disable" : ""}`}
+                      disabled={phase === 2 || !fwdBtn}
                       onClick={HandleForward}
                     >
                       <img src={forward} alt="" />
@@ -606,8 +626,8 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       }`}
                   >
                     <button
-                      className={`upper-part ${!StopBtn ? "disable" : ""}`}
-                      disabled={!StopBtn}
+                      className={`upper-part ${phase === 2 || !StopBtn ? "disable" : ""}`}
+                      disabled={phase === 2 || !StopBtn}
                       onClick={HandleStop}
                     >
                       <img src={stop} alt="" />

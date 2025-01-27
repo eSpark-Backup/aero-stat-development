@@ -8,7 +8,7 @@ import Phase2 from "./phase_2";
 export const WebSocketContext = createContext();
 
 function App() {
-  const { phase } = useContext(ThemeContext);
+  const { phase, isPhase1Starts } = useContext(ThemeContext);
   const [pageLoads, setPageLoads] = useState(false)
 
   // Memoize the socket URL to prevent unnecessary reinitializations
@@ -20,6 +20,8 @@ function App() {
     onClose: () => console.log("WebSocket connection closed"),
     onError: (event) => console.error("WebSocket error:", event),
   });
+
+  useEffect(() => { console.log("IS PHASE: ", isPhase1Starts) }, [isPhase1Starts])
 
   useEffect(() => {
     if (!pageLoads) {

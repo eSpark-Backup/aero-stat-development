@@ -16,7 +16,7 @@ const Sidebar = ({
   fwdBtn,
 }) => {
   const { theme } = useContext(ThemeContext);
-  const { phase, setPhase,setPhase1Start } = useContext(ThemeContext);
+  const { phase, setPhase, setPhase1Start, isPhase1Starts, setIsPhase2Starts, isPhase2Starts } = useContext(ThemeContext);
   const { sendJsonMessage } = useContext(WebSocketContext);
 
   const changePhase = async (newPhase) => {
@@ -29,13 +29,24 @@ const Sidebar = ({
         "method": "alfa.phase.settings.set",
         "phaseType": "modbus"
       })
-      setPhase1Start(false)
+      if (!isPhase2Starts) {
+        setPhase1Start(false)
+      }
+      if (isPhase2Starts) {
+        setPhase1Start(true)
+      }
     }
     else {
       sendJsonMessage({
         "method": "alfa.phase.settings.set",
         "phaseType": "tcp"
       })
+      if (isPhase1Starts) {
+        setPhase1Start(true)
+      }
+      else {
+        setPhase1Start(false)
+      }
     }
     setPhase(newPhase);
   };
