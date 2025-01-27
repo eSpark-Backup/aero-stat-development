@@ -51,6 +51,9 @@ struct ballonetPressureData : public SensorData {
     }
 };
 
+#define MAGHEADING_OFFSET 0
+#define PITCH_OFFSET 1
+#define ROLL_OFFSET 2
 struct digitalCompassData : public SensorData {
     std::string status;
     float magheading;
