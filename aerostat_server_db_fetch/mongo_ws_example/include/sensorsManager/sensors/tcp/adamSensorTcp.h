@@ -28,20 +28,41 @@ public:
 
     std::shared_ptr<void> readData() override {
         // Random number generation setup
-        std::random_device rd;
-        std::mt19937 gen(rd());
+        // std::random_device rd;
+        // std::mt19937 gen(rd());
         
-        // For floating point range [min, max]
-        std::uniform_real_distribution<> disTension(0.0, 360.0);
+        // // For floating point range [min, max]
+        // std::uniform_real_distribution<> disTension(0.0, 360.0);
         
-        // Assign random values to the fields
-        data->tension = disTension(gen);
-        if(data->tension > data->maxTension)
-        {
-            data->maxTension = data->tension;
-        }
-        data->status = "connected";
+        // // Assign random values to the fields
+        // data->tension = disTension(gen);
+        // if(data->tension > data->maxTension)
+        // {
+        //     data->maxTension = data->tension;
+        // }
+        // data->status = "connected";
+
         // data->print();
+
+        /* orignal server reading routine */
+        std::string ipToConnect = this->connectionParams_.ip;
+        TcpConnectionManager connectionMan;
+        std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
+
+        data = std::make_unique<adamSensorData>(readAdamsSensorData(nmeaData));
+        if(connectionMan.port_flag == false)
+        {
+            data->tension = 0;
+            data->status = "disconnected";
+        }
+        else
+        {
+            // if(data->tension > data->maxTension)
+            // {
+            //     data->maxTension = data->maxTension;
+            // }
+            data->status = "connected";
+        }    
 
         return data;
     }
@@ -64,6 +85,68 @@ private:
     std::string ip_;
     std::shared_ptr<adamSensorData> data;
     std::shared_ptr<fanLightWriteData> dataToWrite;
+    adamSensorData readAdamsSensorData(const std::string& nmeaData) {
+        TcpConnectionManager connectionMan;
+        float __max_tension = 0.0;
+        adamSensorData parsedData;
+        std::string m_msgStr;
+        std::vector<std::string> msgsList;
+
+        // Split the NMEA data by '\r' to process individual messages
+        std::istringstream nmeaStream(nmeaData);
+        std::string line;
+        while (std::getline(nmeaStream, line, '\r')) {
+            msgsList.push_back(line);
+        }
+
+        for (const auto& packet : msgsList) {
+            std::vector<std::string> msgsList;
+            std::istringstream packetStream(packet);
+            std::string field;
+
+            // Strip and check if the packet starts with '>'
+            if (!packet.empty() && packet[0] == '>') {
+                std::string tension_str = connectionMan.strip(packet.substr(1));
+                std::ostringstream oss;
+                oss << std::fixed << std::setprecision(2);
+                
+                try {
+                    double tension_value = std::stod(tension_str);  // Convert to float
+                    if (!std::isnan(tension_value)) {  // Ensure valid value
+                        parsedData.flag |= 1<< TENSION;
+                        parsedData.flag |= 1<< MAX_TENSION;
+                        tension_value = (tension_value * 271.0279) / 9.8;  // Apply conversion
+                        tension_value = std::round(tension_value * 10.0) / 10.0;  // Round to 1 decimal
+
+                        // Update max tension if the new value is greater
+                        if (tension_value > __max_tension) {
+                            __max_tension = tension_value;
+                        }
+                        parsedData.tension = tension_value;
+                        parsedData.maxTension = __max_tension;
+
+                        oss.str("");
+                        oss << std::fixed << std::setprecision(2) << tension_value;
+                        m_msgStr += "Tension: " + oss.str() + "\t";
+
+                        oss.str("");
+                        oss << std::fixed << std::setprecision(2) << __max_tension;
+                        m_msgStr += "Max Tension: " + oss.str() + "\t";
+                    }
+                } catch (...) {
+                    // Handle parsing errors silently
+                }
+            }
+        }
+
+        // Log the message if any data was parsed
+        if (!m_msgStr.empty()) {
+            LOG_SUCCESS( "%s",m_msgStr.c_str());
+        }
+
+        return parsedData;
+    }
+
 };
 
 #endif //ADAM_SENSOR_TCP_H

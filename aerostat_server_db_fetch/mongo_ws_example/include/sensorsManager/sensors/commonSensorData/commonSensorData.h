@@ -33,6 +33,7 @@ struct weatherStationData : public SensorData {
     }
 };
 
+#define BALPRES_OFFSET 0
 struct ballonetPressureData : public SensorData {
     std::string status;
     float pressure;
@@ -89,6 +90,8 @@ struct relayWriteData {
     bool relayStates[4];
 };
 
+#define TENSION 0
+#define MAX_TENSION 1
 struct adamSensorData : public SensorData {
     std::string status;
     float tension;
