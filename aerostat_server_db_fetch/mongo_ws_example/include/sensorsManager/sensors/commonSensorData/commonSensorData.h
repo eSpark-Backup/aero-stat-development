@@ -11,6 +11,8 @@
 #define WIND_TEMPERATURE_REGISTER  0x0004
 #define WIND_HUMIDITY_REGISTER  0x0006
 #define AIR_PRESSURE_REGISTER  0x0008
+#define PRESSURE_SCALING_FACTOR 4.01463
+
 struct RegisterInfo {
     int address;
     int count;
