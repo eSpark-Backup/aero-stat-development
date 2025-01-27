@@ -30,6 +30,10 @@ RUN echo "file ../bin/main" > ~/.gdbinit && \
 CMD ["gdb"]
 
 # RUN make run
+#### NOTE BEFORE RUNNING THIS CONATINER RUN THE CONATINER FROM DOCKER FILE /assets/modbus_tcp_server/
+#### open modbus_tcp_server in a new terminal and run the commands provided in that docker file.
+
+#### when container is successfully running, run the following commands in the terminal to spin up the backend
 
 # COMMAND TO BUILD IMAGE AND RUN BACKEND
 #==========================================

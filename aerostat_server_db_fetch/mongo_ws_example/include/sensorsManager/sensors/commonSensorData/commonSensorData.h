@@ -16,6 +16,28 @@
 #define TEMP_HUMIDITY_REGISTER 0x0001
 #define HUMIDITY_REGISTER 0x0000
 
+// AHRS/GPS register addresses
+const uint16_t ROLL_REGISTER = 0x3D;
+const uint16_t PITCH_REGISTER = 0x3E;
+const uint16_t YAW_REGISTER = 0x3F;
+const uint16_t LONL_REGISTER = 0x49;
+const uint16_t LONH_REGISTER = 0x4A;
+const uint16_t LATL_REGISTER = 0x4B;
+const uint16_t LATH_REGISTER = 0x4C;
+const uint16_t GPS_HEIGHT_REGISTER = 0x4D;
+const uint16_t GPS_YAW_REGISTER = 0x4E;
+const uint16_t GPS_VL_REGISTER = 0x4F;
+const uint16_t GPS_VH_REGISTER = 0x50;
+const uint16_t SVNUM_REGISTER = 0x55;
+const uint16_t PDOP_REGISTER = 0x56;
+const uint16_t HDOP_REGISTER = 0x57;
+const uint16_t VDOP_REGISTER = 0x58;
+
+struct RegisterInfoAHRS {
+    uint16_t address;
+    int count;
+};
+
 struct RegisterInfo {
     int address;
     int count;

@@ -29,31 +29,37 @@ public:
     std::shared_ptr<void> readData() override {
 
         // Random number generation setup
-        std::random_device rd;
-        std::mt19937 gen(rd());
+        // std::random_device rd;
+        // std::mt19937 gen(rd());
 
-        // For binary values [0, 1]
-        std::uniform_int_distribution<> disbinary(0, 1);
+        // // For binary values [0, 1]
+        // std::uniform_int_distribution<> disbinary(0, 1);
 
-        // Assign random binary values to the fields
-        data->primary_blower_value = disbinary(gen);
-        data->secondary_blower_value = disbinary(gen);
-        data->strobe_lights_value = disbinary(gen);
-        data->payload_power_value = disbinary(gen);
+        // // Assign random binary values to the fields
+        // data->primary_blower_value = disbinary(gen);
+        // data->secondary_blower_value = disbinary(gen);
+        // data->strobe_lights_value = disbinary(gen);
+        // data->payload_power_value = disbinary(gen);
         data->status = "connected";
 
         return data;
     }
 
-    bool writeData(const std::shared_ptr<void>& data) override {
+    bool writeData(const std::shared_ptr<void>& dataRcv) override {
         // Implementation for writing data
-        if (data) {
-            auto value = std::static_pointer_cast<relayWriteData>(data);
+        if (dataRcv) {
+            auto value = std::static_pointer_cast<relayWriteData>(dataRcv);
             // Write `value` to the sensor
             dataToWrite->relayStates[0] = value->relayStates[0];
             dataToWrite->relayStates[1] = value->relayStates[1];
             dataToWrite->relayStates[2] = value->relayStates[2];
             dataToWrite->relayStates[3] = value->relayStates[3];
+
+            data->primary_blower_value = value->relayStates[0];
+            data->secondary_blower_value = value->relayStates[1];
+            data->strobe_lights_value = value->relayStates[2];
+            data->payload_power_value = value->relayStates[3];
+
             return true;
         }
         return false; // Indicate failure

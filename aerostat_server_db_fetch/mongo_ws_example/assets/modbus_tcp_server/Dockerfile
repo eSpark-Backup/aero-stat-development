@@ -15,6 +15,9 @@ EXPOSE 4002 4003 4004 4005 4006 4007 5001 5002 5003 5004 5005 5006 5007 4196
 CMD ["sh", "-c", "python modbus_server.py & python tcp_server.py"]
 
 ## COMMANDS TO RUN THE DOCKER CONTAINER
-
+##==========================================
+##
 ## docker build -t modbus_tcp_server . --no-cache
 ## docker run -it --rm modbus_tcp_server
+##
+##==========================================
