@@ -196,7 +196,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     <StatusChip color={"blue"} description={"Wind Angle"} />
                     <StatusChip
                       color={"red"}
-                      description={phase === 1 ? "Aerostat Heading" : "Humididty"}
+                      description={phase === 1 ? "Aerostat Heading" : "Humidity"}
                     />
                   </div>
                   {
