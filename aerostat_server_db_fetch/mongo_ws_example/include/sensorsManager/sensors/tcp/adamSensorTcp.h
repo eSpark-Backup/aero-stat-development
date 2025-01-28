@@ -78,9 +78,41 @@ public:
         if (data) {
             auto value = std::static_pointer_cast<fanLightWriteData>(data);
             // Write `value` to the sensor
+            std::string fanCommand;
+            std::string lightCommand;
             dataToWrite->fan_one = value->fan_one;
             dataToWrite->fan_two = value->fan_two;
             dataToWrite->strobe_light = value->strobe_light;
+
+            if (dataToWrite->fan_one && dataToWrite->fan_two) {
+                fanCommand = "@01DO00\r";
+                LOG_INFO("Fan One: ON");
+            }
+            else if (!dataToWrite->fan_one && !dataToWrite->fan_two) {
+                fanCommand = "@01DO03\r";
+                LOG_INFO("Fan One: ON");
+            }
+            else if (dataToWrite->fan_one && !dataToWrite->fan_two) {
+                fanCommand = "@01DO02\r";
+                LOG_INFO("Fan One: ON");
+            }
+            else if (!dataToWrite->fan_one && dataToWrite->fan_two) {
+                fanCommand = "@01DO01\r";
+                LOG_INFO("Fan One: ON");
+            }
+
+            if(dataToWrite->strobe_light) {
+                lightCommand = "@01DO11\r";
+                LOG_INFO("Strobe Light: ON");
+            }
+            else {
+                lightCommand = "@01DO12\r";
+                LOG_INFO("Strobe Light: OFF");
+            }
+
+            TcpConnectionManager connectionMan = TcpConnectionManager::getInstance();
+            connectionMan.connect_and_send_to_port(fanCommand, this->connectionParams_.port, stoi(this->connectionParams_.ip));
+
             return true;
         }
         return false; // Indicate failure

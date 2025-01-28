@@ -16,8 +16,10 @@ class ModbusConnectionManager {
     }
     float convert_to_float(uint16_t regs[2])
     {
-        uint32_t combined = (regs[0] << 16) | regs[1];
-        return *reinterpret_cast<float*>(&combined);
+        uint32_t combined_value = (static_cast<uint32_t>(regs[0]) & 0xFFFF) | (static_cast<uint32_t>(regs[1]) << 16);
+        float result;
+        std::memcpy(&result, &combined_value, sizeof(result));
+        return result;
     }
     float calculate_position_accuracy(float pdop, float hdop, float vdop) 
     {

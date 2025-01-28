@@ -50,6 +50,43 @@ class TcpConnectionManager {
     }
 
 
+    std::string connect_and_send_to_port(const std::string &command, std::string host, int target_port) {
+        if (host.empty()) {
+            return "Host is not configured";
+        }
+
+        try {
+            int sock = socket(AF_INET, SOCK_STREAM, 0);
+            if (sock < 0) {
+                std::cerr << "Socket creation failed\n";
+                return "Socket creation failed";
+            }
+
+            sockaddr_in serverAddress{};
+            serverAddress.sin_family = AF_INET;
+            serverAddress.sin_port = htons(target_port);
+            inet_pton(AF_INET, host.c_str(), &serverAddress.sin_addr);
+
+            if (connect(sock, (sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
+                std::cerr << "Connection failed to " << host << ":" << target_port << "\n";
+                close(sock);
+                return "Connection failed";
+            }
+
+            std::cout << "Connected to " << host << ":" << target_port << std::endl;
+            send(sock, command.c_str(), command.size(), 0);
+
+            char buffer[1024] = {0};
+            recv(sock, buffer, sizeof(buffer), 0);
+            close(sock);
+            return "Command sent successfully";
+        } catch (const std::exception &e) {
+            std::cerr << "Error on port " << target_port << ": " << e.what() << std::endl;
+            return "Error occurred";
+        }
+    }
+
+
         std::map<int, int> sockets;
         std::string TENSION_REQ_MSG = "#01\r";
         bool port_flag =false;

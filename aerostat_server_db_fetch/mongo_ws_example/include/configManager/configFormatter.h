@@ -17,6 +17,9 @@ public:
         json tcpJson;
         // Process TCP servers
         for (const auto& tcpServer : serverConfig.tcp) {
+            if (tcpServer.data.empty()) {
+                continue;
+            }
             json serverDataJson;
 
             // Iterate through sensor data
@@ -41,6 +44,9 @@ public:
 
         // Process MODBUS servers
         for (const auto& modbusServer : serverConfig.modbus) {
+            if (modbusServer.data.empty()) {
+                continue;
+            }
             json serverDataJson;
 
             // Iterate through sensor data

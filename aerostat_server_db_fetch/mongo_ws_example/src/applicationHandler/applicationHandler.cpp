@@ -107,7 +107,7 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
             // Populate the `data` field based on `phaseType`
             if (serverConfig.phaseType == "tcp") {
                 responseJson["data"]["tcp"] = ConfigFormatter::tcpDataToJson(serverConfig);
-                if(connectionMan.check_host_reachable(serverConfig.tcp[0].ip))
+                if(!serverConfig.tcp.empty() && connectionMan.check_host_reachable(serverConfig.tcp[0].ip))
                 {
                     responseJson["status"] = "connected";
                 }
@@ -117,7 +117,7 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
                 }
             } else if (serverConfig.phaseType == "modbus") {
                 responseJson["data"]["modbus"] = ConfigFormatter::modbusDataToJson(serverConfig);
-                if(connectionMan.check_host_reachable(serverConfig.modbus[0].ip))
+                if(!serverConfig.modbus.empty() && connectionMan.check_host_reachable(serverConfig.modbus[0].ip))
                 {
                     responseJson["status"] = "connected";
                 }
