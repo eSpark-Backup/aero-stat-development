@@ -24,7 +24,7 @@ struct PortSetting {
 
 struct ServerSetting {
     std::string name;
-    std::string ip;
+    std::string ip = "0.0.0.255";
     std::vector<PortSetting> ports;
 
     std::map<std::string, std::map<std::string, std::string>> data;
@@ -60,7 +60,7 @@ struct ServerSetting {
 struct ServerConfig {
     std::vector<ServerSetting> tcp;
     std::vector<ServerSetting> modbus;
-    std::string phaseType = "tcp";
+    std::string phaseType = "unknown";
     bool broadcastEnable = false;
 
     void print() const {

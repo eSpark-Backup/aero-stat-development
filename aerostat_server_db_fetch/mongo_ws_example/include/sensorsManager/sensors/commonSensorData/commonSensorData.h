@@ -377,4 +377,56 @@ struct fanLightData : public SensorData {
     }
 };
 
+
+struct weatherStationTcpData : public SensorData {
+    std::string status;
+    float humidity;
+    float barometricPressure;
+    float airTemperature;
+    float windAngle;
+    float windSpeed;
+    uint8_t flag;
+
+    std::map<std::string, std::string> toMap() const override {
+        std::map<std::string, std::string> data;
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(2);  // Set precision to 2 decimal places
+
+        // Format each value and add it to the map
+        oss.str(""); oss.clear();  // Clear the stream
+        oss << humidity;
+        data["humidity"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << barometricPressure;
+        data["barometric_pressure"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << airTemperature;
+        data["air_temperature"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << windAngle;
+        data["wind_angle"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << windSpeed;
+        data["wind_speed"] = oss.str();
+
+        data["connection_status"] = status;
+
+        return data;
+    }
+
+
+    void print() const override {
+        LOG_WARNING("humidity: %f", humidity);
+        LOG_WARNING("barometric_pressure: %f", barometricPressure);
+        LOG_WARNING("air_temperature: %f", airTemperature);
+        LOG_WARNING("wind_angle: %f", windAngle);
+        LOG_WARNING("wind_speed: %f", windSpeed);
+        LOG_WARNING("connection_status: %s", status.c_str());
+    }
+};
+
 #endif //COMMON_SENSOR_DATA_TYPE
