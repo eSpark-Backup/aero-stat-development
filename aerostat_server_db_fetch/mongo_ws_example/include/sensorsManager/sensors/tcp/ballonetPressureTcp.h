@@ -44,8 +44,8 @@ public:
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
         if(nmeaData.empty())
         {
-            data->pressure = 0;
-            data->status = "disconnected";
+            // data->pressure = 0;
+            // data->status = "disconnected";
             return data;
         }
 

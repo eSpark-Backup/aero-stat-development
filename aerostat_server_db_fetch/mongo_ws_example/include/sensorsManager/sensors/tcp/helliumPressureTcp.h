@@ -45,8 +45,8 @@ public:
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
         if(nmeaData.empty())
         {
-            data->helliumPressure = 0;
-            data->status = "disconnected";
+            // data->helliumPressure = 0;
+            // data->status = "disconnected";
             return data;
         }
         data = std::make_unique<helliumPressureData>(readHelPressureData(nmeaData));
