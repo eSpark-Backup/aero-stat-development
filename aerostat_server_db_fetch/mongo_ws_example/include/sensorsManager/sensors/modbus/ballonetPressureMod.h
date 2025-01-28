@@ -40,6 +40,12 @@ public:
         // data->pressure = disPressure(gen);
         // data->status = "connected";
 
+        if(!ballonet_pressure_client)
+        {
+            data->status = "disconnected";
+            return data;
+        }
+
         {
             uint16_t regs[1];  // To store the register values
             // Read the pressure register using modbus_read_holding_registers

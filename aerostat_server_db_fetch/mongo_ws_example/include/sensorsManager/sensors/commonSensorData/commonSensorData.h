@@ -2,6 +2,7 @@
 #define COMMON_SENSOR_DATA_TYPE
 
 #include "sensorsManager/base/sensorBase.h"
+#include <sstream>
 
 #define LOAD_CELL_REGISTER 0x9C40
 #define ULTRASONIC_REGISTER 0x0101
@@ -55,14 +56,35 @@ struct weatherStationData : public SensorData {
 
     std::map<std::string, std::string> toMap() const override {
         std::map<std::string, std::string> data;
-        data["heading"] = std::to_string(heading);
-        data["barometric_pressure"] = std::to_string(barometricPressure);
-        data["air_temperature"] = std::to_string(airTemperature);
-        data["wind_angle"] = std::to_string(windAngle);
-        data["wind_speed"] = std::to_string(windSpeed);
+        std::ostringstream oss;
+        oss << std::fixed << std::setprecision(2);  // Set precision to 2 decimal places
+
+        // Format each value and add it to the map
+        oss.str(""); oss.clear();  // Clear the stream
+        oss << heading;
+        data["heading"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << barometricPressure;
+        data["barometric_pressure"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << airTemperature;
+        data["air_temperature"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << windAngle;
+        data["wind_angle"] = oss.str();
+
+        oss.str(""); oss.clear();
+        oss << windSpeed;
+        data["wind_speed"] = oss.str();
+
         data["connection_status"] = status;
+
         return data;
     }
+
 
     void print() const override {
         LOG_WARNING("heading: %f", heading);

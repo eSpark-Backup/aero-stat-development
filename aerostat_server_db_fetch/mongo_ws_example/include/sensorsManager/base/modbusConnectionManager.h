@@ -36,6 +36,24 @@ class ModbusConnectionManager {
         return std::min(pdop_accuracy, std::min(hdop_accuracy, vdop_accuracy));
     #endif
     }
+    bool write_coil(int coil_address, bool value, modbus* mb_ptr) {
+        uint16_t coil_value = value ? 0xFF00 : 0x0000;  // Modbus protocol uses 0xFF00 for ON and 0x0000 for OFF
+        if (mb_ptr->modbus_write_coil(coil_address, coil_value)) {
+            std::cerr << "Error writing to coil at address " << coil_address << ".\n";
+            return false;
+        }
+        return true;
+    }
+
+    bool read_coil(int coil_address, bool &value, modbus* mb_ptr) {
+        bool coil_value = false;
+        if (mb_ptr->modbus_read_coils(coil_address, 1, &coil_value)) {
+            std::cerr << "Error reading coil at address " << coil_address << ".\n";
+            return false;
+        }
+        value = coil_value;
+        return true;
+    }
 };
 
 #endif //MODBUS_CONNECTION_MANAGER

@@ -38,7 +38,16 @@ public:
 
         TcpConnectionManager connectionMan;
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
-
+        if(nmeaData.empty())
+        {
+            data->barometricPressure = 0;
+            data->airTemperature = 0;
+            data->heading = 0;
+            data->windAngle = 0;
+            data->windSpeed = 0;
+            data->status = "disconnected";
+            return data;
+        }
         data = std::make_unique<weatherStationData>(readWeatherSData(nmeaData));
         if(connectionMan.port_flag == false)
         {

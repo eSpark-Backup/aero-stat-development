@@ -103,11 +103,29 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
                 {"data", {}} // Initialize empty data
             };
 
+            ServerConfig serverInformation = configManager.getServerConfig();
+            TcpConnectionManager connectionMan = TcpConnectionManager::getInstance();
             // Populate the `data` field based on `phaseType`
             if (serverConfig.phaseType == "tcp") {
                 responseJson["data"]["tcp"] = ConfigFormatter::tcpDataToJson(serverConfig);
+                if(connectionMan.check_host_reachable(serverInformation.tcp[0].ip))
+                {
+                    responseJson["status"] = "connected";
+                }
+                else
+                {
+                    responseJson["status"] = "disconnected";
+                }
             } else if (serverConfig.phaseType == "modbus") {
                 responseJson["data"]["modbus"] = ConfigFormatter::modbusDataToJson(serverConfig);
+                if(connectionMan.check_host_reachable(serverInformation.modbus[0].ip))
+                {
+                    responseJson["status"] = "connected";
+                }
+                else
+                {
+                    responseJson["status"] = "disconnected";
+                }
             } else {
                 responseJson = {
                     {"error", "Invalid phaseType in configuration"},

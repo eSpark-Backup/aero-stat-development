@@ -79,7 +79,11 @@ public:
         // data->position_accuracy = disposition_accuracy(gen);
         // data->status = "connected";
         // return data;
-
+        if(!ahrs_client)
+        {
+            data->status = "disconnected";
+            return data;
+        }
 
         {
             ModbusConnectionManager connectionMan = ModbusConnectionManager::getInstance();

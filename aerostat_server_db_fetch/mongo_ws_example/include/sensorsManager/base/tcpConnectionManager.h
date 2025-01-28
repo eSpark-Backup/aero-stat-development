@@ -27,6 +27,27 @@ class TcpConnectionManager {
         static TcpConnectionManager connectionManagerInstance;
         return connectionManagerInstance;
     }
+    bool check_host_reachable(const std::string &ip_address) {
+        try {
+    #ifdef WINDOWS        
+            std::string command = "ping -n 1 -w 1000 " + ip_address;
+    #else
+            std::string command = "ping -c 1 -W 1 " + ip_address;
+    #endif        
+            int return_code = system(command.c_str());
+
+            if (return_code == 0) {
+                std::cout << "Host " << ip_address << " is reachable." << std::endl;
+                return true;
+            } else {
+                std::cout << "Host " << ip_address << " is unreachable." << std::endl;
+                return false;
+            }
+        } catch (const std::exception &e) {
+            std::cerr << "Error occurred while pinging " << ip_address << ": " << e.what() << std::endl;
+            return false;
+        }
+    }
 
 
         std::map<int, int> sockets;

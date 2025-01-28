@@ -2,6 +2,7 @@
 #include "alfaUtil/alfaUtilVersion.h"
 #include "configManager/configManager.h"
 #include "sensorsManager/base/sensorManager.h"
+#include "sensorsManager/base/tcpConnectionManager.h"
 #include "logger/logger.h"
 #include <stdexcept>
 
@@ -43,11 +44,23 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
                     setting.name = serverConfig["name"].get<std::string>();
                     setting.ip = serverConfig["ip"].get<std::string>();
 
+                    TcpConnectionManager connectionMan = TcpConnectionManager::getInstance();
+                    if (!connectionMan.check_host_reachable(setting.ip)) {
+                        LOG_ERROR("Host %s is not reachable for setting %s", setting.ip.c_str(), setting.name.c_str());
+                        continue;
+                    }
+
                     // Populate the ports
                     for (const auto& port : serverConfig["ports"]) {
                         PortSetting portSetting;
                         portSetting.port = port["port"].get<std::string>();
                         portSetting.name = port["name"].get<std::string>();
+                        if(currentSensorIntType == sensorInterfaceType::SENSOR_INT_TCP) {
+                            if(connectionMan.connect_to_port(stoi(portSetting.port), setting.ip).empty()) {
+                                LOG_ERROR("Connection to host %s failed for port %s", setting.ip.c_str(), portSetting.port.c_str());
+                                continue;
+                            }
+                        }
 
                         //register a sensor here
                         std::string updatedName = portSetting.name + "_" + protocol;

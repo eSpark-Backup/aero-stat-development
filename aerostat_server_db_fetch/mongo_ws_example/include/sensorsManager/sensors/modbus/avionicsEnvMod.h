@@ -41,6 +41,11 @@ public:
         // data->temperature = distemperature(gen);
         // data->humidity = dishumidity(gen);
         // data->status = "connected";
+        if(!temp_humidity_client)
+        {
+            data->status = "disconnected";
+            return data;
+        }
 
 
         uint16_t temp_regs[1] = {0};

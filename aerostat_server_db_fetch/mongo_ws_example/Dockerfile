@@ -23,6 +23,8 @@ RUN cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && make main
 
 RUN apt install gdb -y
 
+RUN apt-get update && apt-get install -y iputils-ping
+
 RUN echo "file ../bin/main" > ~/.gdbinit && \
     echo "run" >> ~/.gdbinit
 

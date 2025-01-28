@@ -37,6 +37,11 @@ public:
         // std::uniform_real_distribution<> disHeight(0.0, 360.0);
         
         // Assign random values to the fields
+        if(!ultrasonic_client)
+        {
+            data->status = "disconnected";
+            return data;
+        }
         data->height = read_ultrasonic();
         data->status = "connected";
 

@@ -42,6 +42,12 @@ public:
         std::string ipToConnect = this->connectionParams_.ip;
         TcpConnectionManager connectionMan;
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
+        if(nmeaData.empty())
+        {
+            data->pressure = 0;
+            data->status = "disconnected";
+            return data;
+        }
 
         data = std::make_unique<ballonetPressureData>(readBalPressureData(nmeaData));
         if(connectionMan.port_flag == false)

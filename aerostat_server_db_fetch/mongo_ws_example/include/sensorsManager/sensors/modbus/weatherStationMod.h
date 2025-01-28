@@ -57,7 +57,13 @@ public:
         data->windSpeed = disWindSpeed(gen);
         data->status = "connected";
 
-        /* Modbus reading routine */
+        // if(!weather_station_client)
+        // {
+        //     data->status = "disconnected";
+        //     return data;
+        // }
+
+        // /* Modbus reading routine */
         // ModbusConnectionManager modbusConn = ModbusConnectionManager::getInstance();
         // for (const auto& [key, reg_info] : WEATHER_REGISTERS) {
         //     uint16_t regs[2] = {0}; // Buffer to store register values
@@ -71,7 +77,6 @@ public:
         //             }
         //         } else if (reg_info.data_type == "float") {
         //             float value = modbusConn.convert_to_float(regs); // Convert two registers to float
-        //             value = std::round(value * 100.0f) / 100.0f;
         //             if (key == "wind_speed") {
         //                 data->windSpeed = value;
         //             } else if (key == "temperature") {
@@ -90,6 +95,8 @@ public:
 
         // if (data->windAngle || data->windSpeed || data->airTemperature || data->barometricPressure || data->heading) {
         //     data->status = "connected";
+        // } else {
+        //     data->status = "disconnected";
         // }
 
         

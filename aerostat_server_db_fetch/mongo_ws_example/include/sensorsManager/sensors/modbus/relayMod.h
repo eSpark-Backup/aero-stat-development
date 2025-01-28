@@ -11,12 +11,26 @@
 #include "sensorsManager/base/sensorFactory.h"
 #include "logger/trace_util.h"
 
+// Define relay button configurations
+struct RelayConfig {
+    std::string name;
+    std::vector<int> relay_nums;
+};
+
+std::vector<RelayConfig> relay_configs = {
+    {"primary_blower", {3}},
+    {"secondary_blower", {5}},
+    {"strobe_lights", {4, 6}},  // Controls both relays 4 and 6
+    {"payload_power", {7}}
+};
 
 class RelayMod : public Sensor {
 public:
     RelayMod(const std::string& name, sensorInterfaceType interfaceType, const ConnectionParams cp) : Sensor(interfaceType, cp) , name_(name) {
         data = std::make_shared<relayData>();
         dataToWrite = std::make_shared<relayWriteData>();
+        mb_relay = new modbus(cp.ip, stoi(cp.port));
+        relay_client = mb_relay->modbus_connect();
     }
 
     static void registerType() {
@@ -40,6 +54,11 @@ public:
         // data->secondary_blower_value = disbinary(gen);
         // data->strobe_lights_value = disbinary(gen);
         // data->payload_power_value = disbinary(gen);
+        if(!relay_client)
+        {
+            data->status = "disconnected";
+            return data;
+        }
         data->status = "connected";
 
         return data;
@@ -47,6 +66,7 @@ public:
 
     bool writeData(const std::shared_ptr<void>& dataRcv) override {
         // Implementation for writing data
+        ModbusConnectionManager& modbus = ModbusConnectionManager::getInstance();
         if (dataRcv) {
             auto value = std::static_pointer_cast<relayWriteData>(dataRcv);
             // Write `value` to the sensor
@@ -60,6 +80,26 @@ public:
             data->strobe_lights_value = value->relayStates[2];
             data->payload_power_value = value->relayStates[3];
 
+            for (const auto& config : relay_configs) {
+                bool value = false;
+                if (config.name == relay_configs[0].name) {
+                    value = data->primary_blower_value;
+                } else if (config.name == relay_configs[1].name) {
+                    value = data->secondary_blower_value;
+                } else if (config.name == relay_configs[2].name) {
+                    value = data->strobe_lights_value;
+                } else if (config.name == relay_configs[3].name) {
+                    value = data->payload_power_value;
+                }
+
+                for (int relay_num : config.relay_nums) {
+                    if (!modbus.write_coil(relay_num - 1, value, mb_relay)) {
+                        std::cerr << "Failed to write to relay " << relay_num << " (" << config.name << ").\n";
+                        return false;
+                    }
+                }
+            }
+
             return true;
         }
         return false; // Indicate failure
@@ -71,6 +111,8 @@ private:
     std::string ip_;
     std::shared_ptr<relayData> data;
     std::shared_ptr<relayWriteData> dataToWrite;
+    modbus* mb_relay;
+    bool relay_client = false;
 };
 
 #endif //RELAY_MODBUS_SENSOR_H

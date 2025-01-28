@@ -40,6 +40,30 @@ public:
         // data->hullPressure = disPressure(gen);
         // data->status = "connected";
 
+        if(!hull_pressure_client)
+        {
+            data->status = "disconnected";
+            return data;
+        }
+
+        {
+            uint16_t regs[1];  // To store the register values
+            // Read the pressure register using modbus_read_holding_registers
+            if (mb_hull->modbus_read_holding_registers(PRESSURE_SENSOR_REGISTER, 1, regs) == -1) {
+                std::cerr << "Error reading pressure register\n";
+                data->hullPressure = 0;
+                return data;
+            }
+
+            // Convert the register value to pressure in kPa
+            float pressure_kpa = regs[0] / 1000.0f;
+            
+            // Convert kPa to inWG using the scaling factor
+            float pressure_inwg = pressure_kpa * PRESSURE_SCALING_FACTOR;
+
+            data->hullPressure = pressure_inwg;
+        }
+
         /* from orignal server */
         {
             uint16_t regs[1];  // To store the register values

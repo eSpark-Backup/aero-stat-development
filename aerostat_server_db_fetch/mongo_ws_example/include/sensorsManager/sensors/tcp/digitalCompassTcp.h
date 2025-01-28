@@ -46,7 +46,14 @@ public:
         std::string ipToConnect = this->connectionParams_.ip;
         TcpConnectionManager connectionMan;
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
-
+        if(nmeaData.empty())
+        {
+            data->magheading = 0;
+            data->pitch = 0;
+            data->roll = 0;
+            data->status = "disconnected";
+            return data;
+        }
         data = std::make_unique<digitalCompassData>(readDigitalCompassData(nmeaData));
         if(connectionMan.port_flag == false)
         {

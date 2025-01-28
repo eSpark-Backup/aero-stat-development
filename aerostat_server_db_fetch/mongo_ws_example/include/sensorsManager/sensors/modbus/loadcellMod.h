@@ -44,6 +44,12 @@ public:
         // data->status = "connected";
         // // data->print();
 
+        if(!load_cell_client)
+        {
+            data->status = "disconnected";
+            return data;
+        }
+
         /* orignal server reading routine */
         uint16_t regs[2];
 
