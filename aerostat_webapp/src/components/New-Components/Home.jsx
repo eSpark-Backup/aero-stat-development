@@ -45,13 +45,6 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, onMessage } = useContext(WebSocketContext);
 
-  useEffect(() => {
-    setPrimaryBlower(response?.relay?.primary_blower)
-    setSecondaryBlower(response?.relay?.secondary_blower)
-    setStrobeLight(response?.relay?.strobe_lights)
-    setPayloadPower(response?.relay?.payload_power)
-  }, [response])
-
   const handleChange = (name, value) => {
     if (fetchingStart) {
       switch (name) {
@@ -89,69 +82,40 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
     }
   };
 
-  // useEffect(() => {
-  //   let FansLight = {
-  //     Fans: null,
-  //     Lights: null
-  //   };
-  //   if (fan1 === "Continuous" && fan2 === "Continuous") {
-  //     FansLight.Fans = "@01DO00\r";
-  //   } else if (fan1 === "Continuous" && fan2 === "Off") {
-  //     FansLight.Fans = "@01DO02\r";
-  //   } else if (fan1 === "Pressured" && fan2 === "Continuous") {
-  //     FansLight.Fans = "@01DO01\r";
-  //   } else if (fan1 === "Pressured" && fan2 === "Off") {
-  //     FansLight.Fans = "@01DO03\r";
-  //   }
-  //   if (light === "Off") {
-  //     FansLight.Lights = "@01DO12\r";
-  //   }
-  //   else if (light === "On") {
-  //     FansLight.Lights = "@01DO11\r";
-  //   }
-  //   if (sendData) {
-  //     sendDeviceCommands(FansLight)
-  //       .then((response) => {
-  //         const result = response?.ButtonResponse.split(",");
-  //         setFan1(result[2].toLowerCase() === "off" ? "Pressured" : "Continuous");
-  //         setFan2(result[3].toLowerCase() === "off" ? "Off" : "Continuous");
-  //         setLight(result[4].toLowerCase().startsWith("off") ? "Off" : "On");
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error sending device commands:', error);
-  //       })
-  //       .finally(() => setSendData(false));
-  //   }
-
-
-  // }, [sendData, fan1, fan2, light, primary_blower, secondary_blower, strobe_light, payload_power]);
-
   useEffect(() => {
-    let relayControls = {
-      "method": "alfa.actuator.settings.set",
-      "modbus": [
-        {
-          "name": "modbus1",
-          "relay": [
-            primary_blower === "On" ? 1 : 0,
-            secondary_blower === "On" ? 1 : 0,
-            strobe_light === "On" ? 1 : 0,
-            payload_power === "On" ? 1 : 0
-          ]
-        }
-      ],
-      "tcp": [
-        {
-          "name": "tcp1",
-          "fan": [
-            fan1 === "Pressured" ? 0 : 1,
-            fan2 === "Off" ? 0 : 1
-          ],
-          "strobe_light": [
-            light === "On" ? 1 : 0
-          ]
-        }
-      ]
+    let relayControls = {};
+    if (phase === 1) {
+      relayControls = {
+        "method": "alfa.actuator.settings.set",
+        "tcp": [
+          {
+            "name": "tcp1",
+            "fan": [
+              fan1 === "Pressured" ? 0 : 1,
+              fan2 === "Off" ? 0 : 1
+            ],
+            "strobe_light": [
+              light === "On" ? 1 : 0
+            ]
+          }
+        ]
+      }
+    }
+    if (phase === 2) {
+      relayControls = {
+        "method": "alfa.actuator.settings.set",
+        "modbus": [
+          {
+            "name": "modbus1",
+            "relay": [
+              primary_blower === "On" ? 1 : 0,
+              secondary_blower === "On" ? 1 : 0,
+              strobe_light === "On" ? 1 : 0,
+              payload_power === "On" ? 1 : 0
+            ]
+          }
+        ],
+      }
     }
     if (sendData) {
       sendJsonMessage(relayControls)
@@ -163,11 +127,21 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
   useWebSocket("ws://localhost:9001", {
     onMessage: (message) => {
       let data = JSON.parse(message.data)
-      if (data?.status === "success") {
-        setFan1(data?.settings_set?.tcp?.fan?.fan_one === "OFF" ? "Pressured" : "Continuous")
-        setFan2(data?.settings_set?.tcp?.fan?.fan_two === "OFF" ? "Off" : "Continuous")
-        setLight(data?.settings_set?.tcp?.strobe_light === "OFF" ? "Off" : "On")
-        console.log(data?.status && data)
+      if (phase === 1) {
+        if (data?.status === "success") {
+          setFan1(data?.settings_set?.tcp?.fan?.fan_one === "OFF" ? "Pressured" : "Continuous")
+          setFan2(data?.settings_set?.tcp?.fan?.fan_two === "OFF" ? "Off" : "Continuous")
+          setLight(data?.settings_set?.tcp?.strobe_light === "OFF" ? "Off" : "On")
+        }
+      }
+      if (phase === 2) {
+        if (data?.status === "success") {
+          setPrimaryBlower(data?.settings_set?.modbus?.relay[0] === 1 ? "On" : "Off")
+          setSecondaryBlower(data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off")
+          setStrobeLight(data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off")
+          setPayloadPower(data?.settings_set?.modbus?.relay[3] === 1 ? "On" : "Off")
+          console.log(data?.settings_set?.modbus?.relay[0])
+        }
       }
     },
   });
@@ -222,7 +196,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                     <StatusChip color={"blue"} description={"Wind Angle"} />
                     <StatusChip
                       color={"red"}
-                      description={"Aerostat Heading"}
+                      description={phase === 1 ? "Aerostat Heading" : "Humididty"}
                     />
                   </div>
                   {

@@ -65,6 +65,7 @@ function Phase1() {
     port_4004: "Disconnected",
     port_4005: "Disconnected",
     port_4006: "Disconnected",
+    loading: "Disconnected"
   });
 
   const { theme, form, phase1Start, setPhase1Start, phase, setIsPhase1Starts, setIsPhase2Starts } = useContext(ThemeContext);
@@ -83,6 +84,7 @@ function Phase1() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentResult, setCurrentResult] = useState(null);
   const [fetchingSpeed, setFetchingSpeed] = useState(1000);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme") || "light";
@@ -119,24 +121,25 @@ function Phase1() {
 
     try {
       const data = JSON.parse(message.data);
+      console.log(data)
       if (data) {
         const parsedResponses = {
           weather: {
-            air_temp: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.air_temperature : data?.data?.modbus?.modbus1[5007]?.air_temperature)
+            air_temp: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.air_temperature : data?.data?.modbus?.modbus1[5007]?.air_temperature)
               ? lastPerfectResponses.current.weather.air_temp
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.air_temperature : data?.data?.modbus?.modbus1[5007]?.air_temperature).toFixed(2),
-            baro_presssure: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.barometric_pressure : data?.data?.modbus?.modbus1[5007]?.barometric_pressure)
+              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.air_temperature : data?.data?.modbus?.modbus1[5007]?.air_temperature).toFixed(2),
+            baro_presssure: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.barometric_pressure : data?.data?.modbus?.modbus1[5007]?.barometric_pressure)
               ? lastPerfectResponses.current.weather.baro_presssure
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.barometric_pressure : data?.data?.modbus?.modbus1[5007]?.barometric_pressure).toFixed(2),
-            heading: isInvalidValue(data?.data?.tcp?.tcp1[4002]?.heading)
+              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.barometric_pressure : data?.data?.modbus?.modbus1[5007]?.barometric_pressure).toFixed(2),
+            heading: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.heading : data?.data?.modbus?.modbus1[5007]?.humidity)
               ? lastPerfectResponses.current.weather.heading
-              : parseFloat(data?.data?.tcp?.tcp1[4002]?.heading).toFixed(2),
-            wind_angle: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.wind_angle : data?.data?.modbus?.modbus1[5007]?.wind_angle)
+              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.heading : data?.data?.modbus?.modbus1[5007]?.humidity).toFixed(2),
+            wind_angle: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_angle : data?.data?.modbus?.modbus1[5007]?.wind_angle)
               ? lastPerfectResponses.current.weather.wind_angle
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.wind_angle : data?.data?.modbus?.modbus1[5007]?.wind_angle).toFixed(2),
-            wind_speed: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.wind_speed : data?.data?.modbus?.modbus1[5007]?.wind_speed)
+              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_angle : data?.data?.modbus?.modbus1[5007]?.wind_angle).toFixed(2),
+            wind_speed: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_speed : data?.data?.modbus?.modbus1[5007]?.wind_speed)
               ? lastPerfectResponses.current.weather.wind_speed
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4002]?.wind_speed : data?.data?.modbus?.modbus1[5007]?.wind_speed).toFixed(2),
+              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_speed : data?.data?.modbus?.modbus1[5007]?.wind_speed).toFixed(2),
             longitude: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.longitude)
               ? lastPerfectResponses.current.weather.longitude
               : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.longitude).toFixed(2),
@@ -151,9 +154,9 @@ function Phase1() {
               : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.ground_speed).toFixed(2),
           },
           digitalCompass: {
-            mag_heading: isInvalidValue(data?.data?.tcp?.tcp1[4003]?.magnitude_heading)
+            mag_heading: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.magnitude_heading : data?.data?.modbus?.modbus1[5003]?.heading)
               ? lastPerfectResponses.current.digitalCompass.mag_heading
-              : parseFloat(data?.data?.tcp?.tcp1[4003]?.magnitude_heading).toFixed(2),
+              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.magnitude_heading : data?.data?.modbus?.modbus1[5003]?.heading).toFixed(2),
             pitch: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.pitch : data?.data?.modbus?.modbus1[5003]?.pitch)
               ? lastPerfectResponses.current.digitalCompass.pitch
               : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.pitch : data?.data?.modbus?.modbus1[5003]?.pitch).toFixed(2),
@@ -226,7 +229,7 @@ function Phase1() {
               : "Off",
           },
           time: formatDateTime(),
-          loading: data?.connection_status,
+          loading: data?.status === "connected" ? "Connected" : "Disconnected",
           port_4002: data?.data?.tcp?.tcp1[4002]?.connection_status
             ? data?.data?.tcp?.tcp1[4002]?.connection_status
             : "Disconnected",
@@ -275,6 +278,8 @@ function Phase1() {
     }
   };
 
+  useEffect(() => { console.log("LOADING:::", loading) }, [loading])
+
   useEffect(() => {
     if (!startFetchingFromFile && (startFetchData && phase1Start)) {
       // console.log("HELLO")
@@ -312,83 +317,93 @@ function Phase1() {
     if (errors.length > 0) {
       return;
     }
-    const newForm = {
-      method: "alfa.server.connection.settings.set",
-      servers: [
-        {
-          tcp: [
-            {
-              name: "tcp1",
-              ip: form?.rawtcp_host_ip,
-              ports: [
-                {
-                  port: form?.weather,
-                  name: "weather_station"
-                },
-                {
-                  port: form?.hmr,
-                  name: "digital_compass"
-                },
-                {
-                  port: form?.ballonet,
-                  name: "ballonet_pressure"
-                },
-                {
-                  port: form?.helium,
-                  name: "hellium_pressure"
-                },
-                {
-                  port: form?.adam,
-                  name: "adam_sensor"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "modbus": [
-            {
-              "name": "modbus1",
-              "ip": form?.modbustcp_host_ip,
-              "ports": [
-                {
-                  "port": "5001",
-                  "name": "hull_pressure"
-                },
-                {
-                  "port": "5002",
-                  "name": "ballonet_pressure"
-                },
-                {
-                  "port": "5003",
-                  "name": "ahrs"
-                },
-                {
-                  "port": "5004",
-                  "name": "ultrasonic"
-                },
-                {
-                  "port": "5005",
-                  "name": "load_cell"
-                },
-                {
-                  "port": "5006",
-                  "name": "temp_humidity"
-                },
-                {
-                  "port": "5007",
-                  "name": "weather_station"
-                },
-                {
-                  "port": "4196",
-                  "name": "relay"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    };
+    let newForm = {}
+    if (phase === 1) {
+      newForm = {
+        method: "alfa.server.connection.settings.set",
+        servers: [
+          {
+            tcp: [
+              {
+                name: "tcp1",
+                ip: form?.rawtcp_host_ip,
+                ports: [
+                  {
+                    port: form?.weather,
+                    name: "weather_station"
+                  },
+                  {
+                    port: form?.hmr,
+                    name: "digital_compass"
+                  },
+                  {
+                    port: form?.ballonet,
+                    name: "ballonet_pressure"
+                  },
+                  {
+                    port: form?.helium,
+                    name: "hellium_pressure"
+                  },
+                  {
+                    port: form?.adam,
+                    name: "adam_sensor"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+    }
+    if (phase === 2) {
+      newForm = {
+        method: "alfa.server.connection.settings.set",
+        servers: [
+          {
+            modbus: [
+              {
+                name: "modbus1",
+                ip: form?.modbustcp_host_ip,
+                ports: [
+                  {
+                    port: "5001",
+                    name: "hull_pressure"
+                  },
+                  {
+                    port: "5002",
+                    name: "ballonet_pressure"
+                  },
+                  {
+                    port: "5003",
+                    name: "ahrs"
+                  },
+                  {
+                    port: "5004",
+                    name: "ultrasonic"
+                  },
+                  {
+                    port: "5005",
+                    name: "load_cell"
+                  },
+                  {
+                    port: "5006",
+                    name: "temp_humidity"
+                  },
+                  {
+                    port: "5007",
+                    name: "weather_station"
+                  },
+                  {
+                    port: "4196",
+                    name: "relay"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      };
+    }
     try {
       setStartFetchData(true);
       setPhase1Start(true)
@@ -594,7 +609,7 @@ function Phase1() {
         />
         <Home
           response={responses}
-          isLoading={false}
+          isLoading={responses?.loading}
           handleSubmit={handleSubmit}
           errorValues={errorValues}
           setErrorValues={setErrorValues}
