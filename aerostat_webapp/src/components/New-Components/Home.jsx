@@ -43,7 +43,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
   const [strobe_light, setStrobeLight] = useState("Off");
   const [payload_power, setPayloadPower] = useState("Off");
   const [sendData, setSendData] = useState(false);
-  const { sendJsonMessage, onMessage } = useContext(WebSocketContext);
+  const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
 
   const handleChange = (name, value) => {
     if (fetchingStart) {
@@ -124,18 +124,18 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
     }
   }, [sendData, fan1, fan2, light, primary_blower, secondary_blower, strobe_light, payload_power]);
 
-  useWebSocket("ws://localhost:9001", {
-    onMessage: (message) => {
-      let data = JSON.parse(message.data)
-      if (phase === 1) {
-        if (data?.status === "success") {
+  useEffect(() => {
+    if (lastMessage?.data) {
+      const data = JSON.parse(lastMessage.data);
+      const status = data.status;
+      if (status === "success") {
+        if (phase === 1) {
           setFan1(data?.settings_set?.tcp?.fan?.fan_one === "OFF" ? "Pressured" : "Continuous")
           setFan2(data?.settings_set?.tcp?.fan?.fan_two === "OFF" ? "Off" : "Continuous")
           setLight(data?.settings_set?.tcp?.strobe_light === "OFF" ? "Off" : "On")
+          console.log(`${data?.settings_set?.tcp?.fan?.fan_one} ${data?.settings_set?.tcp?.fan?.fan_two} ${data?.settings_set?.tcp?.strobe_light}`)
         }
-      }
-      if (phase === 2) {
-        if (data?.status === "success") {
+        if (phase === 2) {
           setPrimaryBlower(data?.settings_set?.modbus?.relay[0] === 1 ? "On" : "Off")
           setSecondaryBlower(data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off")
           setStrobeLight(data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off")
@@ -143,8 +143,8 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
           console.log(data?.settings_set?.modbus?.relay)
         }
       }
-    },
-  });
+    }
+  }, [lastMessage]);
 
   return (
     <>
