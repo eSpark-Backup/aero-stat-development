@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import Header from "../components/New-Components/Header";
 import Home from "../components/New-Components/Home";
 import Sidebar from "../components/New-Components/Sidebar";
@@ -9,9 +9,9 @@ import "./phase1.css";
 import { WebSocketContext } from "../App";
 import useWebSocket from "react-use-websocket";
 
-function Phase1() {
+const Phase1 = React.memo(() => {
 
-  const { readyState, sendJsonMessage } = useContext(WebSocketContext);
+  const { readyState, sendJsonMessage,lastMessage } = useContext(WebSocketContext);
   const [activateWebSocket, setActivateWebSocket] = useState(false);
 
   const connectionStatus = {
@@ -121,7 +121,6 @@ function Phase1() {
 
     try {
       const data = JSON.parse(message.data);
-      console.log(data)
       if (data) {
         const parsedResponses = {
           weather: {
@@ -292,9 +291,11 @@ function Phase1() {
     }
   }, [startFetchingFromFile, startFetchData, phase1Start]);
 
-  useWebSocket("ws://localhost:9001", {
-    onMessage: activateWebSocket ? fetchData : undefined,
-  });
+  useEffect(() => {
+    if (lastMessage && activateWebSocket) {
+      fetchData(lastMessage);
+    }
+  }, [lastMessage]);
 
   const [errorValues, setErrorValues] = useState([]);
 
@@ -633,6 +634,6 @@ function Phase1() {
       ></div>
     </>
   );
-}
+})
 
 export default Phase1;

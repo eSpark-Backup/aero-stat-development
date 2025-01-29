@@ -140,7 +140,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
           setSecondaryBlower(data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off")
           setStrobeLight(data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off")
           setPayloadPower(data?.settings_set?.modbus?.relay[3] === 1 ? "On" : "Off")
-          console.log(data?.settings_set?.modbus?.relay[0])
+          console.log(data?.settings_set?.modbus?.relay)
         }
       }
     },

@@ -109,7 +109,8 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData, size
             plotShadow: false,
             backgroundColor: "transparent",
             height: size,
-            width: size
+            width: size,
+            animation: false
         },
         plotOptions: {
             gauge: {
@@ -214,7 +215,8 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
             plotShadow: false,
             backgroundColor: "transparent",
             height: size,
-            width: size
+            width: size,
+            animation: false
         },
         plotOptions: {
             gauge: {
