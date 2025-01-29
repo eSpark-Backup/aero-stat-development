@@ -228,7 +228,7 @@ const Phase1 = React.memo(() => {
               : "Off",
           },
           time: formatDateTime(),
-          loading: data?.status === "connected" ? "Connected" : "Disconnected",
+          loading: data?.status === "connected" || "success" ? "Connected" : "Disconnected",
           port_4002: data?.data?.tcp?.tcp1[4002]?.connection_status
             ? data?.data?.tcp?.tcp1[4002]?.connection_status
             : "Disconnected",

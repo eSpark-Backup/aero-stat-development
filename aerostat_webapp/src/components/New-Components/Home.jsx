@@ -34,6 +34,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
   const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
   const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
   // const [openModal, setOpenModal] = useState(false);
+  console.log(isLoading)
 
   const [fan1, setFan1] = useState("Continuous");
   const [fan2, setFan2] = useState("Off");
