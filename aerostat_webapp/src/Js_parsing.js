@@ -47,12 +47,12 @@ export function formatDateTime(dateString = new Date().toISOString()) {
 export function processDataArray(dataArray, currentResult = null) {
 
     let result = currentResult || {
-        adams: { MaxTension: 700, Tension: 10 },
-        ballonet: { BalPressure: 0.071 },
-        digitalCompass: { Magheading: 240.1, Pitch: 0, Roll: 0 },
+        adams: { max_tension: 700, tension: 10 },
+        ballonet: { bal_pressure: 0.071 },
+        digitalCompass: { mag_heading: 240.1, pitch: 0, roll: 0 },
         ebox: { InternalTemp: 25.5, fan1: 'ON', fan2: 'ON', position: '1', strobe: 'OFF' },
-        helium: { HelPressure: 0.398 },
-        weather: { airTemp: 18.8, baroPres: 29.3, heading: 128, windAngle: 158.4, windSpeed: 70 },
+        helium: { hel_pressure: 0.398 },
+        weather: { air_temp: 18.8, baro_presssure: 29.3, heading: 128, wind_angle: 158.4, wind_speed: 70 },
         time: ""
     };
 
@@ -87,34 +87,40 @@ export function processDataArray(dataArray, currentResult = null) {
                 const numericValue = parseFloat(value).toFixed(2);
 
 
-                if (key === 'Pitch' || key === 'Roll') {
-                    result.digitalCompass[key] = numericValue;
+                // if (key === 'Pitch' || key === 'Roll') {
+                //     result.digitalCompass[key] = numericValue;
+                // }
+                if (key === "Pitch") {
+                    result.digitalCompass["pitch"] = numericValue
                 }
-                else if (key === 'MagHeading') {
-                    result.digitalCompass['Magheading'] = numericValue;
+                else if (key === "Roll") {
+                    result.digitalCompass["roll"] = numericValue
+                }
+                else if (key === 'Mag Heading') {
+                    result.digitalCompass['mag_heading'] = numericValue;
                 }
                 else if (key === 'Ballonet Pressure') {
-                    result.ballonet['BalPressure'] = numericValue;
+                    result.ballonet['bal_pressure'] = numericValue;
                 }
                 else if (key === 'Helium Pressure') {
-                    result.helium['HelPressure'] = numericValue;
+                    result.helium['hel_pressure'] = numericValue;
                 } else if (key === 'Aerostat Heading') {
                     result.weather['heading'] = numericValue;
                 } else if (key === 'Wind Speed') {
-                    result.weather['windSpeed'] = numericValue;
+                    result.weather['wind_speed'] = numericValue;
                 } else if (key === 'Wind Angle') {
-                    result.weather['windAngle'] = numericValue;
+                    result.weather['wind_angle'] = numericValue;
                 } else if (key === 'Tension') {
-                    result.adams['Tension'] = numericValue;
+                    result.adams['tension'] = numericValue;
                 }
                 else if (key === 'Max Tension') {
-                    result.adams['MaxTension'] = numericValue;
+                    result.adams['max_tension'] = numericValue;
                 }
                 else if (key === 'Air Temp') {
-                    result.weather['airTemp'] = numericValue;
+                    result.weather['air_temp'] = numericValue;
                 }
                 else if (key === 'Baro Pres') {
-                    result.weather['baroPres'] = numericValue;
+                    result.weather['baro_presssure'] = numericValue;
                 }
             });
         }

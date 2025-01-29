@@ -4,6 +4,8 @@ import logo from "../../assets/logo.svg";
 import logowhite from "../../assets/logo-white.svg";
 import close from "../../assets/close.svg";
 import close2 from "../../assets/close-dark.svg";
+import { updateToggle } from "../../utils";
+import { WebSocketContext } from "../../App";
 
 const Sidebar = ({
   open,
@@ -14,6 +16,40 @@ const Sidebar = ({
   fwdBtn,
 }) => {
   const { theme } = useContext(ThemeContext);
+  const { phase, setPhase, setPhase1Start, isPhase1Starts, setIsPhase2Starts, isPhase2Starts } = useContext(ThemeContext);
+  const { sendJsonMessage } = useContext(WebSocketContext);
+
+  const changePhase = async (newPhase) => {
+    if (phase === newPhase) {
+      return
+    }
+    console.log(newPhase)
+    if (newPhase === 2) {
+      sendJsonMessage({
+        "method": "alfa.phase.settings.set",
+        "phaseType": "modbus"
+      })
+      if (!isPhase2Starts) {
+        setPhase1Start(false)
+      }
+      if (isPhase2Starts) {
+        setPhase1Start(true)
+      }
+    }
+    else {
+      sendJsonMessage({
+        "method": "alfa.phase.settings.set",
+        "phaseType": "tcp"
+      })
+      if (isPhase1Starts) {
+        setPhase1Start(true)
+      }
+      else {
+        setPhase1Start(false)
+      }
+    }
+    setPhase(newPhase);
+  };
 
   return (
     <div className={`sidebar ${open ? "open" : ""} ${theme}`}>
@@ -25,12 +61,14 @@ const Sidebar = ({
       />
       <img src={theme === "light" ? logo : logowhite} alt="Logo" />
       <div className="sidebar-menu">
-        <p>Dashboard</p>
+        <div style={{ display: "flex", flexDirection: "column", rowGap: "20px" }}>
+          <p className={phase === 2 && "side-item-notactive"} onClick={() => changePhase(1)}>Phase 1</p>
+          <p className={phase === 1 && "side-item-notactive"} onClick={() => changePhase(2)}>Phase 2</p>
+        </div>
         <div
           style={{ width: "306px" }}
-          className={`config-box ${
-            theme === "light" ? "config-box-light" : "config-box-dark"
-          }`}
+          className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"
+            }`}
         >
           <button
             onClick={() => {
@@ -39,7 +77,7 @@ const Sidebar = ({
             }}
             className={
               (!playBtn && StopBtn && fwdBtn) ||
-              (!playBtn && !fwdBtn && StopBtn)
+                (!playBtn && !fwdBtn && StopBtn)
                 ? "disable"
                 : ""
             }

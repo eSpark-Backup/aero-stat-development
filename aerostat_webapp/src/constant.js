@@ -9,7 +9,8 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData, size) => 
             plotShadow: false,
             backgroundColor: "transparent",
             height: size,
-            width: size
+            width: size,
+            animation: false
         },
         plotOptions: {
             gauge: {
@@ -108,7 +109,8 @@ export const pressureGaugeOptions = (theme, min = 0, max = 610, seriesData, size
             plotShadow: false,
             backgroundColor: "transparent",
             height: size,
-            width: size
+            width: size,
+            animation: false
         },
         plotOptions: {
             gauge: {
@@ -213,7 +215,8 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
             plotShadow: false,
             backgroundColor: "transparent",
             height: size,
-            width: size
+            width: size,
+            animation: false
         },
         plotOptions: {
             gauge: {
@@ -304,3 +307,96 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
         }]
     }
 }
+
+export const details = [
+    {
+        key: "Load Cell Tension:",
+        value: "Error",
+        unit: null
+    },
+    {
+        key: "Roll:",
+        value: "Error",
+        unit: null
+    },
+    {
+        key: "Wind Direction:",
+        value: "Error",
+        unit: null
+    },
+    {
+        key: "Pitch:",
+        value: "0.00°",
+        unit: "°"
+    },
+    {
+        key: "Wind Speed:",
+        value: "0.00",
+        unit: "m/s"
+    },
+    {
+        key: "Yaw:",
+        value: "0.00",
+        unit: "°"
+    },
+    {
+        key: "Temperature:",
+        value: "0.00",
+        unit: "°C"
+    },
+    {
+        key: "Longitude:",
+        value: "N/A",
+        unit: null
+    },
+    {
+        key: "Humidity:",
+        value: "0.00",
+        unit: "%"
+    },
+    {
+        key: "Latitude:",
+        value: "N/A",
+        unit: null
+    },
+    {
+        key: "Barometric Pressure:",
+        value: "0.00",
+        unit: "hPa"
+    },
+    {
+        key: "Altitude:",
+        value: "N/A",
+        unit: null
+    },
+    {
+        key: "Ballonet Curtain:",
+        value: "Error",
+        unit: null
+    },
+    {
+        key: "Position Accuracy:",
+        value: "Error",
+        unit: null
+    },
+    {
+        key: "Ballonet Pressure:",
+        value: "Error",
+        unit: null
+    },
+    {
+        key: "Ground Speed:",
+        value: "N/A",
+        unit: null
+    },
+    {
+        key: "Hull Pressure:",
+        value: "Error",
+        unit: null
+    },
+    {
+        key: "Heading:",
+        value: "N/A",
+        unit: null
+    },
+];

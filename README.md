@@ -3,13 +3,13 @@ This repository will contain the latest project progress
 
 ## STEPS TO BE FOLLOWED
 
-1. Open folder `aerostat_localserver` and open `cmd prompt` on this directory.
-2. Run `pip install -r requirements.txt` to install the required dependencies.
-3. Then, run `python backend.py` and press `Enter`.
-4. After that, open `aerostat_webapp` folder and open `cmd prompt` on this directory.
-5. Type `npm install` then `npm run dev`.
-6. Open any browser on your system, and type `http://alfaops.local:8080/` or `alfaops.local:8080`. Your UI will be opened and can be opened on any system having same network just by opening the given url on the browser.
-7. First click on the config button, and enter your GCS ip and ports. Select Save & the values will start updating.
+1. Open folder `Backend_Application` and launch the .exe file start the backend C++ server. The server will wait for GCS port and configuration info from the Frontend Dashboard.
+2. After that, open `aerostat_webapp` folder and open `cmd prompt` on this directory.
+3. Type `npm install` to install all the required node_modules. Before running this command, npm will be required in the system as a pre-requisite. Instructions for that are mentioned below.
+4. Afterwards, run `npm run build` to build the src code.
+5. After successful build, run `npm run preview` to launch the Frontend Dashboard.
+6. Open any browser on the system, and type `http://localhost:8080/`. The Frontend Dashboard will be launched.
+7. Click on the hamburger menu next to Date on the top of the UI, then press Config button on the slider menu and enter  GCS IP and Ports. Select Save & the values will start updating.
 
 ## INSTALLATIONS
 ### Nodejs:
@@ -31,23 +31,9 @@ Open Command Prompt (search for cmd in the Start menu).
 Run node --version to check the Node.js version.
 Run npm --version to check the npm version.
 
-### Python:
-1. Download Python:
 
-Go to the [Python official website](https://www.python.org/downloads/).                        
-Download the latest version of Python for Windows (usually the executable installer).
-
-2. Install Python:
-
-Run the installer.
-Check the box that says "Add Python to PATH" before clicking "Install Now."
-Follow the prompts to complete the installation.
-
-3. Verify Installation:
-
-Open Command Prompt (search for cmd in the Start menu).
-Run python --version to check the Python version.
-Run pip --version to check if pip is installed.
+## Video Demonstration of Deployment Procedure
+[Deployment Procedure Recording](https://www.loom.com/share/c457404340014f1a92c6fff8859ac802)
 
 ## GCS ANYDESK:
 ID: 1122996002  
