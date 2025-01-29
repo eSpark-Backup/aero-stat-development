@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  frontend:
+    build: ../aerostat_webapp
+    ports:
+      - "8081:8081"
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_SERVER=http://backend:9001
+
+  backend:
+    build: ./mongo_ws_example
+    ports:
+      - "9001:9001"
+    volumes:
+      - ./logs:/home/logs
+
+  mock-socket:
+    build: ./mongo_ws_example/assets/modbus_tcp_server
+
+    ##====================================================
+    ##
+    ## COMMANDS TO SPIN ALL THE SERVICES
+    ##
+    ## docker-compose up -d --build
+    ##
+    ##====================================================
+
+    ## COMMAND TO SHUTDOWN THE SERVICES
+    ## docker-compose down

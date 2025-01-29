@@ -12,7 +12,7 @@ const size_t MAX_LOG_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 #include <direct.h>
 const std::string LOG_DIR_PATH = std::string(getenv("USERPROFILE")) + "\\logs";
 #else
-const std::string LOG_DIR_PATH = std::string(getenv("HOME")) + "/logs";
+const std::string LOG_DIR_PATH = "/home/logs";
 #endif
 std::string log_file_path;
 
