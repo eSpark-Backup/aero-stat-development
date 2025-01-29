@@ -16,14 +16,17 @@ const Sidebar = ({
   fwdBtn,
 }) => {
   const { theme } = useContext(ThemeContext);
-  const { phase, setPhase, setPhase1Start, isPhase1Starts, setIsPhase2Starts, isPhase2Starts } = useContext(ThemeContext);
+  const { phase, setPhase, setPhase1Start, isPhase1Starts, setIsPhase2Starts, isPhase2Starts, fileFetchingStart } = useContext(ThemeContext);
   const { sendJsonMessage } = useContext(WebSocketContext);
 
   const changePhase = async (newPhase) => {
     if (phase === newPhase) {
       return
     }
-    console.log(newPhase)
+
+    if (newPhase === 2 && fileFetchingStart) {
+      return
+    }
     if (newPhase === 2) {
       sendJsonMessage({
         "method": "alfa.phase.settings.set",
@@ -63,7 +66,7 @@ const Sidebar = ({
       <div className="sidebar-menu">
         <div style={{ display: "flex", flexDirection: "column", rowGap: "20px" }}>
           <p className={phase === 2 && "side-item-notactive"} onClick={() => changePhase(1)}>Phase 1</p>
-          <p className={phase === 1 && "side-item-notactive"} onClick={() => changePhase(2)}>Phase 2</p>
+          <p style={{ cursor: fileFetchingStart && "not-allowed", backgroundColor: fileFetchingStart && "#cbcbcbbb" }} className={phase === 1 && "side-item-notactive"} onClick={() => changePhase(2)}>Phase 2</p>
         </div>
         <div
           style={{ width: "306px" }}
