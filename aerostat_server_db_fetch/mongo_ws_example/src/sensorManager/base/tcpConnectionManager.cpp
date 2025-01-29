@@ -82,8 +82,8 @@ std::string TcpConnectionManager::connect_to_port(int port, std::string host)
             setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout));
 #else
             struct timeval timeout;
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 70000;
+            timeout.tv_sec = 1;
+            timeout.tv_usec = 0;
             setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 #endif
             sockaddr_in serverAddress;
@@ -100,7 +100,7 @@ std::string TcpConnectionManager::connect_to_port(int port, std::string host)
                 Sleep(1*1000);
 #else
                 close(sock);
-                // usleep(1*1000*1000);
+                usleep(1*1000*1000);
 #endif                                
                 return "";
             }

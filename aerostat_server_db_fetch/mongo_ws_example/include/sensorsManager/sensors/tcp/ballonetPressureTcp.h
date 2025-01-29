@@ -116,6 +116,7 @@ private:
 
         // // Log the message if any data was parsed
         if (!m_msgStr.empty()) {
+            log_message(m_msgStr);
             LOG_SUCCESS( "%s",m_msgStr.c_str());
         }
 

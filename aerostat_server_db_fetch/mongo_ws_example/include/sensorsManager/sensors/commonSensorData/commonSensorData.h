@@ -2,6 +2,7 @@
 #define COMMON_SENSOR_DATA_TYPE
 
 #include "sensorsManager/base/sensorBase.h"
+#include "logger/log_file.h"
 #include <sstream>
 
 #define LOAD_CELL_REGISTER 0x9C40
