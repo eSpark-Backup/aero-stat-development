@@ -96,7 +96,7 @@ export function processDataArray(dataArray, currentResult = null) {
                 else if (key === "Roll") {
                     result.digitalCompass["roll"] = numericValue
                 }
-                else if (key === 'Mag Heading') {
+                else if (key === 'MagHeading') {
                     result.digitalCompass['mag_heading'] = numericValue;
                 }
                 else if (key === 'Ballonet Pressure') {

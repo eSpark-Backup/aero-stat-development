@@ -12,6 +12,7 @@ const ThemeHandler = ({ children }) => {
     const [phase1Start, setPhase1Start] = useState(false)
     const [isPhase1Starts, setIsPhase1Starts] = useState(false)
     const [isPhase2Starts, setIsPhase2Starts] = useState(false)
+    const [fileFetchingStart, setFileFetchingStart] = useState(false)
 
     const [form, setForm] = useState({
         rawtcp_host_ip: "172.17.0.2",
@@ -34,7 +35,7 @@ const ThemeHandler = ({ children }) => {
     }, [theme]);
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme, phase, setPhase, form, setForm, phase2Start, setPhase2Start, phase1Start, setPhase1Start, setIsPhase1Starts, isPhase1Starts, setIsPhase2Starts, isPhase2Starts }}>
+        <ThemeContext.Provider value={{ theme, toggleTheme, phase, setPhase, form, setForm, phase2Start, setPhase2Start, phase1Start, setPhase1Start, setIsPhase1Starts, isPhase1Starts, setIsPhase2Starts, isPhase2Starts, fileFetchingStart, setFileFetchingStart }}>
             {children}
         </ThemeContext.Provider>
     );

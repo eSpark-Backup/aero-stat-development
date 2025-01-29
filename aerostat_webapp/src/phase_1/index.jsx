@@ -11,7 +11,7 @@ import useWebSocket from "react-use-websocket";
 
 const Phase1 = React.memo(() => {
 
-  const { readyState, sendJsonMessage,lastMessage } = useContext(WebSocketContext);
+  const { readyState, sendJsonMessage, lastMessage } = useContext(WebSocketContext);
   const [activateWebSocket, setActivateWebSocket] = useState(false);
 
   const connectionStatus = {
@@ -68,7 +68,7 @@ const Phase1 = React.memo(() => {
     loading: "Disconnected"
   });
 
-  const { theme, form, phase1Start, setPhase1Start, phase, setIsPhase1Starts, setIsPhase2Starts } = useContext(ThemeContext);
+  const { theme, form, phase1Start, setPhase1Start, phase, setIsPhase1Starts, setIsPhase2Starts, fileFetchingStart, setFileFetchingStart } = useContext(ThemeContext);
   const [sidebar, setSidebar] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [responses, setResponses] = useState(lastPerfectResponses.current);
@@ -410,6 +410,7 @@ const Phase1 = React.memo(() => {
       setPhase1Start(true)
       setOpenModal(false);
       setStartFetchingFromFile(false);
+      setFileFetchingStart(false);
       setErrorValues([]);
       sendJsonMessage(newForm);
       sendJsonMessage({
@@ -476,6 +477,7 @@ const Phase1 = React.memo(() => {
         clearInterval(intervalId);
 
         setStartFetchingFromFile(false);
+        setFileFetchingStart(false)
         setFwdBtn(false);
         setPlayBtn(false);
         setFileContent("");
@@ -530,6 +532,7 @@ const Phase1 = React.memo(() => {
 
   const HandlePlay = () => {
     setStartFetchingFromFile(true);
+    setFileFetchingStart(true)
     setFwdBtn(true);
     setStopBtn(true);
     setStartFetchData(false);
@@ -543,6 +546,7 @@ const Phase1 = React.memo(() => {
   };
   const HandleStop = () => {
     setStartFetchingFromFile(false);
+    setFileFetchingStart(false)
     setFwdBtn(false);
     setPlayBtn(false);
     setFileContent("");
