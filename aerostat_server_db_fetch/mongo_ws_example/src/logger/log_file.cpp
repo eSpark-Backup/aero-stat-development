@@ -33,7 +33,7 @@ std::string get_current_datetime() {
     auto now = std::time(nullptr);
     std::tm tm = *std::localtime(&now);
     std::ostringstream oss;
-    oss << std::put_time(&tm, "%d%m%Y_%H-%M-%S");
+    oss << std::put_time(&tm, "%d%m%Y %H:%M:%S");
     return oss.str();
 }
 
@@ -58,7 +58,7 @@ void log_message(const std::string& message) {
 
     std::ofstream log_file(log_file_path, std::ios_base::app);
     if (log_file.is_open()) {
-        log_file << get_current_datetime() << " - " << message << std::endl;
+        log_file << get_current_datetime() << "\t" << message << std::endl;
     } else {
         std::cerr << "Unable to open log file: " << log_file_path << std::endl;
     }

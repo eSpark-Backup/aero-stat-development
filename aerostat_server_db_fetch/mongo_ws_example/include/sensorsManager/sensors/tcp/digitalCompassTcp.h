@@ -119,7 +119,7 @@ private:
 
                             oss.str("");
                             oss << std::fixed << std::setprecision(2) << Magheading;
-                            m_msgStr += "Mag Heading: " + oss.str() + "\t";
+                            m_msgStr += "MagHeading: " + oss.str() + "\t";
 
                             oss.str("");
                             oss << std::fixed << std::setprecision(2) << pitchV;
