@@ -41,7 +41,7 @@ public:
         /* from orignal server */
         std::string ipToConnect = this->connectionParams_.ip;
 
-        TcpConnectionManager connectionMan;
+         TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
         if(nmeaData.empty())
         {
@@ -68,7 +68,7 @@ private:
     std::string ip_;
     std::shared_ptr<helliumPressureData> data;
     helliumPressureData readHelPressureData(const std::string& nmeaData){
-        TcpConnectionManager connectionMan;
+         TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         helliumPressureData parsedData;
         std::string m_msgStr;
         std::vector<std::string> msgsList;

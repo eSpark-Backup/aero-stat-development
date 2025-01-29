@@ -44,7 +44,7 @@ public:
 
         /* orignal server reading routine */
         std::string ipToConnect = this->connectionParams_.ip;
-        TcpConnectionManager connectionMan;
+         TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
         if(nmeaData.empty())
         {
@@ -75,7 +75,7 @@ private:
     std::string ip_;
     std::shared_ptr<digitalCompassData> data;
     digitalCompassData readDigitalCompassData(const std::string& nmeaData) {
-        TcpConnectionManager connectionMan;
+         TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         digitalCompassData parsedData;
         std::string m_msgStr;
         std::vector<std::string> msgsList;

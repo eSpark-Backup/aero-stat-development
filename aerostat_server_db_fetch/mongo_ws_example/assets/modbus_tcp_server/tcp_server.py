@@ -22,14 +22,30 @@ state_4006 = {
     "increasing": True  # Track whether we are incrementing or decrementing
 }
 
-# Data to be sent to clients on each port
-data_dict = {
-    4002: b"$HCHDT,128.0,T*22\r\n$WIMDA,29.2878,I,0.9918,B,18.8,C,,,,,,,,,,,,,,*36\r\n$WIMWV,158.4,R,1.9,N,A*23\r\n",
-    4003: b"$PTNTHPR,240.1,N,0.8,N,2.2,N*3B\r\n",
-    4004: b"#01CP=0.0712\r\n",
-    4005: b"#01CP=-0.3984\r\n",
-    4006: b">12\r\n"
-}
+data_dicts = [
+    {
+        4002: b"$HCHDT,128.0,T*22\r\n$WIMDA,29.2878,I,0.9918,B,18.8,C,,,,,,,,,,,,,,*36\r\n$WIMWV,158.4,R,1.9,N,A*23\r\n",
+        4003: b"$PTNTHPR,240.1,N,0.8,N,2.2,N*3B\r\n",
+        4004: "#01CP={:.2f}\r\n",
+        4005: "#01CP={:.2f}\r\n",
+        4006: ">{:.1f}\r\n"
+    },
+    {
+        4002: b"$HCHDT,130.0,T*22\r\n$WIMDA,29.3012,I,0.9925,B,19.0,C,,,,,,,,,,,,,,*37\r\n$WIMWV,160.0,R,2.1,N,A*24\r\n",
+        4003: b"$PTNTHPR,242.5,N,1.0,N,2.5,N*3C\r\n",
+        4004: "#01CP={:.2f}\r\n",
+        4005: "#01CP={:.2f}\r\n",
+        4006: ">{:.1f}\r\n"
+    },
+    {
+        4002: b"$HCHDT,130.0,T*22\r\n$WIMDA,29.2000,I,0.9935,B,17.0,C,,,,,,,,,,,,,,*37\r\n$WIMWV,170.0,R,2.7,N,A*24\r\n",
+        4003: b"$PTNTHPR,230.5,N,0.7,N,2.3,N*3D\r\n",
+        4004: "#01CP={:.2f}\r\n",
+        4005: "#01CP={:.2f}\r\n",
+        4006: ">{:.1f}\r\n"
+    }
+]
+current_data_index = 0  # Track the active data dictionary
 
 # Function to update dynamic values for port 4004 and 4005
 def update_dynamic_state(state):
@@ -61,6 +77,7 @@ def handle_client(conn, addr, port):
     print(f"Connected by {addr} on port {port}")
     try:
         while True:
+            data_dict = data_dicts[current_data_index]
             if port == 4004:
                 # Update and send dynamic value for port 4004
                 update_dynamic_state(state_4004)
@@ -97,6 +114,13 @@ def handle_client(conn, addr, port):
         conn.close()
         print(f"Connection closed for {addr} on port {port}")
 
+def switch_data_dict():
+    global current_data_index
+    while True:
+        time.sleep(1)  # Switch data every 10 seconds
+        current_data_index = (current_data_index + 1) % len(data_dicts)
+        print(f"Switched to data dictionary {current_data_index}")
+
 # Function to set up a server socket and listen for connections
 def start_server(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
@@ -108,6 +132,9 @@ def start_server(port):
             conn, addr = server_socket.accept()
             client_thread = threading.Thread(target=handle_client, args=(conn, addr, port))
             client_thread.start()
+
+switch_thread = threading.Thread(target=switch_data_dict, daemon=True)
+switch_thread.start()
 
 # Start servers on the specified ports
 for port in ports:

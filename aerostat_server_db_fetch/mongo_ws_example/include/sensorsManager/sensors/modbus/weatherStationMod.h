@@ -64,7 +64,7 @@ public:
         }
 
         /* Modbus reading routine */
-        ModbusConnectionManager modbusConn = ModbusConnectionManager::getInstance();
+        ModbusConnectionManager& modbusConn = ModbusConnectionManager::getInstance();
         for (const auto& [key, reg_info] : WEATHER_REGISTERS) {
             uint16_t regs[2] = {0}; // Buffer to store register values
 

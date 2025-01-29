@@ -86,7 +86,7 @@ public:
         }
 
         {
-            ModbusConnectionManager connectionMan = ModbusConnectionManager::getInstance();
+            ModbusConnectionManager& connectionMan = ModbusConnectionManager::getInstance();
             std::map<std::string, uint16_t> mappedData;
 
             // Read the registers for AHRS GPS data

@@ -36,7 +36,7 @@ public:
         
         std::string ipToConnect = this->connectionParams_.ip;
 
-        TcpConnectionManager connectionMan;
+         TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
         if(nmeaData.empty())
         {
@@ -86,7 +86,7 @@ public:
 private:
 
     weatherStationData readWeatherSData(const std::string& nmeaData) const {
-        TcpConnectionManager connectionMan;
+         TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         weatherStationData parsedData;
         std::string m_msgStr;
         std::vector<std::string> msgsList;

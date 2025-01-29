@@ -46,7 +46,7 @@ public:
 
         /* orignal server reading routine */
         std::string ipToConnect = this->connectionParams_.ip;
-        TcpConnectionManager connectionMan;
+        TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         std::string nmeaData = connectionMan.connect_to_port(stoi(this->connectionParams_.port), ipToConnect);
         if(nmeaData.empty())
         {
@@ -110,7 +110,7 @@ public:
                 LOG_INFO("Strobe Light: OFF");
             }
 
-            TcpConnectionManager connectionMan = TcpConnectionManager::getInstance();
+            TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
             connectionMan.connect_and_send_to_port(fanCommand, this->connectionParams_.port, stoi(this->connectionParams_.ip));
 
             return true;
@@ -124,7 +124,7 @@ private:
     std::shared_ptr<adamSensorData> data;
     std::shared_ptr<fanLightWriteData> dataToWrite;
     adamSensorData readAdamsSensorData(const std::string& nmeaData) {
-        TcpConnectionManager connectionMan;
+         TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
         static float __max_tension = 0.0;
         adamSensorData parsedData;
         std::string m_msgStr;

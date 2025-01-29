@@ -80,7 +80,7 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
         }
         // ServerConfig serverInformation = configManager.getServerConfig();
         // serverInformation.print();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // Adjust time as needed
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Adjust time as needed
     }
 }
 
@@ -98,7 +98,7 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
             // LOG_DEBUG("Updating Frontend");
 
             const ServerConfig& serverConfig = configManager.getServerConfig();
-            TcpConnectionManager connectionMan = TcpConnectionManager::getInstance();
+            TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
             json responseJson = {
                 // {"method", "alfa.broadcast.settings.set"}, // Add the method field
                 {"data", {}} // Initialize empty data

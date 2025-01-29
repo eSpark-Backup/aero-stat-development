@@ -44,7 +44,7 @@ json handleServerConnectionSettingsSet(const json& parsedJson) {
                     setting.name = serverConfig["name"].get<std::string>();
                     setting.ip = serverConfig["ip"].get<std::string>();
 
-                    TcpConnectionManager connectionMan = TcpConnectionManager::getInstance();
+                    TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
                     if (!connectionMan.check_host_reachable(setting.ip)) {
                         LOG_ERROR("Host %s is not reachable for setting %s", setting.ip.c_str(), setting.name.c_str());
                         continue;
