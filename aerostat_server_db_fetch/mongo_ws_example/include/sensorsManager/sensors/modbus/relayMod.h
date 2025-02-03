@@ -54,32 +54,79 @@ public:
         // data->secondary_blower_value = disbinary(gen);
         // data->strobe_lights_value = disbinary(gen);
         // data->payload_power_value = disbinary(gen);
+
+        // if(!relay_client)
+        // {
+        //     data->status = "disconnected";
+        //     return data;
+        // }
+        // data->status = "connected";
+
+        // cloudLogger& logger = cloudLogger::getInstance();
+        // std::vector<std::string> results = logger.cloudDb.query("relay_status"); //pass collection name
+        // for (const auto& result : results) {
+        //     LOG_SUCCESS("DATA = %s", result.c_str());
+
+        //     json json_doc = nlohmann::json::parse(result);
+
+        //     if (json_doc.contains("value")) {
+        //         double tensionValue = json_doc["value"].get<double>();
+        //         LOG_DEBUG("LoadCell Tension : %f", tensionValue);
+        //         data->tension = tensionValue;              
+        //         if(data->tension > data->maxTension)
+        //         {
+        //             data->maxTension = data->tension;
+        //         }  
+        //     } else {
+        //         std::cout << "'value' field not found in the JSON" << std::endl;
+        //     }
+        // }
+        cloudLogger& logger = cloudLogger::getInstance();
+        ModbusConnectionManager& modbus = ModbusConnectionManager::getInstance();
+
         if(!relay_client)
         {
             data->status = "disconnected";
             return data;
         }
-        data->status = "connected";
 
+        // bool relay_value;
+        // std::vector<int> relayNumsVec;
+        // int i = 0;
+        // std::map<std::string, std::vector<int>> testMap;
+        // json statusNameJson;
+        // // testMap["relay_test"] = std::vector<int>{3, 5, 6
+        // bool* relayArr[4] = {&data->primary_blower_value, &data->secondary_blower_value, &data->strobe_lights_value, &data->payload_power_value };
+        // for (const auto& config : relay_configs) {
+
+        //     for(const auto& relay_nums : config.relay_nums)
+        //     {
+        //         std::vector<int>relayNumVector;
+        //         if (!modbus.read_coil(relay_nums - 1, relay_value, mb_relay)) {
+        //             std::cerr << "Failed to read to relay " << relay_nums << " (" << config.name << ").\n";
+        //             return data;
+        //         } 
+        //         relayNumVector.push_back(relay_nums);
+        //         testMap["relay_test"] = relayNumVector;
+        //         statusNameJson["relay_name"] = config.name;
+        //         statusNameJson["status"] = relay_value ? "ON" : "OFF";
+        //         logger.cloudDb.insert("relay_status", statusNameJson.dump(), testMap);
+        //     }
+        //     *relayArr[i++] = relay_value;
+
+        // }
         return data;
     }
 
     bool writeData(const std::shared_ptr<void>& dataRcv) override {
         // Implementation for writing data
         ModbusConnectionManager& modbus = ModbusConnectionManager::getInstance();
+        cloudLogger& logger = cloudLogger::getInstance();
+
+        std::map<std::string, std::vector<int>> testMap;
+        json statusNameJson;
         if (dataRcv) {
             auto value = std::static_pointer_cast<relayWriteData>(dataRcv);
-            // Write `value` to the sensor
-            dataToWrite->relayStates[0] = value->relayStates[0];
-            dataToWrite->relayStates[1] = value->relayStates[1];
-            dataToWrite->relayStates[2] = value->relayStates[2];
-            dataToWrite->relayStates[3] = value->relayStates[3];
-
-            data->primary_blower_value = value->relayStates[0];
-            data->secondary_blower_value = value->relayStates[1];
-            data->strobe_lights_value = value->relayStates[2];
-            data->payload_power_value = value->relayStates[3];
-
             for (const auto& config : relay_configs) {
                 bool value = false;
                 if (config.name == relay_configs[0].name) {
@@ -97,9 +144,20 @@ public:
                         std::cerr << "Failed to write to relay " << relay_num << " (" << config.name << ").\n";
                         return false;
                     }
+
+                    std::vector<int>relayNumVector;
+                    // bool relay_value;
+                    // if (!modbus.read_coil(relay_nums - 1, relay_value, mb_relay)) {
+                    //     std::cerr << "Failed to read to relay " << relay_nums << " (" << config.name << ").\n";
+                    //     return data;
+                    // } 
+                    relayNumVector.push_back(relay_num);
+                    statusNameJson["relay_name"] = config.name;
+                    statusNameJson["status"] = value ? "ON" : "OFF";
+                    testMap["relay_numbers"] = relayNumVector;
+                    logger.cloudDb.insert("relay_status", statusNameJson.dump(), testMap);
                 }
             }
-
             return true;
         }
         return false; // Indicate failure

@@ -11,6 +11,7 @@
 #include "sensorsManager/base/modbusConnectionManager.h"
 #include "logger/trace_util.h"
 #include "modbus_lib/modbus.h"
+#include "logger/cloudLogger.h"
 
 std::map<std::string, RegisterInfo> WEATHER_REGISTERS = {
     {"wind_direction", {WIND_DIRECTION_REGISTER, 1, "int"}},
@@ -57,48 +58,102 @@ public:
         // data->windSpeed = disWindSpeed(gen);
         // data->status = "connected";
 
-        if(!weather_station_client)
-        {
-            data->status = "disconnected";
-            return data;
-        }
+        // if(!weather_station_client)
+        // {
+        //     data->status = "disconnected";
+        //     return data;
+        // }
 
-        /* Modbus reading routine */
-        ModbusConnectionManager& modbusConn = ModbusConnectionManager::getInstance();
-        for (const auto& [key, reg_info] : WEATHER_REGISTERS) {
-            uint16_t regs[2] = {0}; // Buffer to store register values
+        // /* Modbus reading routine */
+        // ModbusConnectionManager& modbusConn = ModbusConnectionManager::getInstance();
+        // for (const auto& [key, reg_info] : WEATHER_REGISTERS) {
+        //     uint16_t regs[2] = {0}; // Buffer to store register values
 
-            if (!mb_weatherstation->modbus_read_holding_registers(reg_info.address, reg_info.count, regs)) {
-                // Successfully read Modbus registers
-                if (reg_info.data_type == "int") {
-                    int value = regs[0]; // Assume single register for int
-                    if (key == "wind_direction") {
-                        data->windAngle = static_cast<float>(value);
-                    }
-                } else if (reg_info.data_type == "float") {
-                    float value = modbusConn.convert_to_float(regs); // Convert two registers to float
-                    if (key == "wind_speed") {
-                        data->windSpeed = value;
-                    } else if (key == "temperature") {
-                        data->airTemperature = value;
-                    } else if (key == "humidity") {
-                        data->humidity = value;
-                    } else if (key == "air_pressure") {
-                        data->barometricPressure = value;
-                    }
+        //     if (!mb_weatherstation->modbus_read_holding_registers(reg_info.address, reg_info.count, regs)) {
+        //         // Successfully read Modbus registers
+        //         if (reg_info.data_type == "int") {
+        //             int value = regs[0]; // Assume single register for int
+        //             if (key == "wind_direction") {
+        //                 data->windAngle = static_cast<float>(value);
+        //             }
+        //         } else if (reg_info.data_type == "float") {
+        //             float value = modbusConn.convert_to_float(regs); // Convert two registers to float
+        //             if (key == "wind_speed") {
+        //                 data->windSpeed = value;
+        //             } else if (key == "temperature") {
+        //                 data->airTemperature = value;
+        //             } else if (key == "humidity") {
+        //                 data->humidity = value;
+        //             } else if (key == "air_pressure") {
+        //                 data->barometricPressure = value;
+        //             }
+        //         }
+        //     } else {
+        //         // Log error and continue with other registers
+        //         std::cerr << "Error reading " << key << " register.\n";
+        //     }
+        // }
+
+        // if (data->windAngle || data->windSpeed || data->airTemperature || data->barometricPressure || data->humidity) {
+        //     data->status = "connected";
+        // } else {
+        //     data->status = "disconnected";
+        // }
+
+        cloudLogger& logger = cloudLogger::getInstance();
+        // logger.cloudDb.insert("TABLE", data->toJson().dump());
+        std::vector<std::string> results = logger.cloudDb.query("weather_sensor_readings"); //pass collection name
+        for (const auto& result : results) {
+            LOG_SUCCESS("DATA = %s", result.c_str());
+
+            json json_doc = nlohmann::json::parse(result);
+
+            if (json_doc.contains("value")) {
+                json value = json_doc["value"];
+
+                // Extract wind direction
+                if (value.contains("wind_direction")) {
+                    double wind_direction = value["wind_direction"]["value"].get<double>();
+                    std::string wind_direction_unit = value["wind_direction"]["unit"].get<std::string>();
+                    std::cout << "Wind Direction: " << wind_direction << " " << wind_direction_unit << std::endl;
+                    data->windAngle = wind_direction;
+                }
+
+                // Extract wind speed
+                if (value.contains("wind_speed")) {
+                    double wind_speed = value["wind_speed"]["value"].get<double>();
+                    std::string wind_speed_unit = value["wind_speed"]["unit"].get<std::string>();
+                    std::cout << "Wind Speed: " << wind_speed << " " << wind_speed_unit << std::endl;
+                    data->windSpeed= wind_speed;
+                }
+
+                // Extract outside air temperature
+                if (value.contains("outside_air_temperature")) {
+                    double outside_air_temperature = value["outside_air_temperature"]["value"].get<double>();
+                    std::string temperature_unit = value["outside_air_temperature"]["unit"].get<std::string>();
+                    std::cout << "Outside Air Temperature: " << outside_air_temperature << " " << temperature_unit << std::endl;
+                    data->airTemperature = outside_air_temperature;
+                }
+
+                // Extract outside air humidity
+                if (value.contains("outside_air_humidity")) {
+                    double outside_air_humidity = value["outside_air_humidity"]["value"].get<double>();
+                    std::string humidity_unit = value["outside_air_humidity"]["unit"].get<std::string>();
+                    std::cout << "Outside Air Humidity: " << outside_air_humidity << " " << humidity_unit << std::endl;
+                    data->humidity = outside_air_humidity;
+                }
+
+                // Extract outside air pressure
+                if (value.contains("outside_air_pressure")) {
+                    double outside_air_pressure = value["outside_air_pressure"]["value"].get<double>();
+                    std::string pressure_unit = value["outside_air_pressure"]["unit"].get<std::string>();
+                    std::cout << "Outside Air Pressure: " << outside_air_pressure << " " << pressure_unit << std::endl;
+                    data->barometricPressure = outside_air_pressure;
                 }
             } else {
-                // Log error and continue with other registers
-                std::cerr << "Error reading " << key << " register.\n";
+                std::cout << "'value' field not found in the JSON" << std::endl;
             }
         }
-
-        if (data->windAngle || data->windSpeed || data->airTemperature || data->barometricPressure || data->humidity) {
-            data->status = "connected";
-        } else {
-            data->status = "disconnected";
-        }
-
         
         return data;
     }

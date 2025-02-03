@@ -7,6 +7,7 @@
 #include "applicationHandler/applicationHandler.h"
 #include "sensorsManager/base/sensorManager.h"
 #include "configManager/configFormatter.h"
+#include "logger/cloudLogger.h"
 
 #include "sensorsManager/sensors/commonSensorData/sensorsDef.h"
 
@@ -191,12 +192,15 @@ void ApplicationHandler::start() {
         });
         protocol_->startListening();
 
-        if (db_->connect(db_->dbConfig.connectionStringOrFilePath)) {
-            LOG_INFO("Database Connected!");
-            protocol_->sendData("Connected to Database!");
-        } else {
-            LOG_ERROR("Database not Connected!");
-        }
+        //CONNECT TO DATABASE
+        cloudLogger& logger = cloudLogger::getInstance();
+
+        // if (db_->connect(db_->dbConfig.connectionStringOrFilePath)) {
+        //     LOG_INFO("Database Connected!");
+        //     protocol_->sendData("Connected to Database!");
+        // } else {
+        //     LOG_ERROR("Database not Connected!");
+        // }
 
         // std::string jsonData = R"({
         //     "timestamp": "2025-01-22 20:58:57",

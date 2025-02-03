@@ -1,9 +1,11 @@
 #ifndef COMMON_SENSOR_DATA_TYPE
 #define COMMON_SENSOR_DATA_TYPE
 
+#include <math.h>
+#include <string>
+#include <sstream>
 #include "sensorsManager/base/sensorBase.h"
 #include "logger/log_file.h"
-#include <sstream>
 
 #define LOAD_CELL_REGISTER 0x9C40
 #define ULTRASONIC_REGISTER 0x0101
@@ -240,16 +242,16 @@ struct ahrsData : public SensorData {
     std::string status;
     float roll;
     float pitch;
-    float yaw;
+    float yaw = NAN;
     float longitude;
     float latitude;
     float altitude;
     float heading;
-    float ground_speed;
-    float pdop;
-    float hdop;
-    float vdop;
-    float position_accuracy;
+    float ground_speed = NAN;
+    float pdop = NAN;
+    float hdop = NAN;
+    float vdop = NAN;
+    float position_accuracy = NAN;
     uint8_t flag;
 
     std::map<std::string, std::string> toMap() const override {
@@ -419,6 +421,18 @@ struct weatherStationTcpData : public SensorData {
         return data;
     }
 
+
+    json toJson() const {
+        json data;
+
+        data["humidity"] = std::to_string(humidity);
+        data["barometric_pressure"] = std::to_string(barometricPressure);
+        data["air_temperature"] = std::to_string(airTemperature);
+        data["wind_angle"] = std::to_string(windAngle);
+        data["wind_speed"] = std::to_string(windSpeed);
+
+        return data;
+    }
 
     void print() const override {
         LOG_WARNING("humidity: %f", humidity);
