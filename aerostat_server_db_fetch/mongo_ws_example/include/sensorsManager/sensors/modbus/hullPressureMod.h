@@ -29,58 +29,20 @@ public:
 
     std::shared_ptr<void> readData() override {
 
-        // Random number generation setup
-        // std::random_device rd;
-        // std::mt19937 gen(rd());
-        
-        // // For floating point range [min, max]
-        // std::uniform_real_distribution<> disPressure(0.0, 360.0);
-        
-        // // Assign random values to the fields
-        // data->hullPressure = disPressure(gen);
-        // data->status = "connected";
+        cloudLogger& logger = cloudLogger::getInstance();
+        std::vector<std::string> results = logger.cloudDb.query("hull_pressure_sensor_readings"); //pass collection name
+        for (const auto& result : results) {
+            LOG_SUCCESS("DATA = %s", result.c_str());
 
-        if(!hull_pressure_client)
-        {
-            data->status = "disconnected";
-            return data;
-        }
+            json json_doc = nlohmann::json::parse(result);
 
-        {
-            uint16_t regs[1];  // To store the register values
-            // Read the pressure register using modbus_read_holding_registers
-            if (mb_hull->modbus_read_holding_registers(PRESSURE_SENSOR_REGISTER, 1, regs) == -1) {
-                std::cerr << "Error reading pressure register\n";
-                data->hullPressure = 0;
-                return data;
+            if (json_doc.contains("value")) {
+                double hullPressureValue = json_doc["value"].get<double>();
+                LOG_DEBUG("Hull Pressure : %f", hullPressureValue);
+                data->hullPressure = hullPressureValue;               
+            } else {
+                std::cout << "'value' field not found in the JSON" << std::endl;
             }
-
-            // Convert the register value to pressure in kPa
-            float pressure_kpa = regs[0] / 1000.0f;
-            
-            // Convert kPa to inWG using the scaling factor
-            float pressure_inwg = pressure_kpa * PRESSURE_SCALING_FACTOR;
-
-            data->hullPressure = pressure_inwg;
-        }
-
-        /* from orignal server */
-        {
-            uint16_t regs[1];  // To store the register values
-            // Read the pressure register using modbus_read_holding_registers
-            if (mb_hull->modbus_read_holding_registers(PRESSURE_SENSOR_REGISTER, 1, regs) == -1) {
-                std::cerr << "Error reading pressure register\n";
-                data->hullPressure = 0;
-                return data;
-            }
-
-            // Convert the register value to pressure in kPa
-            float pressure_kpa = regs[0] / 1000.0f;
-            
-            // Convert kPa to inWG using the scaling factor
-            float pressure_inwg = pressure_kpa * PRESSURE_SCALING_FACTOR;
-
-            data->hullPressure = pressure_inwg;
         }
 
         return data;

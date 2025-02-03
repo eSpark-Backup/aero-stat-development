@@ -29,21 +29,21 @@ public:
 
     std::shared_ptr<void> readData() override {
 
-        // // Random number generation setup
-        // std::random_device rd;
-        // std::mt19937 gen(rd());
-        
-        // // For floating point range [min, max]
-        // std::uniform_real_distribution<> disHeight(0.0, 360.0);
-        
-        // Assign random values to the fields
-        if(!ultrasonic_client)
-        {
-            data->status = "disconnected";
-            return data;
+        cloudLogger& logger = cloudLogger::getInstance();
+        std::vector<std::string> results = logger.cloudDb.query("ballonet_curtain_height_sensor_readings"); //pass collection name
+        for (const auto& result : results) {
+            LOG_SUCCESS("DATA = %s", result.c_str());
+
+            json json_doc = nlohmann::json::parse(result);
+
+            if (json_doc.contains("value")) {
+                double balCurtainHeightValue = json_doc["value"].get<double>();
+                LOG_DEBUG("Ballonet Curtain Height : %f", balCurtainHeightValue);
+                data->height = balCurtainHeightValue;               
+            } else {
+                std::cout << "'value' field not found in the JSON" << std::endl;
+            }
         }
-        data->height = read_ultrasonic();
-        data->status = "connected";
 
         return data;
     }

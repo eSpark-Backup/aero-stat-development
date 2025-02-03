@@ -29,39 +29,23 @@ public:
 
     std::shared_ptr<void> readData() override {
 
-        // // Random number generation setup
-        // std::random_device rd;
-        // std::mt19937 gen(rd());
-        
-        // // For floating point range [min, max]
-        // std::uniform_real_distribution<> distemperature(0.0, 360.0);
-        // std::uniform_real_distribution<> dishumidity(0.0, 360.0);
-        
-        // // Assign random values to the fields
-        // data->temperature = distemperature(gen);
-        // data->humidity = dishumidity(gen);
-        // data->status = "connected";
-        if(!temp_humidity_client)
-        {
-            data->status = "disconnected";
-            return data;
-        }
+        cloudLogger& logger = cloudLogger::getInstance();
+        std::vector<std::string> results = logger.cloudDb.query("avionics_environment_sensor_readings"); //pass collection name
+        for (const auto& result : results) {
+            LOG_SUCCESS("DATA = %s", result.c_str());
 
+            json json_doc = nlohmann::json::parse(result);
 
-        uint16_t temp_regs[1] = {0};
-        if (!mb_temp_humidity->modbus_read_holding_registers(TEMP_HUMIDITY_REGISTER, 1, temp_regs)) {
-            data->temperature = temp_regs[0] / 10.0f;  // Adjust division as needed
-        } else {
-            std::cerr << "Error reading temperature register.\n";
-            data->temperature = 0.0f;  // Set default value on error
-        }
-
-        uint16_t hum_regs[1] = {0};
-        if (!mb_temp_humidity->modbus_read_holding_registers(HUMIDITY_REGISTER, 1, hum_regs)) {
-            data->humidity = hum_regs[0] / 10.0f;  // Adjust division as needed
-        } else {
-            std::cerr << "Error reading humidity register.\n";
-            data->humidity = 0.0f;  // Set default value on error
+            if (json_doc.contains("value")) {
+                double avionicsHumidityValue = json_doc["value"]["humidity"].get<double>();
+                double avionicsTemperatureValue = json_doc["value"]["temperature"].get<double>();
+                LOG_DEBUG("Avionic Humidity : %f", avionicsHumidityValue);
+                LOG_DEBUG("Avionic Temperature : %f", avionicsTemperatureValue);
+                data->temperature = avionicsTemperatureValue;
+                data->humidity= avionicsHumidityValue;
+            } else {
+                std::cout << "'value' field not found in the JSON" << std::endl;
+            }
         }
 
         return data;
