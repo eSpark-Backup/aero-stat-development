@@ -22,7 +22,7 @@ private:
     // DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost1:27017/alfacor01");
     // DatabaseConfig localDbConfig(DatabaseType::LOCAL_DB, "local_database_test.txt");
 
-    cloudLogger() : cloudDb({DatabaseType::MONGO_DB, "mongodb://172.17.0.4:27017/alfacor01"}) {
+    cloudLogger() : cloudDb({DatabaseType::MONGO_DB, "mongodb://172.17.0.2:27017/alfacor01"}) {
         if(cloudDb.connect("not needed string"))
         {
             LOG_SUCCESS("DB CONNECTED SUCCESSFULLY");

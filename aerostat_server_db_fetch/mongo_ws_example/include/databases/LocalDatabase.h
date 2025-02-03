@@ -11,7 +11,7 @@ public:
     ~LocalTextDatabase() override;
 
     bool connect(const std::string& filePath) override;
-    bool insert(const std::string& table, const std::string& jsonData)  override;
+    bool insert(const std::string& table, const std::string& jsonData, std::map<std::string, std::vector<int>> extraArgs = {})  override;
     std::vector<std::string> query(const std::string& table) override;
     void disconnect() override;
 

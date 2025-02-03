@@ -25,7 +25,7 @@ public:
     virtual ~Database() = default;
     
     virtual bool connect(const std::string& connectionString) = 0;
-    virtual bool insert(const std::string& table, const std::string& jsonData) = 0;
+    virtual bool insert(const std::string& table, const std::string& jsonData, std::map<std::string, std::vector<int>> extraArgs = {}) = 0;
     virtual std::vector<std::string> query(const std::string& query) = 0;
     virtual void disconnect() = 0;
     DatabaseConfig dbConfig;

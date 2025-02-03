@@ -24,7 +24,7 @@ bool LocalTextDatabase::connect(const std::string& filePath) {
     return true;
 }
 
-bool LocalTextDatabase::insert(const std::string& table, const std::string& jsonData) {
+bool LocalTextDatabase::insert(const std::string& table, const std::string& jsonData, std::map<std::string, std::vector<int>> extraArgs) {
     if (!isConnected_) {
         LOG_ERROR("Database is not connected!");
         return false;
