@@ -159,14 +159,14 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
                   placeholder="192.168.0.102"
                   type="text"
                   value={form.modbustcp_host_ip}
-                  className={errorValues.includes("modbustcp_host_ip") ? "input-err" : ""}
                   onChange={(e) => handleChange(e.target.value, "modbustcp_host_ip")}
+                  className={errorValues.includes("modbustcp_host_ip") ? "input-err" : ""}
                 />
               </div>
               <div className={`modal-input ${theme}`}>
                 <p className={`${theme}`}>Hull Pressure</p>
                 <input
-                  placeholder="192.168.0.102"
+                  placeholder="5001"
                   type="text"
                   value={"5001"}
                   readOnly
@@ -175,7 +175,7 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
               <div className={`modal-input ${theme}`}>
                 <p className={`${theme}`}>Ballonet pressure</p>
                 <input
-                  placeholder="192.168.0.102"
+                  placeholder="5002"
                   type="text"
                   value={"5002"}
                   readOnly
@@ -184,7 +184,7 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
               <div className={`modal-input ${theme}`}>
                 <p className={`${theme}`}>ahrs</p>
                 <input
-                  placeholder="192.168.0.102"
+                  placeholder="5003"
                   type="text"
                   value={"5003"}
                   readOnly
@@ -193,7 +193,7 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
               <div className={`modal-input ${theme}`}>
                 <p className={`${theme}`}>Ultrasonic</p>
                 <input
-                  placeholder="192.168.0.102"
+                  placeholder="5004"
                   type="text"
                   value={"5004"}
                   readOnly
@@ -202,7 +202,7 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
               <div className={`modal-input ${theme}`}>
                 <p className={`${theme}`}>Load cell</p>
                 <input
-                  placeholder="192.168.0.102"
+                  placeholder="5005"
                   type="text"
                   value={"5005"}
                   readOnly
@@ -211,7 +211,7 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
               <div className={`modal-input ${theme}`}>
                 <p className={`${theme}`}>Temp humidity</p>
                 <input
-                  placeholder="192.168.0.102"
+                  placeholder="5006"
                   type="text"
                   value={"5006"}
                   readOnly
@@ -220,20 +220,31 @@ const Modal = ({ open, handleClose, handleSubmit, theme, errorValues, setErrorVa
               <div className={`modal-input ${theme}`}>
                 <p className={`${theme}`}>Weather station</p>
                 <input
-                  placeholder="192.168.0.102"
+                  placeholder="5007"
                   type="text"
                   value={"5007"}
                   readOnly
                 />
               </div>
-              <div className={`modal-input ${theme}`}>
-                <p className={`${theme}`}>Relay</p>
-                <input
-                  placeholder="192.168.0.102"
-                  type="text"
-                  value={"4196"}
-                  readOnly
-                />
+              <div className={`modal-input-horizontal ${theme}`}>
+                <div className={`modal-input ${theme}`}>
+                  <p className={`${theme}`}>Relay (IP)</p>
+                  <input
+                    placeholder="192.168.0.102"
+                    type="text"
+                    value={form.relayIp}
+                    onChange={(e) => handleChange(e.target.value, "relayIp")}
+                  />
+                </div>
+                <div className={`modal-input ${theme}`}>
+                  <p className={`${theme}`}>Relay (PORT)</p>
+                  <input
+                    placeholder="4197"
+                    type="text"
+                    value={form.relayPort}
+                    onChange={(e) => handleChange(e.target.value, "relayPort")}
+                  />
+                </div>
               </div>
               <div className={`modal-btn-group ${theme}`}>
                 <button onClick={handleSubmit}>Save</button>
