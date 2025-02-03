@@ -15,7 +15,7 @@ int main() {
     printBuildInfo();
 
     try {
-        DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost1:27017/alfacor01");
+        DatabaseConfig mongoConfig(DatabaseType::MONGO_DB, "mongodb://localhost:27017/alfacor01");
         DatabaseConfig localDbConfig(DatabaseType::LOCAL_DB, "local_database_test.txt");
 
         DatabaseConfig dbConfig = mongoConfig;
@@ -24,7 +24,8 @@ int main() {
         std::unique_ptr<MessageHandler> messageHandler = std::make_unique<MessageHandler>();
 
         auto protocol = CommunicationProtocolFactory::createProtocol(ProtocolType::UWS);
-        auto db = DatabaseFactory::createDatabase(dbConfig);
+        // auto db = DatabaseFactory::createDatabase(dbConfig);
+        auto db = nullptr; //currently no cloud db is used by the application
 
         ApplicationHandler appHandler(std::move(db), std::move(protocol), std::move(messageHandler));
         

@@ -17,20 +17,22 @@ MongoDBDatabase::~MongoDBDatabase() {
 }
 
 bool MongoDBDatabase::connect(const std::string& connectionString) {
+
+    std::string __connectionString = dbConfig.connectionStringOrFilePath;
     try {
         mongocxx::instance inst{};
         // Create a MongoDB client using the provided connection string
-        client_ = new mongocxx::client(mongocxx::uri(connectionString));
+        client_ = new mongocxx::client(mongocxx::uri(__connectionString));
 
         // Extract the database name from the connection string
-        auto lastSlashPos = connectionString.find_last_of('/');
-        if (lastSlashPos == std::string::npos || lastSlashPos == connectionString.size() - 1) {
+        auto lastSlashPos = __connectionString.find_last_of('/');
+        if (lastSlashPos == std::string::npos || lastSlashPos == __connectionString.size() - 1) {
             LOG_ERROR("Invalid connection string: Database name is missing.");
             return false;
         }
 
         // Get the database name and assign it to the db_ member
-        std::string dbName = connectionString.substr(lastSlashPos + 1);
+        std::string dbName = __connectionString.substr(lastSlashPos + 1);
         db_ = new mongocxx::database((*client_)[dbName]);
 
         const auto ping_cmd = bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("ping", 1));
@@ -89,24 +91,41 @@ bool MongoDBDatabase::insert(const std::string& table, const std::string& jsonDa
     }
 }
 
-std::vector<std::string> MongoDBDatabase::query(const std::string& query) {
+std::vector<std::string> MongoDBDatabase::query(const std::string& collection_name) {
     std::vector<std::string> results;
 
     if (!db_) {
-        // std::cerr << "Database is not connected!" << std::endl;
         LOG_ERROR("Database is not connected!");
         return results;
     }
 
     try {
-        auto collection = (*db_)[query];  // Assuming query is collection name
-        auto cursor = collection.find({});
+        auto collection = (*db_)[collection_name];
+
+        // Querying the last document by sorting `_id` in descending order
+        auto cursor = collection.find({}, mongocxx::options::find{}
+            .sort(bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp("_id", -1))) // Newest first
+            .limit(1)); // Get only 1 document
+
+        // Check if the cursor has any results before iterating
+        auto it = cursor.begin();
+        if (it == cursor.end()) {
+            LOG_ERROR("No documents found in collection '{}'.", collection_name);
+            return results;
+        }
+
         for (auto&& doc : cursor) {
-            results.push_back(bsoncxx::to_json(doc));
+            try {
+                std::string json_doc = bsoncxx::to_json(doc);
+                LOG_DEBUG("Retrieved document: {}");
+                results.push_back(json_doc);
+            } catch (const std::exception& e) {
+                LOG_ERROR("Failed to convert BSON to JSON: {}", e.what());
+            }
         }
     } catch (const mongocxx::exception& e) {
-        // std::cerr << "Error querying MongoDB: " << e.what() << std::endl;
-        LOG_ERROR("Error querying MongoDB");
+        LOG_ERROR("Error querying MongoDB: {}", e.what());
     }
 
     return results;

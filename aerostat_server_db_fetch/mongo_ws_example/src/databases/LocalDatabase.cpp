@@ -18,6 +18,7 @@ bool LocalTextDatabase::connect(const std::string& filePath) {
         LOG_ERROR("Could not open file at %s", filePath);
         return false;
     }
+    LOG_SUCCESS("file opened at %s", filePath.c_str());
     isConnected_ = true;
     file.close();
     return true;
@@ -28,6 +29,8 @@ bool LocalTextDatabase::insert(const std::string& table, const std::string& json
         LOG_ERROR("Database is not connected!");
         return false;
     }
+
+    std::cout << "Received JSON: " << jsonData << std::endl;
 
     try {
         nlohmann::json json = nlohmann::json::parse(jsonData);
@@ -52,7 +55,7 @@ bool LocalTextDatabase::insert(const std::string& table, const std::string& json
         LOG_SUCCESS("Data inserted to LOCALDB Collection successfully");
         return true;
     } catch (const std::exception& e) {
-        LOG_ERROR("Error inserting data into file: {}", e.what());
+        LOG_ERROR("Error inserting data into file: {%s}", std::string(e.what()).c_str());
         return false;
     }
 }

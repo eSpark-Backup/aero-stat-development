@@ -3,6 +3,7 @@
 
 #include "sensorsManager/base/sensorBase.h"
 #include "logger/log_file.h"
+#include <string>
 #include <sstream>
 
 #define LOAD_CELL_REGISTER 0x9C40
@@ -419,6 +420,18 @@ struct weatherStationTcpData : public SensorData {
         return data;
     }
 
+
+    json toJson() const {
+        json data;
+
+        data["humidity"] = std::to_string(humidity);
+        data["barometric_pressure"] = std::to_string(barometricPressure);
+        data["air_temperature"] = std::to_string(airTemperature);
+        data["wind_angle"] = std::to_string(windAngle);
+        data["wind_speed"] = std::to_string(windSpeed);
+
+        return data;
+    }
 
     void print() const override {
         LOG_WARNING("humidity: %f", humidity);
