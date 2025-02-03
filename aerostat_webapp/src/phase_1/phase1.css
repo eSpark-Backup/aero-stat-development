@@ -1432,7 +1432,20 @@ input[type=number] {
     font-size: 13px;
 }
 
+
+.prefrence-box-new {
+    display: flex;
+    column-gap: 10px;
+    align-items: center;
+}
+
+.pref-data-new {
+    column-gap: 10px;
+    display: flex;
+}
+
 /* Media Queries */
+
 
 @media screen and (min-width:769px) and (max-width:1300px) {
     .charts-data-between {
@@ -1471,6 +1484,27 @@ input[type=number] {
         flex-direction: column;
         row-gap: 10px;
         padding: 23px 5px;
+    }
+
+    .preferences {
+        flex-direction: column;
+        align-items: flex-start;
+        row-gap: 10px;
+    }
+
+    .prefrence-box-new {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .pref-data-new {
+        flex-direction: column;
+        row-gap: 10px;
+        width: 100%;
+    }
+
+    .pref-data-new>.chart-chip {
+        width: 100%;
     }
 
     .logo {
@@ -2179,7 +2213,18 @@ input[type=number] {
     row-gap: 3px;
 }
 
-.modal-input p {
+.modal-input-horizontal {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.modal-input-horizontal>div {
+    width: 45%;
+}
+
+.modal-input p,
+.modal-input-horizontal>div p {
     font-family: Inter;
     font-size: 16px;
     font-weight: 600;
@@ -2189,15 +2234,18 @@ input[type=number] {
     margin-bottom: 5px;
 }
 
-.modal-input p.dark {
+.modal-input p.dark,
+.modal-input-horizontal>div p.dark {
     color: #f8f8f8;
 }
 
-.modal-input p.light {
+.modal-input p.light,
+.modal-input-horizontal>div p.light {
     color: #4C4C4C;
 }
 
-.modal-input input {
+.modal-input input,
+.modal-input-horizontal>div input {
     width: 100%;
     height: 41px;
     padding: 12px 20px;
@@ -2212,12 +2260,14 @@ input[type=number] {
     text-align: left;
 }
 
-.modal-input.light input {
+.modal-input.light input,
+.modal-input-horizontal>div.light input {
     border: 1px solid #E4E4E4;
     background: #FAFAFA;
 }
 
-.modal-input.dark input {
+.modal-input.dark input,
+.modal-input-horizontal>div.dark input {
     background: linear-gradient(180deg, #000000 0%, #282801 100%);
     border: 1px solid #E4E4E4;
     color: white !important;

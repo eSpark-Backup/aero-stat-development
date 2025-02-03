@@ -121,6 +121,7 @@ const Phase1 = React.memo(() => {
 
     try {
       const data = JSON.parse(message.data);
+      console.log(data, "RECEIVING DATA")
       if (data) {
         const parsedResponses = {
           weather: {
@@ -372,11 +373,11 @@ const Phase1 = React.memo(() => {
                   },
                   {
                     port: "5002",
-                    name: "ballonet_pressure"
+                    "name": "ballonet_pressure"
                   },
                   {
                     port: "5003",
-                    name: "ahrs"
+                    "name": "ahrs"
                   },
                   {
                     port: "5004",
@@ -384,18 +385,24 @@ const Phase1 = React.memo(() => {
                   },
                   {
                     port: "5005",
-                    name: "load_cell"
+                    "name": "load_cell"
                   },
                   {
                     port: "5006",
-                    name: "temp_humidity"
+                    "name": "temp_humidity"
                   },
                   {
                     port: "5007",
                     name: "weather_station"
-                  },
+                  }
+                ]
+              },
+              {
+                name: "modbus-relay",
+                ip: form?.relayIp,
+                ports: [
                   {
-                    port: "4196",
+                    port: form?.relayPort,
                     name: "relay"
                   }
                 ]
@@ -403,7 +410,7 @@ const Phase1 = React.memo(() => {
             ]
           }
         ]
-      };
+      }
     }
     try {
       setStartFetchData(true);

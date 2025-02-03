@@ -34,7 +34,6 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
   const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
   const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
   // const [openModal, setOpenModal] = useState(false);
-  console.log(isLoading)
 
   const [fan1, setFan1] = useState("Continuous");
   const [fan2, setFan2] = useState("Off");
@@ -154,23 +153,50 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
           className={`preferences2 ${theme === "light" ? "preferences2-light" : "preferences2-dark"
             }`}
         >
-          <p>Preference</p>
-          <div
-            className={`choice ${theme === "light" ? "choice-light" : "choice-dark"
-              }`}
-            onClick={toggleTheme}
-          >
-            {theme === "light" ? (
-              <>
-                <div className="theme-light"></div>
-                <p className="theme-text-light">Light</p>
-              </>
-            ) : (
-              <>
-                <p className="theme-text-dark">Dark</p>
-                <div className="theme-dark"></div>
-              </>
-            )}
+          <div className='pref-data-new'>
+            <ChartChip
+              name={"Temperature:"}
+              value={
+                phase === 1
+                  ? "N/A"
+                  : (response?.digitalCompass.temperature === "NaN" || !response?.digitalCompass.temperature
+                    ? "N/A"
+                    : response?.digitalCompass.temperature)
+              }
+              unit={"°"}
+            />
+
+            <ChartChip
+              name={"Humidity:"}
+              value={
+                phase === 1
+                  ? "N/A"
+                  : (response?.digitalCompass.humidity === "NaN" || !response?.digitalCompass.humidity
+                    ? "N/A"
+                    : `${response?.digitalCompass.humidity}%`)
+              }
+              unit={""}
+            />
+          </div>
+          <div style={{ display: "flex", columnGap: "10px", alignItems: "center" }}>
+            <p style={{ fontSize: "20px" }}>Preferences</p>
+            <div
+              className={`choice ${theme === "light" ? "choice-light" : "choice-dark"
+                }`}
+              onClick={toggleTheme}
+            >
+              {theme === "light" ? (
+                <>
+                  <div className="theme-light"></div>
+                  <p className="theme-text-light">Light</p>
+                </>
+              ) : (
+                <>
+                  <p className="theme-text-dark">Dark</p>
+                  <div className="theme-dark"></div>
+                </>
+              )}
+            </div>
           </div>
         </div>
         <div className="box1">
@@ -200,16 +226,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                       description={phase === 1 ? "Aerostat Heading" : "Humidity"}
                     />
                   </div>
-                  {
-                    phase === 2 &&
-                    <>
-                      <ChartChip
-                        name={"Temperature:"}
-                        value={response?.digitalCompass.temperature === "NaN" || !response?.digitalCompass.temperature ? "N/A" : response?.digitalCompass.temperature}
-                        unit={"°"}
-                      />
-                    </>
-                  }
+
                 </div>
               </ChildCard>
             </div>
@@ -250,23 +267,50 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
             className={`preferences ${theme === "light" ? "preferences-light" : "preferences-dark"
               }`}
           >
-            <p>Preference</p>
-            <div
-              className={`choice ${theme === "light" ? "choice-light" : "choice-dark"
-                }`}
-              onClick={toggleTheme}
-            >
-              {theme === "light" ? (
-                <>
-                  <div className="theme-light"></div>
-                  <p className="theme-text-light">Light</p>
-                </>
-              ) : (
-                <>
-                  <p className="theme-text-dark">Dark</p>
-                  <div className="theme-dark"></div>
-                </>
-              )}
+            <div className='pref-data-new'>
+              <ChartChip
+                name={"Temperature:"}
+                value={
+                  phase === 1
+                    ? "N/A"
+                    : (response?.digitalCompass.temperature === "NaN" || !response?.digitalCompass.temperature
+                      ? "N/A"
+                      : response?.digitalCompass.temperature)
+                }
+                unit={phase === 1 ? "" : "°"}
+              />
+
+              <ChartChip
+                name={"Humidity:"}
+                value={
+                  phase === 1
+                    ? "N/A"
+                    : (response?.digitalCompass.humidity === "NaN" || !response?.digitalCompass.humidity
+                      ? "N/A"
+                      : `${response?.digitalCompass.humidity}%`)
+                }
+                unit={""}
+              />
+            </div>
+            <div className='prefrence-box-new'>
+              <p style={{ fontSize: "20px" }}>Preferences</p>
+              <div
+                className={`choice ${theme === "light" ? "choice-light" : "choice-dark"
+                  }`}
+                onClick={toggleTheme}
+              >
+                {theme === "light" ? (
+                  <>
+                    <div className="theme-light"></div>
+                    <p className="theme-text-light">Light</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="theme-text-dark">Dark</p>
+                    <div className="theme-dark"></div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
           <MainCard title={"Magnetometer"}>
@@ -343,11 +387,6 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
                           <ChartChip
                             name={"Position Accuracy:"}
                             value={response?.digitalCompass.position_accuracy === "NaN" || !response?.digitalCompass.position_accuracy ? "N/A" : `${response?.digitalCompass.position_accuracy}m`}
-                            unit={""}
-                          />
-                          <ChartChip
-                            name={"Humidity:"}
-                            value={response?.digitalCompass.humidity === "NaN" || !response?.digitalCompass.humidity ? "N/A" : `${response?.digitalCompass.humidity}%`}
                             unit={""}
                           />
                         </>
