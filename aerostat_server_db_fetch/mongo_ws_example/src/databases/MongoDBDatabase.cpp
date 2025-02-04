@@ -14,6 +14,7 @@ using namespace bsoncxx::builder::stream;
 namespace bson = bsoncxx;
 
 MongoDBDatabase::~MongoDBDatabase() {
+    LOG_WARNING("CALLING DESTRUCTOR MONGODBDATABASE");
     if (client_) {
         disconnect();
     }
@@ -33,7 +34,7 @@ bool MongoDBDatabase::connect(const std::string& connectionString) {
 
     std::string __connectionString = dbConfig.connectionStringOrFilePath;
     try {
-        mongocxx::instance inst{};
+        static mongocxx::instance inst{};
         // Create a MongoDB client using the provided connection string
         client_ = new mongocxx::client(mongocxx::uri(__connectionString));
 
@@ -60,10 +61,16 @@ bool MongoDBDatabase::connect(const std::string& connectionString) {
 }
 
 bool MongoDBDatabase::insert(const std::string& table, const std::string& jsonData, std::map <std::string, std::vector<int>>extraArgs) {
-    if (!db_) {
-        LOG_ERROR("Database is not connected!");
-        return false;
+    if(!connect("not needed string"))
+    {
+        LOG_ERROR("DB NOT CONNECTED");
     }
+    LOG_SUCCESS("DB CONNECTED SUCCESSFULLY");
+
+    // if (!db_) {
+    //     LOG_ERROR("Database is not connected!");
+    //     return false;
+    // }
 
     try {
         // Parse JSON input
@@ -115,70 +122,100 @@ bool MongoDBDatabase::insert(const std::string& table, const std::string& jsonDa
         // Insert the document into the collection
         collection.insert_one(document.view());
         LOG_SUCCESS("Data inserted to MONGODB Collection successfully");
+        disconnect();
         return true;
     } catch (const std::exception& e) {
         LOG_ERROR("Error inserting data into MongoDB: {}", e.what());
+        disconnect();
         return false;
     }
 }
 
 std::vector<std::string> MongoDBDatabase::query(const std::string& collection_name) {
-    std::vector<std::string> results;
 
-    if (!db_) {
-        LOG_ERROR("Database is not connected!");
-        return results;
+    std::vector<std::string> results;
+    LOG_WARNING("Collection Name %s", collection_name.c_str());
+
+    if(!connect("not needed string"))
+    {
+        LOG_ERROR("DB NOT CONNECTED");
     }
+    LOG_SUCCESS("DB CONNECTED SUCCESSFULLY");
+
+    // if (!db_) {
+    //     LOG_ERROR("Database is not connected!");
+    //     return results;
+    // }
 
     try {
         auto collection = (*db_)[collection_name];
 
         // Querying the last document by sorting `_id` in descending order
-        auto cursor = collection.find({}, mongocxx::options::find{}.sort(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("_id", -1))).limit(1)); // Get only 1 document
+        // auto cursor = collection.find({}, mongocxx::options::find{}.sort(bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("_id", -1))).limit(1)); // Get only 1 document
+
+        bsoncxx::builder::stream::document sort_builder;
+        sort_builder << "_id" << -1;  // -1 for descending order
+
+        mongocxx::options::find find_options;
+        find_options.sort(sort_builder.view());
+
+        auto latestDoc = collection.find_one({}, find_options);
 
         // Check if the cursor has any results before iterating
-        try {
-            // Ensure the cursor is valid before accessing it
-            // if(cursor.empty())
-            // {
-            //     LOG_ERROR("CURSOR EMPTY");
-            //     while(1)
-            //     {
-            //     }
-            // }
-            auto it = cursor.begin();
-            if (it == cursor.end()) {
-                LOG_ERROR("No documents found in collection '{}'.", collection_name);
-                return results;
-            }
-        } catch (const std::runtime_error& e) {
-            LOG_ERROR("Runtime error while iterating through the cursor: {}", e.what());
-            return results;
-        } catch (const std::exception& e) {
-            LOG_ERROR("General error while iterating through the cursor: {}", e.what());
-            return results;
-        } catch (...) {
-            LOG_ERROR("An unknown error occurred while iterating through the cursor.");
-            return results;
-        }
+        // try {
+        //     // Ensure the cursor is valid before accessing it
+        //     // if(cursor.empty())
+        //     // {
+        //     //     LOG_ERROR("CURSOR EMPTY");
+        //     //     while(1)
+        //     //     {
+        //     //     }
+        //     // }
+        //     auto it = cursor.begin();
+        //     if (it == cursor.end()) {
+        //         LOG_ERROR("No documents found in collection '{}'.", collection_name);
+        //         return results;
+        //     }
+        // } catch (const std::runtime_error& e) {
+        //     LOG_ERROR("Runtime error while iterating through the cursor: {}", e.what());
+        //     return results;
+        // } catch (const std::exception& e) {
+        //     LOG_ERROR("General error while iterating through the cursor: {}", e.what());
+        //     return results;
+        // } catch (...) {
+        //     LOG_ERROR("An unknown error occurred while iterating through the cursor.");
+        //     return results;
+        // }
 
-        for (auto&& doc : cursor) {
-            try {
-                std::string json_doc = bsoncxx::to_json(doc);
-                LOG_DEBUG("Retrieved document: {}");
-                results.push_back(json_doc);
-            } catch (const std::exception& e) {
-                LOG_ERROR("Failed to convert BSON to JSON: {}", e.what());
-            }
+        // for (auto&& doc : cursor) {
+        //     try {
+        //         std::string json_doc = bsoncxx::to_json(doc);
+        //         LOG_DEBUG("Retrieved document: {}");
+        //         results.push_back(json_doc);
+        //     } catch (const std::exception& e) {
+        //         LOG_ERROR("Failed to convert BSON to JSON: {}", e.what());
+        //     }
+        // }
+        try{
+            std::string json_doc = bsoncxx::to_json(latestDoc.value());
+            results.push_back(json_doc);
+        } catch(const std::exception& e) {
+            LOG_ERROR("Failed to convert BSON to JSON: {}", e.what());
+            disconnect();
+            return results;
         }
     } catch (const mongocxx::exception& e) {
         LOG_ERROR("Error querying MongoDB: {}", e.what());
+        disconnect();
+        return results;
     }
 
+    disconnect();
     return results;
 }
 
 void MongoDBDatabase::disconnect() {
+    LOG_INFO("DATABASE DISCONNECTED");
     if (client_) {
         delete db_;
         delete client_;
