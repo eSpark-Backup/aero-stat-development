@@ -61,6 +61,7 @@ bool MongoDBDatabase::connect(const std::string& connectionString) {
 }
 
 bool MongoDBDatabase::insert(const std::string& table, const std::string& jsonData, std::map <std::string, std::vector<int>>extraArgs) {
+    std::unique_lock<std::mutex> lock(mtx);
     if(!connect("not needed string"))
     {
         LOG_ERROR("DB NOT CONNECTED");
@@ -123,16 +124,18 @@ bool MongoDBDatabase::insert(const std::string& table, const std::string& jsonDa
         collection.insert_one(document.view());
         LOG_SUCCESS("Data inserted to MONGODB Collection successfully");
         disconnect();
+        lock.unlock();
         return true;
     } catch (const std::exception& e) {
         LOG_ERROR("Error inserting data into MongoDB: {}", e.what());
         disconnect();
+        lock.unlock();
         return false;
     }
 }
 
 std::vector<std::string> MongoDBDatabase::query(const std::string& collection_name) {
-
+    std::unique_lock<std::mutex> lock(mtx);
     std::vector<std::string> results;
     LOG_WARNING("Collection Name %s", collection_name.c_str());
 
@@ -202,15 +205,18 @@ std::vector<std::string> MongoDBDatabase::query(const std::string& collection_na
         } catch(const std::exception& e) {
             LOG_ERROR("Failed to convert BSON to JSON: {}", e.what());
             disconnect();
+            lock.unlock();
             return results;
         }
     } catch (const mongocxx::exception& e) {
         LOG_ERROR("Error querying MongoDB: {}", e.what());
         disconnect();
+        lock.unlock();
         return results;
     }
 
     disconnect();
+    lock.unlock();
     return results;
 }
 

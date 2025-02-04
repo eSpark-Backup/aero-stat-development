@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <string>
+#include <mutex>
 #include <vector>
 #include "nlohmann/json.hpp"
 
@@ -30,6 +31,9 @@ public:
     virtual void disconnect() = 0;
     DatabaseConfig dbConfig;
 private: 
+
+protected:
+    std::mutex mtx;
 };
 
 #endif // DATABASE_H
