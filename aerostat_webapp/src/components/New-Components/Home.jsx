@@ -106,7 +106,7 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
         "method": "alfa.actuator.settings.set",
         "modbus": [
           {
-            "name": "modbus1",
+            "name": "modbus-relay",
             "relay": [
               primary_blower === "On" ? 1 : 0,
               secondary_blower === "On" ? 1 : 0,
