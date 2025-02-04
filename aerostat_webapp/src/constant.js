@@ -400,3 +400,43 @@ export const details = [
         unit: null
     },
 ];
+
+export const lineChartOptions = (theme, data) => ({
+    chart: {
+        type: 'line',
+        height: 390,
+        backgroundColor: 'transparent',
+    },
+    title: {
+        text: 'Hull Helium Over Time',
+        style: {
+            color: theme === 'light' ? '#000000' : '#FFFFFF',
+        }
+    },
+    xAxis: {
+        title: { text: '' },
+        labels: { enabled: false },
+    },
+    yAxis: {
+        title: { text: 'Hull Helium' },
+        min: 0,
+        max: 10,
+        tickInterval: 2,
+        tickColor: theme === 'light' ? '#000000' : '#FFFFFF',
+        labels: {
+            style: {
+                color: theme === 'light' ? '#666666' : '#FC030F', // Tick labels color
+            },
+        },
+    },
+    series: [
+        {
+            name: 'Hull Helium',
+            data: data,
+            color: '#666666',
+            marker: {
+                enabled: true,
+            },
+        },
+    ],
+});

@@ -15,7 +15,7 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HighchartsMore from "highcharts/highcharts-more";
 import HighchartsGauge from "highcharts/modules/solid-gauge";
-import { confluenceGaugeOptions, pressureGaugeOptions, windGaugeOptions } from '../../constant'
+import { confluenceGaugeOptions, lineChartOptions, pressureGaugeOptions, windGaugeOptions } from '../../constant'
 import { ThemeContext } from '../../ThemeHandler'
 import { useWindowWidth, sendDeviceCommands } from '../../utils'
 import Modal from '../Modal'
@@ -29,7 +29,7 @@ HighchartsGauge(Highcharts);
 const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, openModal, setOpenModal, handleOpenModal, fetchingStart, HandleBrowse, fileName, HandlePlay, HandleForward, HandleStop, playBtn, fwdBtn, StopBtn
 
 }) => {
-  const { theme, toggleTheme, phase } = useContext(ThemeContext);
+  const { theme, toggleTheme, phase, isPhase1Starts, isPhase2Starts } = useContext(ThemeContext);
   const width = useWindowWidth();
   const getChartSize = () => (width >= 1280 && width <= 1440) ? 200 : 260
   const getCompassSize = () => (width >= 1280 && width <= 1440) ? true : false;
@@ -44,6 +44,24 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
   const [payload_power, setPayloadPower] = useState("Off");
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
+
+  const [dataPoints, setDataPoints] = useState([]);
+
+  useEffect(() => {
+    if (response?.helium?.hel_pressure !== undefined) {
+      // Add new data point to the array
+      setDataPoints((prevDataPoints) => {
+        const newDataPoints = [...prevDataPoints, parseFloat(response?.helium?.hel_pressure)];
+
+        // If the array has more than 10 points, remove the first one
+        if (newDataPoints.length > 10) {
+          newDataPoints.shift();
+        }
+
+        return newDataPoints;
+      });
+    }
+  }, [response]);
 
   const handleChange = (name, value) => {
     if (fetchingStart) {
@@ -501,8 +519,15 @@ const Home = ({ handleSubmit, errorValues, setErrorValues, response, isLoading, 
           </div>
         </div>
       </div>
-
-      <div className="main2">
+      <div style={{ width: "100%", height: "auto", display: "flex", justifyContent: "center", alignItems: "center", padding: "0px 50px" }}>
+        <MainCard title={"Line Charts"}>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={lineChartOptions(theme, phase === 1 && !isPhase1Starts || phase === 2 && !isPhase2Starts ? [0.4] : dataPoints)}
+          />
+        </MainCard>
+      </div>
+      <div className="main2" style={{ marginTop: "20px" }}>
         <MainCard title={"Controls & Radio Link"}>
           <div className="control-box-card">
             {
