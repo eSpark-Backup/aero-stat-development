@@ -331,27 +331,24 @@ struct avionicsEnvData : public SensorData {
 
 struct relayData : public SensorData {
     std::string status;
-    bool primary_blower_value;
-    bool secondary_blower_value;
-    bool strobe_lights_value;
-    bool payload_power_value;
+    bool relayStatusArr[4] = {0};
     uint8_t flag;
 
     std::map<std::string, std::string> toMap() const override {
         std::map<std::string, std::string> data;
-        data["primary_blower_value"] = std::to_string(primary_blower_value);
-        data["secondary_blower_value"] = std::to_string(secondary_blower_value);
-        data["strobe_lights_value"] = std::to_string(strobe_lights_value);
-        data["payload_power_value"] = std::to_string(payload_power_value);
+        data["primary_blower_value"] = std::to_string(relayStatusArr[0]);
+        data["secondary_blower_value"] = std::to_string(relayStatusArr[1]);
+        data["strobe_lights_value"] = std::to_string(relayStatusArr[2]);
+        data["payload_power_value"] = std::to_string(relayStatusArr[3]);
         data["connection_status"] = status;
         return data;
     }
 
     void print() const override {
-        LOG_WARNING("primary_blower_value: %d", primary_blower_value);
-        LOG_WARNING("secondary_blower_value: %f", secondary_blower_value);
-        LOG_WARNING("strobe_lights_value: %f", strobe_lights_value);
-        LOG_WARNING("payload_power_value: %f", payload_power_value);
+        LOG_WARNING("primary_blower_value: %d", relayStatusArr[0]);
+        LOG_WARNING("secondary_blower_value: %f", relayStatusArr[1]);
+        LOG_WARNING("strobe_lights_value: %f", relayStatusArr[2]);
+        LOG_WARNING("payload_power_value: %f", relayStatusArr[3]);
         LOG_WARNING("connection_status: %s", status.c_str());
     }
 };

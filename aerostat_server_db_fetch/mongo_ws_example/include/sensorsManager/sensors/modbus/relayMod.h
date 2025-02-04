@@ -115,6 +115,22 @@ public:
         //     *relayArr[i++] = relay_value;
 
         // }
+        bool relay_value;
+
+        int i = 0;
+        for(const auto& config : relay_configs)
+        {
+            for(const auto& relay_nums : config.relay_nums)
+            {
+                if (!modbus.read_coil(relay_nums - 1, relay_value, mb_relay)) {
+                    std::cerr << "Failed to read to relay " << relay_nums << " (" << config.name << ").\n";
+                    return data;
+                } 
+                data->relayStatusArr[i] = relay_value;
+            }
+            i++;
+        }
+
         return data;
     }
 
@@ -127,20 +143,20 @@ public:
         json statusNameJson;
         if (dataRcv) {
             auto value = std::static_pointer_cast<relayWriteData>(dataRcv);
+            int i = 0;
             for (const auto& config : relay_configs) {
-                bool value = false;
-                if (config.name == relay_configs[0].name) {
-                    value = data->primary_blower_value;
-                } else if (config.name == relay_configs[1].name) {
-                    value = data->secondary_blower_value;
-                } else if (config.name == relay_configs[2].name) {
-                    value = data->strobe_lights_value;
-                } else if (config.name == relay_configs[3].name) {
-                    value = data->payload_power_value;
-                }
-
+                // bool value = false;
+                // if (config.name == relay_configs[0].name) {
+                //     data->primary_blower_value = value[0] ;
+                // } else if (config.name == relay_configs[1].name) {
+                //     data->secondary_blower_value = value[1] ;
+                // } else if (config.name == relay_configs[2].name) {
+                //     data->strobe_lights_value = value[2] ;
+                // } else if (config.name == relay_configs[3].name) {
+                //     data->payload_power_value = value[3] ;
+                // }
                 for (int relay_num : config.relay_nums) {
-                    if (!modbus.write_coil(relay_num - 1, value, mb_relay)) {
+                    if (!modbus.write_coil(relay_num - 1, value->relayStates[i], mb_relay)) {
                         std::cerr << "Failed to write to relay " << relay_num << " (" << config.name << ").\n";
                         return false;
                     }
@@ -157,6 +173,7 @@ public:
                     testMap["relay_numbers"] = relayNumVector;
                     logger.cloudDb.insert("relay_status", statusNameJson.dump(), testMap);
                 }
+                i++;
             }
             return true;
         }

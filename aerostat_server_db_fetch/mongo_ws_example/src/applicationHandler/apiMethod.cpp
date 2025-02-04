@@ -278,9 +278,9 @@ json handleActuatorSetting(const json& parseJson) {
     // Write the modbus and TCP settings to their respective sensors if data is available
     if (relayStatesModified) {
         if (sensorManager.writeSensorData(modbusPortNumber, relayDataVar)) {
-            LOG_SUCCESS("Relay data successfully written to modbus sensor");
+            LOG_SUCCESS("Relay data successfully written to modbus sensor %s", modbusPortNumber.c_str());
         } else {
-            LOG_WARNING("Failed to write relay data to modbus sensor");
+            LOG_WARNING("Failed to write relay data to modbus sensor %s", modbusPortNumber.c_str());
         }
     } else if (!relayStatesModified) {
         LOG_WARNING("No relay data to write to modbus sensor.");
