@@ -29,6 +29,22 @@ services:
       - "4196:4196"
     profiles:
       - dev
+
+
+  mongodb:
+    build: ./mongo_ws_example/assets/mongodb-docker
+    container_name: alfa-compose-mongo-container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    profiles:
+      - dev
+
+volumes:
+  mongodb_data:
+
     
     ##                    DEPLOYEMENT
     ##====================================================
