@@ -32,7 +32,7 @@
 #define trace_warning(X, reg...) trace_color(Logger::WARNING, COLOR_FONT_YELLOW, X, ##reg)
 #define trace_success(X, reg...) trace_color(Logger::SUCCESS, COLOR_FONT_GREEN, X, ##reg)
 #define trace_error(X, reg...) trace_color(Logger::ERROR, COLOR_FONT_RED, X, ##reg)
-#define trace_verbose(X, reg...) trace_color(Logger::VERBOSE, COLOR_BG_MAGENTA, X, ##reg)
+#define trace_verbose(X, reg...) trace_color(Logger::VERBOSE, COLOR_BG_CYAN, X, ##reg)
 
 #define LOG_DEBUG trace_debug
 #define LOG_INFO trace_information

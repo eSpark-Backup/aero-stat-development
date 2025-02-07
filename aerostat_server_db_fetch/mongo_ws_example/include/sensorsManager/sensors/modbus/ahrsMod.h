@@ -95,6 +95,10 @@ public:
                     if (value.contains("roll") && value["roll"].contains("value")) {
                         float ahrsRollValue = value["roll"]["value"].get<float>();
                         LOG_DEBUG("AHRS Roll: %f", ahrsRollValue);
+                        data->roll = ahrsRollValue;                    
+                    } else if(value.contains("roll")) {
+                        float ahrsRollValue = value["roll"].get<float>();
+                        LOG_DEBUG("AHRS Roll: %f", ahrsRollValue);
                         data->roll = ahrsRollValue;
                     } else {
                         LOG_WARNING("Roll field is missing in the JSON");
@@ -103,6 +107,10 @@ public:
                     // Check if "pitch" field exists
                     if (value.contains("pitch") && value["pitch"].contains("value")) {
                         float ahrsPitchValue = value["pitch"]["value"].get<float>();
+                        LOG_DEBUG("AHRS Pitch: %f", ahrsPitchValue);
+                        data->pitch = ahrsPitchValue;
+                    } else if(value.contains("pitch")) {
+                        float ahrsPitchValue = value["pitch"].get<float>();
                         LOG_DEBUG("AHRS Pitch: %f", ahrsPitchValue);
                         data->pitch = ahrsPitchValue;
                     } else {
@@ -114,6 +122,10 @@ public:
                         float ahrsHeadingValue = value["heading"]["value"].get<float>();
                         LOG_DEBUG("AHRS Heading: %f", ahrsHeadingValue);
                         data->heading = ahrsHeadingValue;
+                    } else if(value.contains("heading")) {
+                        float ahrsHeadingValue = value["heading"].get<float>();
+                        LOG_DEBUG("AHRS Heading: %f", ahrsHeadingValue);
+                        data->heading = ahrsHeadingValue;
                     } else {
                         LOG_WARNING("Heading field is missing in the JSON");
                     }
@@ -123,13 +135,21 @@ public:
                         float ahrsLatValue = value["latitude"]["value"].get<float>();
                         LOG_DEBUG("AHRS Latitude: %f", ahrsLatValue);
                         data->latitude = ahrsLatValue;
-                    } else {
+                    } else if(value.contains("latitude")) {
+                        float ahrsLatValue = value["latitude"].get<float>();
+                        LOG_DEBUG("AHRS Latitude: %f", ahrsLatValue);
+                        data->latitude = ahrsLatValue;
+                    }else {
                         LOG_WARNING("Latitude field is missing in the JSON");
                     }
 
                     // Check if "longitude" field exists
                     if (value.contains("longitude") && value["longitude"].contains("value")) {
                         float ahrsLongValue = value["longitude"]["value"].get<float>();
+                        LOG_DEBUG("AHRS Longitude: %f", ahrsLongValue);
+                        data->longitude = ahrsLongValue;
+                    } else if(value.contains("longitude")) {
+                        float ahrsLongValue = value["longitude"].get<float>();
                         LOG_DEBUG("AHRS Longitude: %f", ahrsLongValue);
                         data->longitude = ahrsLongValue;
                     } else {
@@ -141,7 +161,11 @@ public:
                         float ahrsAltValue = value["altitude"]["value"].get<float>();
                         LOG_DEBUG("AHRS Altitude: %f", ahrsAltValue);
                         data->altitude = ahrsAltValue;
-                    } else {
+                    } else if(value.contains("altitude")) {
+                        float ahrsAltValue = value["altitude"].get<float>();
+                        LOG_DEBUG("AHRS Altitude: %f", ahrsAltValue);
+                        data->altitude = ahrsAltValue;
+                    }else {
                         LOG_WARNING("Altitude field is missing in the JSON");
                     }
                 } else {

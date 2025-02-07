@@ -11,6 +11,8 @@
 
 #include "sensorsManager/sensors/commonSensorData/sensorsDef.h"
 
+std::mutex sensorConfigManager_mtx;
+
 void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventParams) {
     switch (eventParams.type) {
         case ProtocolEvent::MESSAGE_RECEIVED:
@@ -43,9 +45,14 @@ void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventPar
     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Thread 1 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     - Reads sensors, update FE and DB
 */
-void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& configManager) {
+void ApplicationHandler::continuouslyReadSensorData() {
     LOG_WARNING("Data read thread started");
+    ConfigManager& configManager = ConfigManager::getInstance();
+    SensorManager& sensorManager = SensorManager::getInstance();
+    
     while (true) {
+        // std::lock_guard<std::mutex> lock(sensorConfigManager_mtx);
+        sensorConfigManager_mtx.lock();
         // Get the list of sensor IDs
         auto sensorIds = sensorManager.getSensorIDs();
         // Iterate over all sensor IDs
@@ -81,6 +88,7 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
         }
         // ServerConfig serverInformation = configManager.getServerConfig();
         // serverInformation.print();
+        sensorConfigManager_mtx.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Adjust time as needed
     }
 }
@@ -97,7 +105,8 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
     while (true) {
         if (configManager.getServerConfig().broadcastEnable) {
             // LOG_DEBUG("Updating Frontend");
-
+            // std::lock_guard<std::mutex> lock(sensorConfigManager_mtx);
+            sensorConfigManager_mtx.lock();
             const ServerConfig& serverConfig = configManager.getServerConfig();
             TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
             json responseJson = {
@@ -137,6 +146,7 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
             // Convert the JSON to a string and send it to the frontend
             std::string jsonOutput = responseJson.dump(4); // Pretty print with 4 spaces
             protocol_->sendData(jsonOutput);
+            sensorConfigManager_mtx.unlock();
         }
 
         // Sleep for 1 second before checking again
@@ -225,7 +235,7 @@ void ApplicationHandler::start() {
         SensorManager& sensorManager = SensorManager::getInstance();
         ConfigManager& configManager = ConfigManager::getInstance();
 
-        std::thread sensorReadingThread(continuouslyReadSensorData, std::ref(sensorManager), std::ref(configManager));
+        std::thread sensorReadingThread(&ApplicationHandler::continuouslyReadSensorData, this);
         sensorReadingThread.detach();
 
 
