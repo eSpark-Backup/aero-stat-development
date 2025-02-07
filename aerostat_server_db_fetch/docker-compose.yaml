@@ -14,6 +14,7 @@ services:
     build: ./mongo_ws_example
     ports:
       - "9001:9001"
+    restart: unless-stopped
     volumes:
       - ./logs:/home/logs
 

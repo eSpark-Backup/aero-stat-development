@@ -25,12 +25,14 @@ RUN apt install gdb -y
 
 RUN apt-get update && apt-get install -y iputils-ping
 
-RUN echo "file ../bin/main" > ~/.gdbinit && \
-    echo "run" >> ~/.gdbinit
+# RUN echo "file ../bin/main" > ~/.gdbinit && \
+#     echo "run" >> ~/.gdbinit
 
 # Set GDB as the default command
-CMD ["gdb"]
+# CMD ["gdb"]
 
+
+CMD ["make","run"]
 # RUN make run
 #### NOTE BEFORE RUNNING THIS CONATINER RUN THE CONATINER FROM DOCKER FILE /assets/modbus_tcp_server/
 #### open modbus_tcp_server in a new terminal and run the commands provided in that docker file.
