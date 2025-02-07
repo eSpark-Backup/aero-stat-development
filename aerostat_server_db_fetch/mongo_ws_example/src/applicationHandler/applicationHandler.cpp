@@ -194,6 +194,38 @@ void ApplicationHandler::start() {
     messageHandler_->registerMethodHandler("alfa.tcp.reading.get", NULL);
     messageHandler_->registerMethodHandler("alfa.db.status.get", NULL);
     */
+
+    json forcedConnectionParams = {
+            {"method", "alfa.server.connection.settings.set"},
+            {"servers", {
+                {
+                    {"modbus", {
+                        {
+                            {"name", "modbus1"},
+                            {"ip", "172.17.0.5"},
+                            {"ports", {
+                                {{"port", "5001"}, {"name", "hull_pressure"}},
+                                {{"port", "5002"}, {"name", "ballonet_pressure"}},
+                                {{"port", "5003"}, {"name", "ahrs"}},
+                                {{"port", "5004"}, {"name", "ultrasonic"}},
+                                {{"port", "5005"}, {"name", "load_cell"}},
+                                {{"port", "5006"}, {"name", "temp_humidity"}},
+                                {{"port", "5007"}, {"name", "weather_station"}}
+                            }}
+                        },
+                        {
+                            {"name", "modbus-relay"},
+                            {"ip", "172.17.0.5"},
+                            {"ports", {
+                                {{"port", "4196"}, {"name", "relay"}}
+                            }}
+                        }
+                    }}
+                }
+            }}
+        };
+
+   handleServerConnectionSettingsSet(forcedConnectionParams);
     
     try {
         LOG_INFO("Application Starting");

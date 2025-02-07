@@ -116,18 +116,25 @@ public:
                     } else {
                         LOG_WARNING("Pitch field is missing in the JSON");
                     }
-
+                    float ahrsHeadingValue = 0;
                     // Check if "heading" field exists
                     if (value.contains("heading") && value["heading"].contains("value")) {
-                        float ahrsHeadingValue = value["heading"]["value"].get<float>();
+                        ahrsHeadingValue = value["heading"]["value"].get<float>();
                         LOG_DEBUG("AHRS Heading: %f", ahrsHeadingValue);
-                        data->heading = ahrsHeadingValue;
                     } else if(value.contains("heading")) {
-                        float ahrsHeadingValue = value["heading"].get<float>();
+                        ahrsHeadingValue = value["heading"].get<float>();
                         LOG_DEBUG("AHRS Heading: %f", ahrsHeadingValue);
-                        data->heading = ahrsHeadingValue;
                     } else {
                         LOG_WARNING("Heading field is missing in the JSON");
+                    }
+
+                    if(ahrsHeadingValue < 0)
+                    {
+                        data->heading = ahrsHeadingValue + 360.0f;
+                    }
+                    else 
+                    {
+                        data->heading = ahrsHeadingValue;
                     }
 
                     // Check if "latitude" field exists
