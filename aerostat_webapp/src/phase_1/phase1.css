@@ -1455,6 +1455,10 @@ input[type=number] {
     display: flex;
 }
 
+.highcharts-background{
+    background-color: transparent !important;
+}
+
 /* Media Queries */
 
 

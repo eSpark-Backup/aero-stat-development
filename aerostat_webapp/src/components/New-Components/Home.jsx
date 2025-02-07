@@ -17,6 +17,7 @@ import HighchartsMore from "highcharts/highcharts-more";
 import HighchartsGauge from "highcharts/modules/solid-gauge";
 import {
   confluenceGaugeOptions,
+  lineChartOptions,
   pressureGaugeOptions,
   windGaugeOptions,
 } from "../../constant";
@@ -27,6 +28,7 @@ import { formatDateTime } from "../../Js_parsing";
 import { WebSocketContext } from "../../App";
 import useWebSocket from "react-use-websocket";
 import LeafletMap from "../map/Map";
+import LineChartWithDropdown from "./LineChart";
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -50,7 +52,8 @@ const Home = ({
   fwdBtn,
   StopBtn,
 }) => {
-  const { theme, toggleTheme, phase } = useContext(ThemeContext);
+  const { theme, toggleTheme, phase, isPhase1Starts, isPhase2Starts } =
+    useContext(ThemeContext);
   const width = useWindowWidth();
   const getChartSize = () => (width >= 1280 && width <= 1440 ? 200 : 260);
   const getCompassSize = () => (width >= 1280 && width <= 1440 ? true : false);
@@ -65,6 +68,27 @@ const Home = ({
   const [payload_power, setPayloadPower] = useState("Off");
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
+
+  const [dataPoints, setDataPoints] = useState([]);
+
+  useEffect(() => {
+    if (response?.helium?.hel_pressure !== undefined) {
+      // Add new data point to the array
+      setDataPoints((prevDataPoints) => {
+        const newDataPoints = [
+          ...prevDataPoints,
+          parseFloat(response?.helium?.hel_pressure),
+        ];
+
+        // If the array has more than 10 points, remove the first one
+        if (newDataPoints.length > 10) {
+          newDataPoints.shift();
+        }
+
+        return newDataPoints;
+      });
+    }
+  }, [response]);
 
   const handleChange = (name, value) => {
     if (fetchingStart) {
@@ -272,12 +296,19 @@ const Home = ({
                   />
                   <div className="weather-station-chips">
                     <StatusChip color={"blue"} description={"Wind Angle"} />
-                    <StatusChip
+                    {/* <StatusChip
                       color={"red"}
                       description={
                         phase === 1 ? "Aerostat Heading" : "Humidity"
                       }
-                    />
+                    /> */}
+                    <ChartChip
+                        name={"Heading"}
+                        value={parseFloat(
+                          response?.digitalCompass?.mag_heading
+                        ).toFixed(2)}
+                        unit={"°"}
+                      />
                   </div>
                 </div>
               </ChildCard>
@@ -325,7 +356,9 @@ const Home = ({
             }`}
           >
             <div className="pref-data-new">
-              <h3 style={{display:"flex", alignItems:"center"}}>Alfa Core:</h3>
+              <h3 style={{ display: "flex", alignItems: "center" }}>
+                Alfa Core:
+              </h3>
               <ChartChip
                 name={"Temperature:"}
                 value={
@@ -400,16 +433,15 @@ const Home = ({
                         display: "flex",
                         flexDirection: "column",
                         rowGap: "10px",
-                        
                       }}
                     >
-                      <ChartChip
-                        name={"Heading"}
-                        value={parseFloat(
-                          response?.digitalCompass?.mag_heading
-                        ).toFixed(2)}
-                        unit={"°"}
-                      />
+                      
+                      <StatusChip
+                      color={"red"}
+                      description={
+                        phase === 1 ? "Aerostat Heading" : "Humidity"
+                      }
+                    />
                       {phase === 2 && (
                         <>
                           <ChartChip
@@ -637,8 +669,38 @@ const Home = ({
           </div>
         </div>
       </div>
-
-      <div className="main2">
+      {phase === 2 && (
+        <div
+          style={{
+            width: "100%",
+            height: "auto",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "0px 50px",
+          }}
+        >
+          {/* <MainCard title={"Line Charts"}>
+          <HighchartsReact
+            highcharts={Highcharts}
+            options={lineChartOptions(theme, phase === 1 && !isPhase1Starts || phase === 2 && !isPhase2Starts ? [0.4] : dataPoints)}
+          />
+        </MainCard> */}
+          <LineChartWithDropdown
+            theme={theme}
+            phase={phase}
+            isPhase1Starts={isPhase1Starts}
+            isPhase2Starts={isPhase2Starts}
+            data={
+              (phase === 1 && !isPhase1Starts) ||
+              (phase === 2 && !isPhase2Starts)
+                ? [0.4]
+                : dataPoints
+            }
+          />
+        </div>
+      )}
+      <div className="main2" style={{ marginTop: "20px" }}>
         <MainCard title={"Controls & Radio Link"}>
           <div className="control-box-card">
             {phase === 1 ? (
