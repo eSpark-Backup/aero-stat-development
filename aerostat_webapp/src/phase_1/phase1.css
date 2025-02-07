@@ -486,7 +486,18 @@ input[type=number] {
     height: 100%;
     display: flex;
     justify-content: space-between;
+    gap: 20px;
 }
+
+@media (max-width: 500px) {
+    .heading-box-content-phase2 {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  }
+  
 
 .pitch-box-content {
     width: 100%;
