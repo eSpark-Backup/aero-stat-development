@@ -290,6 +290,14 @@ void ApplicationHandler::start() {
             pauses T2 only.
         */
 
+       /* TEST FOR DOCKER RESTART ROUTINE
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+
+        char* codeCrasherPtr = nullptr;  // Null pointer
+        *codeCrasherPtr = 'A';  // Explicitly write to null pointer (segmentation fault)
+       */
+
+
     } catch (const std::exception& ex) {
         LOG_ERROR("Application Exception");
     }
