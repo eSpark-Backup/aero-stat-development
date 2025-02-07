@@ -76,6 +76,7 @@ const Phase1 = React.memo(() => {
     theme,
     form,
     phase1Start,
+    phase2Start,
     setPhase1Start,
     phase,
     setIsPhase1Starts,
@@ -103,6 +104,10 @@ const Phase1 = React.memo(() => {
   useEffect(() => {
     if (phase === 2) {
       sendJsonMessage(PHASE_2_DATA);
+      sendJsonMessage({
+        method: "alfa.braodcast.settings.set",
+        enable: true
+      });
 
       console.log("Phase 2 Data Sent:", PHASE_2_DATA);
     }
@@ -446,15 +451,16 @@ const Phase1 = React.memo(() => {
   }, [loading]);
 
   useEffect(() => {
-    if (!startFetchingFromFile && startFetchData && phase1Start) {
+    if (!startFetchingFromFile && ((startFetchData && phase1Start) || phase2Start)) {
       // console.log("HELLO")
       // const interval = setInterval(fetchData, 1500);
       // return () => clearInterval(interval);
       setActivateWebSocket(true);
-    } else {
+    }
+    else {
       setActivateWebSocket(false);
     }
-  }, [startFetchingFromFile, startFetchData, phase1Start]);
+  }, [startFetchingFromFile, startFetchData, phase1Start, phase2Start]);
 
   useEffect(() => {
     if (lastMessage && activateWebSocket) {

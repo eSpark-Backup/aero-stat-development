@@ -127,6 +127,23 @@ const Home = ({
     }
   };
 
+  const formatNumber = (num) => {
+    if (!num || isNaN(num)) return "N/A"; // Handle invalid values
+
+    const absNum = Math.abs(num); // Work with positive values
+
+    if (absNum >= 1.0e9) {
+      return (num / 1.0e9).toFixed(2) + "B"; // Billion
+    }
+    if (absNum >= 1.0e6) {
+      return (num / 1.0e6).toFixed(2) + "M"; // Million
+    }
+    if (absNum >= 1.0e3) {
+      return (num / 1.0e3).toFixed(2) + "K"; // Thousand
+    }
+    return num.toString(); // Small numbers remain unchanged
+  };
+
   useEffect(() => {
     let relayControls = {};
     if (phase === 1) {
@@ -253,7 +270,13 @@ const Home = ({
           <div
             style={{ display: "flex", columnGap: "10px", alignItems: "center" }}
           >
-            <p style={{ fontSize: "20px" }}>Preferences</p>
+            <p
+              style={{
+                fontSize: "20px",
+              }}
+            >
+              Preferences
+            </p>
             <div
               className={`choice ${
                 theme === "light" ? "choice-light" : "choice-dark"
@@ -296,19 +319,21 @@ const Home = ({
                   />
                   <div className="weather-station-chips">
                     <StatusChip color={"blue"} description={"Wind Angle"} />
-                    {/* <StatusChip
-                      color={"red"}
-                      description={
-                        phase === 1 ? "Aerostat Heading" : "Humidity"
-                      }
-                    /> */}
-                    <ChartChip
-                        name={"Heading"}
-                        value={parseFloat(
-                          response?.digitalCompass?.mag_heading
-                        ).toFixed(2)}
-                        unit={"°"}
+                    {/* Section for Phase 1 */}
+                    <div className="phase-1-section">
+                      <StatusChip
+                        color={"red"}
+                        description={"Aerostat Heading"}
                       />
+                    </div>
+
+                    {/* <ChartChip
+                      name={"Heading"}
+                      value={parseFloat(
+                        response?.digitalCompass?.mag_heading
+                      ).toFixed(2)}
+                      unit={"°"}
+                    /> */}
                   </div>
                 </div>
               </ChildCard>
@@ -321,10 +346,10 @@ const Home = ({
                 options={windGaugeOptions(
                   theme,
                   0,
-                  70,
+                  50,
                   [
-                    parseFloat(response?.weather?.wind_speed) > 70
-                      ? 70
+                    parseFloat(response?.weather?.wind_speed) > 50
+                      ? 50
                       : parseFloat(response?.weather?.wind_speed) < 0
                       ? 0
                       : parseFloat(response?.weather?.wind_speed),
@@ -332,14 +357,17 @@ const Home = ({
                   getChartSize()
                 )}
               />
+
               <ChartsData
                 position={"between"}
                 description1={"Air Temp (C):"}
-                value1={parseFloat(response?.weather?.air_temp).toFixed(2)}
-                description2={"Baro Press (inHg):"}
-                value2={parseFloat(response?.weather?.baro_presssure).toFixed(
+                value1={`${parseFloat(response?.weather?.air_tempe).toFixed(
                   2
-                )}
+                )} °C`}
+                description2={"Baro Press:"}
+                value2={`${parseFloat(
+                  response?.weather?.baro_presssure
+                ).toFixed(2)} hPa`}
                 graphValue={parseFloat(response?.weather?.wind_speed).toFixed(
                   2
                 )}
@@ -356,8 +384,14 @@ const Home = ({
             }`}
           >
             <div className="pref-data-new">
-              <h3 style={{ display: "flex", alignItems: "center" }}>
-                Alfa Core:
+              <h3
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: theme === "light" ? "black" : "white",
+                }}
+              >
+                AlfaCOR:
               </h3>
               <ChartChip
                 name={"Temperature:"}
@@ -396,7 +430,15 @@ const Home = ({
               />
             </div>
             <div className="prefrence-box-new">
-              <p style={{ fontSize: "20px" }}>Preferences</p>
+              <p
+                style={{
+                  fontSize: "20px",
+                  color: theme === "light" ? "black" : "white",
+                }}
+              >
+                Preferences
+              </p>
+
               <div
                 className={`choice ${
                   theme === "light" ? "choice-light" : "choice-dark"
@@ -435,13 +477,25 @@ const Home = ({
                         rowGap: "10px",
                       }}
                     >
-                      
-                      <StatusChip
-                      color={"red"}
-                      description={
-                        phase === 1 ? "Aerostat Heading" : "Humidity"
-                      }
-                    />
+                      {/* Section for Phase 2 */}
+                      {phase === 2 && (
+                        <div className="phase-2-section">
+                          {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                          <ChartChip
+                            name={"Humidity"}
+                            value={parseFloat().toFixed(2)}
+                          />
+                        </div>
+                      )}
+                      {phase === 1 && (
+                        <ChartChip
+                          name={"Heading"}
+                          value={parseFloat(
+                            response?.digitalCompass?.mag_heading
+                          ).toFixed(2)}
+                          unit={"°"}
+                        />
+                      )}
                       {phase === 2 && (
                         <>
                           <ChartChip
@@ -450,14 +504,13 @@ const Home = ({
                               response?.weather?.altitude === "NaN" ||
                               !response?.weather?.altitude
                                 ? "N/A"
-                                : `${response?.weather?.altitude}m`
+                                : `${formatNumber(response.weather.altitude)}m`
                             }
                             unit={""}
                           />
                         </>
                       )}
                     </div>
-
                     {/* Show NewCompass only in phase 1 */}
                     {phase === 1 && (
                       <NewCompass
@@ -528,27 +581,6 @@ const Home = ({
                             }
                             unit={""}
                           />
-                          {/* <ChartChip
-                            name={"Yaw:"}
-                            value={
-                              response?.digitalCompass.yaw === "NaN" ||
-                              !response?.digitalCompass.yaw
-                                ? "N/A"
-                                : `${response?.digitalCompass.yaw}°`
-                            }
-                            unit={""}
-                          /> */}
-                          {/* <ChartChip
-                            name={"Position Accuracy:"}
-                            value={
-                              response?.digitalCompass.position_accuracy ===
-                                "NaN" ||
-                              !response?.digitalCompass.position_accuracy
-                                ? "N/A"
-                                : `${response?.digitalCompass.position_accuracy}m`
-                            }
-                            unit={""}
-                          /> */}
                         </>
                       )}
                     </div>
@@ -587,7 +619,7 @@ const Home = ({
                       graphValue={parseFloat(
                         response?.helium?.hel_pressure
                       ).toFixed(2)}
-                      graphName={"Hull Helium"}
+                      graphName={"Hull Pressure"}
                     />
                   </div>
                   <div>
@@ -613,7 +645,7 @@ const Home = ({
                         response?.ballonet?.bal_pressure
                       ).toFixed(2)}
                       graphName={"Ballonet Air"}
-                      description1={phase === 2 && "Ballonet Curtain"}
+                      description1={phase === 2 && "Curtain Height"}
                       // value1={response?.ballonet?.ballonet_height === "NaN" ? "N/A" : `${parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}m`}
                       value1={
                         phase === 2 &&
@@ -621,7 +653,7 @@ const Home = ({
                           !response?.ballonet?.ballonet_height)
                           ? "N/A"
                           : phase === 2 && response?.ballonet?.ballonet_height
-                          ? response?.ballonet?.ballonet_height
+                          ? `${response?.ballonet?.ballonet_height}m`
                           : ""
                       }
                     />
@@ -630,7 +662,7 @@ const Home = ({
               </MainCard>
             </div>
             <div className="confluence-box">
-              <MainCard title={"Confluence Point Tension"}>
+              <MainCard title={"Lift Force"}>
                 <div className="confluence-box-content">
                   <ChartChip
                     name={"Max Tension"}
@@ -643,10 +675,10 @@ const Home = ({
                       options={confluenceGaugeOptions(
                         theme,
                         0,
-                        700,
+                        350,
                         [
-                          parseFloat(response?.adams?.tension) > 700
-                            ? 700
+                          parseFloat(response?.adams?.tension) > 350
+                            ? 350
                             : parseFloat(response?.adams?.tension) < 0
                             ? 0
                             : parseFloat(response?.adams?.tension),

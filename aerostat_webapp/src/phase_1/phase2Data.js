@@ -5,7 +5,7 @@ export const PHASE_2_DATA = {
         modbus: [
           {
             name: "modbus1",
-            ip: "10.85.5.12",
+            ip: "10.85.5.13",
             ports: [
               { port: "5001", name: "hull_pressure" },
               { port: "5002", name: "ballonet_pressure" },
@@ -18,7 +18,7 @@ export const PHASE_2_DATA = {
           },
           {
             name: "modbus-relay",
-            ip: "10.85.5.13",
+            ip: "10.85.5.12",
             ports: [{ port: "4196", name: "relay" }]
           }
         ]

@@ -16,7 +16,7 @@ const Sidebar = ({
   fwdBtn,
 }) => {
   const { theme } = useContext(ThemeContext);
-  const { phase, setPhase, setPhase1Start, isPhase1Starts, setIsPhase2Starts, isPhase2Starts, fileFetchingStart } = useContext(ThemeContext);
+  const { phase, setPhase, setPhase1Start, setPhase2Start, isPhase1Starts, setIsPhase2Starts, isPhase2Starts, fileFetchingStart } = useContext(ThemeContext);
   const { sendJsonMessage } = useContext(WebSocketContext);
 
   const changePhase = async (newPhase) => {
@@ -38,6 +38,7 @@ const Sidebar = ({
       if (isPhase2Starts) {
         setPhase1Start(true)
       }
+      setPhase2Start(true)
     }
     else {
       sendJsonMessage({

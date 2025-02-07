@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import logo from "../../assets/logo.svg"
+// import logo from "../../assets/black_logo.png"
 import logowhite from "../../assets/logo-white.svg"
 import { ThemeContext } from '../../ThemeHandler';
 import { formatDateTime } from '../../Js_parsing';

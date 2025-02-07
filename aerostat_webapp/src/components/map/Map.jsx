@@ -1,8 +1,17 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet"; // Import Leaflet to customize the marker icon
 import "leaflet/dist/leaflet.css";
 
 const center = [24.8607, 67.0011]; // Karachi coordinates
+
+// Custom Red Marker Icon
+const redMarker = new L.Icon({
+  iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+});
 
 const LeafletMap = () => {
   const [showCoords, setShowCoords] = useState(false);
@@ -38,6 +47,7 @@ const LeafletMap = () => {
 
           <Marker
             position={center}
+            icon={redMarker} // Apply red marker icon
             eventHandlers={{
               click: () => setShowCoords((prev) => !prev), // Toggle coordinates display on click
             }}
@@ -54,12 +64,10 @@ const LeafletMap = () => {
           .custom-leaflet-map .leaflet-control-container .leaflet-top {
             top: 40px !important; /* Moves zoom buttons lower */
             z-index: 888;
-            
           }
           .leaflet-container .leaflet-control-attribution{
-          display: none;
+            display: none;
           }
-            
         `}
       </style>
     </div>
