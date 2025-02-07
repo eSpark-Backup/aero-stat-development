@@ -21,7 +21,7 @@ WORKDIR /home/backend/build
 # Run CMake to configure and build the project
 RUN cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . && make main
 
-RUN apt install gdb -y
+# RUN apt install gdb -y
 
 RUN apt-get update && apt-get install -y iputils-ping
 
@@ -32,8 +32,11 @@ RUN apt-get update && apt-get install -y iputils-ping
 # CMD ["gdb"]
 
 
-CMD ["make","run"]
+# CMD ["make","run"]
 # RUN make run
+
+CMD ["../bin/main"]
+
 #### NOTE BEFORE RUNNING THIS CONATINER RUN THE CONATINER FROM DOCKER FILE /assets/modbus_tcp_server/
 #### open modbus_tcp_server in a new terminal and run the commands provided in that docker file.
 

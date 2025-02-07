@@ -116,6 +116,7 @@ public:
                     double wind_direction = value["wind_direction"]["value"].get<double>();
                     std::string wind_direction_unit = value["wind_direction"]["unit"].get<std::string>();
                     std::cout << "Wind Direction: " << wind_direction << " " << wind_direction_unit << std::endl;
+                    // data->windAngle = wind_direction - normalizedAerostatHeading; //TODO: Normalization
                     data->windAngle = wind_direction;
                 }
 

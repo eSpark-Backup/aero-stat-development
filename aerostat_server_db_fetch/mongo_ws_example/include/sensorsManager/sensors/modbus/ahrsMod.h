@@ -11,6 +11,7 @@
 #include "sensorsManager/base/sensorFactory.h"
 #include "logger/trace_util.h"
 
+float normalizedAerostatHeading = 0;
 
 std::map<std::string, RegisterInfoAHRS> AHRS_GPS_REGISTERS = {
     {"roll", {ROLL_REGISTER, 1}},
@@ -131,10 +132,12 @@ public:
                     if(ahrsHeadingValue < 0)
                     {
                         data->heading = ahrsHeadingValue + 360.0f;
+                        normalizedAerostatHeading = data->heading;
                     }
                     else 
                     {
                         data->heading = ahrsHeadingValue;
+                        normalizedAerostatHeading = data->heading;
                     }
 
                     // Check if "latitude" field exists
