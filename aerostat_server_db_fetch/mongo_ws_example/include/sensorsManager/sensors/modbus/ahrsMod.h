@@ -179,7 +179,7 @@ public:
                         LOG_WARNING("Altitude field is missing in the JSON");
                     }
                 } else {
-                    LOG_ERROR("'value' field not found in the JSON");
+                    LOG_ERROR("value field not found in the JSON");
                 }
             }
 

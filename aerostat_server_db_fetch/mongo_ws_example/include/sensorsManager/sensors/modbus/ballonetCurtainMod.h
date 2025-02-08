@@ -41,7 +41,8 @@ public:
                 LOG_DEBUG("Ballonet Curtain Height : %f", balCurtainHeightValue);
                 data->height = balCurtainHeightValue;               
             } else {
-                std::cout << "'value' field not found in the JSON" << std::endl;
+                // std::cout << "'value' field not found in the JSON" << std::endl;
+                LOG_ERROR("value field not found in the JSON");
             }
         }
 

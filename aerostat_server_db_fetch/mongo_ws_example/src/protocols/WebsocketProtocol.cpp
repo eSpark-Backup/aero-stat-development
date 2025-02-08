@@ -24,7 +24,8 @@ void WebSocketProtocol::parseUrl() {
         LOG_INFO("Parsed Host: %s", host.c_str());
         LOG_INFO("Parsed Port: %d", port);
     } else {
-        std::cerr << "Invalid URL format. Expected ws://<host>:<port>" << std::endl;
+        // std::cerr << "Invalid URL format. Expected ws://<host>:<port>" << std::endl;
+        LOG_ERROR("Invalid URL format. Expected ws://<%s>:<%d>", host.c_str(), port);
     }
 }
 
@@ -61,7 +62,8 @@ void WebSocketProtocol::startListening(void) {
     try {
         listeningThread = std::make_unique<std::thread>(&WebSocketProtocol::listen, this);
     } catch (const std::exception& e) {
-        std::cerr << "Error creating thread: " << e.what() << std::endl;
+        // std::cerr << "Error creating thread: " << e.what() << std::endl;tcpConnectionManager.h
+        LOG_ERROR("Error creating thread: %s", e.what());
     }
 
 }
