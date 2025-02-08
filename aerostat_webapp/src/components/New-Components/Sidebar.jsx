@@ -16,39 +16,47 @@ const Sidebar = ({
   fwdBtn,
 }) => {
   const { theme } = useContext(ThemeContext);
-  const { phase, setPhase, setPhase1Start, isPhase1Starts, setIsPhase2Starts, isPhase2Starts, fileFetchingStart } = useContext(ThemeContext);
+  const {
+    phase,
+    setPhase,
+    setPhase1Start,
+    setPhase2Start,
+    isPhase1Starts,
+    setIsPhase2Starts,
+    isPhase2Starts,
+    fileFetchingStart,
+  } = useContext(ThemeContext);
   const { sendJsonMessage } = useContext(WebSocketContext);
 
   const changePhase = async (newPhase) => {
     if (phase === newPhase) {
-      return
+      return;
     }
 
     if (newPhase === 2 && fileFetchingStart) {
-      return
+      return;
     }
     if (newPhase === 2) {
       sendJsonMessage({
-        "method": "alfa.phase.settings.set",
-        "phaseType": "modbus"
-      })
+        method: "alfa.phase.settings.set",
+        phaseType: "modbus",
+      });
       if (!isPhase2Starts) {
-        setPhase1Start(false)
+        setPhase1Start(false);
       }
       if (isPhase2Starts) {
-        setPhase1Start(true)
+        setPhase1Start(true);
       }
-    }
-    else {
+      setPhase2Start(true);
+    } else {
       sendJsonMessage({
-        "method": "alfa.phase.settings.set",
-        "phaseType": "tcp"
-      })
+        method: "alfa.phase.settings.set",
+        phaseType: "tcp",
+      });
       if (isPhase1Starts) {
-        setPhase1Start(true)
-      }
-      else {
-        setPhase1Start(false)
+        setPhase1Start(true);
+      } else {
+        setPhase1Start(false);
       }
     }
     setPhase(newPhase);
@@ -64,14 +72,31 @@ const Sidebar = ({
       />
       <img src={theme === "light" ? logo : logowhite} alt="Logo" />
       <div className="sidebar-menu">
-        <div style={{ display: "flex", flexDirection: "column", rowGap: "20px" }}>
-          <p className={phase === 2 && "side-item-notactive"} onClick={() => changePhase(1)}>Phase 1</p>
-          <p style={{ cursor: fileFetchingStart && "not-allowed", backgroundColor: fileFetchingStart && "#cbcbcbbb" }} className={phase === 1 && "side-item-notactive"} onClick={() => changePhase(2)}>Phase 2</p>
+        <div
+          style={{ display: "flex", flexDirection: "column", rowGap: "20px" }}
+        >
+          <p
+            className={phase === 2 && "side-item-notactive"}
+            onClick={() => changePhase(1)}
+          >
+            Phase 1
+          </p>
+          <p
+            style={{
+              cursor: fileFetchingStart && "not-allowed",
+              backgroundColor: fileFetchingStart && "#cbcbcbbb",
+            }}
+            className={phase === 1 && "side-item-notactive"}
+            onClick={() => changePhase(2)}
+          >
+            Phase 2
+          </p>
         </div>
         <div
           style={{ width: "306px" }}
-          className={`config-box ${theme === "light" ? "config-box-light" : "config-box-dark"
-            }`}
+          className={`config-box ${
+            theme === "light" ? "config-box-light" : "config-box-dark"
+          }`}
         >
           <button
             onClick={() => {
@@ -80,7 +105,7 @@ const Sidebar = ({
             }}
             className={
               (!playBtn && StopBtn && fwdBtn) ||
-                (!playBtn && !fwdBtn && StopBtn)
+              (!playBtn && !fwdBtn && StopBtn)
                 ? "disable"
                 : ""
             }
@@ -89,6 +114,7 @@ const Sidebar = ({
           </button>
         </div>
       </div>
+      <div style={{color:"grey", position:"absolute", bottom:"0"}}>v2.1.4</div>
     </div>
   );
 };

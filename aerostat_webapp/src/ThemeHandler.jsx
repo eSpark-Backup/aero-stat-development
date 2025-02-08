@@ -22,8 +22,8 @@ const ThemeHandler = ({ children }) => {
         helium: "4005",
         adam: "4006",
         ebox: "4007",
-        modbustcp_host_ip: "172.17.0.2",
-        relayIp: "172.17.0.3",
+        modbustcp_host_ip: "10.85.5.13",
+        relayIp: "10.85.5.12",
         relayPort: "4196"
     });
 

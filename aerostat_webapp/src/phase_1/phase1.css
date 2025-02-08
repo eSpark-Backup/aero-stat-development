@@ -104,10 +104,9 @@ input[type=number] {
 }
 
 /* .logo img {
-    width: 232px;
-    height: 82px;
+    width: 100%;
+    height: 155px;
     position: relative;
-    top: 4px;
 } */
 
 .header-details {
@@ -486,7 +485,18 @@ input[type=number] {
     height: 100%;
     display: flex;
     justify-content: space-between;
+    gap: 20px;
 }
+
+@media (max-width: 500px) {
+    .heading-box-content-phase2 {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  }
+  
 
 .pitch-box-content {
     width: 100%;
@@ -1241,7 +1251,7 @@ input[type=number] {
 }
 
 .box-values>p {
-    font-size: 14.81px;
+    font-size: 15.81px;
     font-weight: 400;
 }
 
@@ -1442,6 +1452,10 @@ input[type=number] {
 .pref-data-new {
     column-gap: 10px;
     display: flex;
+}
+
+.highcharts-background{
+    background-color: transparent !important;
 }
 
 /* Media Queries */
@@ -2464,3 +2478,17 @@ img.sidebar-close.dark {
 }
 
 /* //sidebar// */
+
+@media (max-width: 768px) {
+    .pitch-box-content,
+    .pitch-box-content-phase2 {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .pitch-roll-chips {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  

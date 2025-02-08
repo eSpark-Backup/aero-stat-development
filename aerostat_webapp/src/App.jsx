@@ -31,7 +31,7 @@ function App() {
       });
       sendJsonMessage({
         "method": "alfa.braodcast.settings.set",
-        "enable": false
+        "enable": true
       });
       setPageLoads(true);
     }

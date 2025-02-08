@@ -8,24 +8,28 @@ import { fetchDataUtil, updateConfigUtil } from "../utils";
 import "./phase1.css";
 import { WebSocketContext } from "../App";
 import useWebSocket from "react-use-websocket";
+import { PHASE_2_DATA } from "./phase2Data";
 
 const Phase1 = React.memo(() => {
-
-  const { readyState, sendJsonMessage, lastMessage } = useContext(WebSocketContext);
+  const { readyState, sendJsonMessage, lastMessage } =
+    useContext(WebSocketContext);
   const [activateWebSocket, setActivateWebSocket] = useState(false);
 
   const connectionStatus = {
-    0: 'Connecting',
-    1: 'Connected',
-    2: 'Closing',
-    3: 'Closed',
+    0: "Connecting",
+    1: "Connected",
+    2: "Closing",
+    3: "Closed",
   }[readyState];
   const lastPerfectResponses = useRef({
     adams: {
       max_tension: parseFloat(700).toFixed(2),
       tension: parseFloat(10).toFixed(2),
     },
-    ballonet: { bal_pressure: parseFloat(0.071).toFixed(2), ballonet_height: parseFloat(0).toFixed(2) },
+    ballonet: {
+      bal_pressure: parseFloat(0.071).toFixed(2),
+      ballonet_height: parseFloat(0).toFixed(2),
+    },
     digitalCompass: {
       mag_heading: parseFloat(240.1).toFixed(2),
       pitch: parseFloat(0).toFixed(2),
@@ -65,10 +69,21 @@ const Phase1 = React.memo(() => {
     port_4004: "Disconnected",
     port_4005: "Disconnected",
     port_4006: "Disconnected",
-    loading: "Disconnected"
+    loading: "Disconnected",
   });
 
-  const { theme, form, phase1Start, setPhase1Start, phase, setIsPhase1Starts, setIsPhase2Starts, fileFetchingStart, setFileFetchingStart } = useContext(ThemeContext);
+  const {
+    theme,
+    form,
+    phase1Start,
+    phase2Start,
+    setPhase1Start,
+    phase,
+    setIsPhase1Starts,
+    setIsPhase2Starts,
+    fileFetchingStart,
+    setFileFetchingStart,
+  } = useContext(ThemeContext);
   const [sidebar, setSidebar] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [responses, setResponses] = useState(lastPerfectResponses.current);
@@ -85,6 +100,18 @@ const Phase1 = React.memo(() => {
   const [currentResult, setCurrentResult] = useState(null);
   const [fetchingSpeed, setFetchingSpeed] = useState(1000);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (phase === 2) {
+      sendJsonMessage(PHASE_2_DATA);
+      sendJsonMessage({
+        method: "alfa.braodcast.settings.set",
+        enable: true
+      });
+
+      console.log("Phase 2 Data Sent:", PHASE_2_DATA);
+    }
+  }, [phase]);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme") || "light";
@@ -110,126 +137,269 @@ const Phase1 = React.memo(() => {
 
   const isInvalidValue = (value) => {
     return (
-      value === undefined ||
-      value === "none" ||
-      value === null ||
-      isNaN(value)
+      value === undefined || value === "none" || value === null || isNaN(value)
     );
   };
 
   const fetchData = (message) => {
-
     try {
       const data = JSON.parse(message.data);
-      console.log(data, "RECEIVING DATA")
+      console.log(data, "RECEIVING DATA");
       if (data) {
         const parsedResponses = {
           weather: {
-            air_temp: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.air_temperature : data?.data?.modbus?.modbus1[5007]?.air_temperature)
+            air_temp: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1["4002"]?.air_temperature
+                : data?.data?.modbus?.modbus1[5007]?.air_temperature
+            )
               ? lastPerfectResponses.current.weather.air_temp
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.air_temperature : data?.data?.modbus?.modbus1[5007]?.air_temperature).toFixed(2),
-            baro_presssure: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.barometric_pressure : data?.data?.modbus?.modbus1[5007]?.barometric_pressure)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1["4002"]?.air_temperature
+                    : data?.data?.modbus?.modbus1[5007]?.air_temperature
+                ).toFixed(2),
+            baro_presssure: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1["4002"]?.barometric_pressure
+                : data?.data?.modbus?.modbus1[5007]?.barometric_pressure
+            )
               ? lastPerfectResponses.current.weather.baro_presssure
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.barometric_pressure : data?.data?.modbus?.modbus1[5007]?.barometric_pressure).toFixed(2),
-            heading: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.heading : data?.data?.modbus?.modbus1[5007]?.humidity)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1["4002"]?.barometric_pressure
+                    : data?.data?.modbus?.modbus1[5007]?.barometric_pressure
+                ).toFixed(2),
+            heading: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1["4002"]?.heading
+                : data?.data?.modbus?.modbus1[5007]?.humidity
+            )
               ? lastPerfectResponses.current.weather.heading
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.heading : data?.data?.modbus?.modbus1[5007]?.humidity).toFixed(2),
-            wind_angle: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_angle : data?.data?.modbus?.modbus1[5007]?.wind_angle)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1["4002"]?.heading
+                    : data?.data?.modbus?.modbus1[5007]?.humidity
+                ).toFixed(2),
+            wind_angle: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1["4002"]?.wind_angle
+                : data?.data?.modbus?.modbus1[5007]?.wind_angle
+            )
               ? lastPerfectResponses.current.weather.wind_angle
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_angle : data?.data?.modbus?.modbus1[5007]?.wind_angle).toFixed(2),
-            wind_speed: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_speed : data?.data?.modbus?.modbus1[5007]?.wind_speed)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1["4002"]?.wind_angle
+                    : data?.data?.modbus?.modbus1[5007]?.wind_angle
+                ).toFixed(2),
+            wind_speed: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1["4002"]?.wind_speed
+                : data?.data?.modbus?.modbus1[5007]?.wind_speed
+            )
               ? lastPerfectResponses.current.weather.wind_speed
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1["4002"]?.wind_speed : data?.data?.modbus?.modbus1[5007]?.wind_speed).toFixed(2),
-            longitude: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.longitude)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1["4002"]?.wind_speed
+                    : data?.data?.modbus?.modbus1[5007]?.wind_speed
+                ).toFixed(2),
+            longitude: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5003]?.longitude
+            )
               ? lastPerfectResponses.current.weather.longitude
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.longitude).toFixed(2),
-            latitude: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.latitude)
+              : parseFloat(
+                  phase === 2 && data?.data?.modbus?.modbus1[5003]?.longitude
+                ).toFixed(2),
+            latitude: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5003]?.latitude
+            )
               ? lastPerfectResponses.current.weather.latitude
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.latitude).toFixed(2),
-            altitude: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.altitude)
+              : parseFloat(
+                  phase === 2 && data?.data?.modbus?.modbus1[5003]?.latitude
+                ).toFixed(2),
+            altitude: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5003]?.altitude
+            )
               ? lastPerfectResponses.current.weather.altitude
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.altitude).toFixed(2),
-            ground_speed: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.ground_speed)
+              : parseFloat(
+                  phase === 2 && data?.data?.modbus?.modbus1[5003]?.altitude
+                ).toFixed(2),
+            ground_speed: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5003]?.ground_speed
+            )
               ? lastPerfectResponses.current.weather.ground_speed
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.ground_speed).toFixed(2),
+              : parseFloat(
+                  phase === 2 && data?.data?.modbus?.modbus1[5003]?.ground_speed
+                ).toFixed(2),
           },
           digitalCompass: {
-            mag_heading: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.magnitude_heading : data?.data?.modbus?.modbus1[5003]?.heading)
+            mag_heading: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1[4003]?.magnitude_heading
+                : data?.data?.modbus?.modbus1[5003]?.heading
+            )
               ? lastPerfectResponses.current.digitalCompass.mag_heading
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.magnitude_heading : data?.data?.modbus?.modbus1[5003]?.heading).toFixed(2),
-            pitch: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.pitch : data?.data?.modbus?.modbus1[5003]?.pitch)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1[4003]?.magnitude_heading
+                    : data?.data?.modbus?.modbus1[5003]?.heading
+                ).toFixed(2),
+            pitch: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1[4003]?.pitch
+                : data?.data?.modbus?.modbus1[5003]?.pitch
+            )
               ? lastPerfectResponses.current.digitalCompass.pitch
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.pitch : data?.data?.modbus?.modbus1[5003]?.pitch).toFixed(2),
-            roll: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.roll : data?.data?.modbus?.modbus1[5003]?.roll)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1[4003]?.pitch
+                    : data?.data?.modbus?.modbus1[5003]?.pitch
+                ).toFixed(2),
+            roll: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1[4003]?.roll
+                : data?.data?.modbus?.modbus1[5003]?.roll
+            )
               ? lastPerfectResponses.current.digitalCompass.roll
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4003]?.roll : data?.data?.modbus?.modbus1[5003]?.roll).toFixed(2),
-            humidity: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5006]?.humidity)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1[4003]?.roll
+                    : data?.data?.modbus?.modbus1[5003]?.roll
+                ).toFixed(2),
+            humidity: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5006]?.humidity
+            )
               ? lastPerfectResponses.current.digitalCompass.humidity
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5006]?.humidity).toFixed(2),
-            temperature: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5006]?.temperature)
+              : parseFloat(
+                  phase === 2 && data?.data?.modbus?.modbus1[5006]?.humidity
+                ).toFixed(2),
+            temperature: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5006]?.temperature
+            )
               ? lastPerfectResponses.current.digitalCompass.temperature
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5006]?.temperature).toFixed(2),
-            yaw: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.yaw)
+              : parseFloat(
+                  phase === 2 && data?.data?.modbus?.modbus1[5006]?.temperature
+                ).toFixed(2),
+            yaw: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5003]?.yaw
+            )
               ? lastPerfectResponses.current.digitalCompass.yaw
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.yaw).toFixed(2),
-            position_accuracy: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5003]?.position_accuracy)
+              : parseFloat(
+                  phase === 2 && data?.data?.modbus?.modbus1[5003]?.yaw
+                ).toFixed(2),
+            position_accuracy: isInvalidValue(
+              phase === 2 &&
+                data?.data?.modbus?.modbus1[5003]?.position_accuracy
+            )
               ? lastPerfectResponses.current.digitalCompass.position_accuracy
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5003]?.position_accuracy).toFixed(2),
+              : parseFloat(
+                  phase === 2 &&
+                    data?.data?.modbus?.modbus1[5003]?.position_accuracy
+                ).toFixed(2),
           },
           ballonet: {
-            bal_pressure: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4004]?.bal_pressure : data?.data?.modbus?.modbus1[5002]?.bal_pressure)
+            bal_pressure: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1[4004]?.bal_pressure
+                : data?.data?.modbus?.modbus1[5002]?.bal_pressure
+            )
               ? lastPerfectResponses.current.ballonet.bal_pressure
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4004]?.bal_pressure : data?.data?.modbus?.modbus1[5002]?.bal_pressure).toFixed(2),
-            ballonet_height: isInvalidValue(phase === 2 && data?.data?.modbus?.modbus1[5004]?.ballonet_height)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1[4004]?.bal_pressure
+                    : data?.data?.modbus?.modbus1[5002]?.bal_pressure
+                ).toFixed(2),
+            ballonet_height: isInvalidValue(
+              phase === 2 && data?.data?.modbus?.modbus1[5004]?.ballonet_height
+            )
               ? lastPerfectResponses.current.ballonet.ballonet_height
-              : parseFloat(phase === 2 && data?.data?.modbus?.modbus1[5004]?.ballonet_height).toFixed(2),
+              : parseFloat(
+                  phase === 2 &&
+                    data?.data?.modbus?.modbus1[5004]?.ballonet_height
+                ).toFixed(2),
           },
           helium: {
-            hel_pressure: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4005]?.hellium_pressure : data?.data?.modbus?.modbus1[5001]?.hull_pressure)
+            hel_pressure: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1[4005]?.hellium_pressure
+                : data?.data?.modbus?.modbus1[5001]?.hull_pressure
+            )
               ? lastPerfectResponses.current.helium.hel_pressure
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4005]?.hellium_pressure : data?.data?.modbus?.modbus1[5001]?.hull_pressure).toFixed(2),
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1[4005]?.hellium_pressure
+                    : data?.data?.modbus?.modbus1[5001]?.hull_pressure
+                ).toFixed(2),
           },
           adams: {
-            max_tension: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4006]?.max_tension : data?.data?.modbus?.modbus1[5005]?.max_tension)
+            max_tension: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1[4006]?.max_tension
+                : data?.data?.modbus?.modbus1[5005]?.max_tension
+            )
               ? lastPerfectResponses.current.adams.max_tension
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4006]?.max_tension : data?.data?.modbus?.modbus1[5005]?.max_tension).toFixed(2),
-            tension: isInvalidValue(phase === 1 ? data?.data?.tcp?.tcp1[4006]?.tension : data?.data?.modbus?.modbus1[5005]?.tension)
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1[4006]?.max_tension
+                    : data?.data?.modbus?.modbus1[5005]?.max_tension
+                ).toFixed(2),
+            tension: isInvalidValue(
+              phase === 1
+                ? data?.data?.tcp?.tcp1[4006]?.tension
+                : data?.data?.modbus?.modbus1[5005]?.tension
+            )
               ? lastPerfectResponses.current.adams.tension
-              : parseFloat(phase === 1 ? data?.data?.tcp?.tcp1[4006]?.tension : data?.data?.modbus?.modbus1[5005]?.tension).toFixed(2),
+              : parseFloat(
+                  phase === 1
+                    ? data?.data?.tcp?.tcp1[4006]?.tension
+                    : data?.data?.modbus?.modbus1[5005]?.tension
+                ).toFixed(2),
           },
           relay: {
             primary_blower:
               phase === 2
-                ? data?.data?.modbus?.modbus1[4196]?.primary_blower_value === "0"
+                ? data?.data?.modbus?.modbus1[4196]?.primary_blower_value ===
+                  "0"
                   ? "Off"
-                  : data?.data?.modbus?.modbus1[4196]?.primary_blower_value === "1"
-                    ? "On"
-                    : "Off"
+                  : data?.data?.modbus?.modbus1[4196]?.primary_blower_value ===
+                    "1"
+                  ? "On"
+                  : "Off"
                 : "Off",
-            secondary_blower: phase === 2
-              ? data?.data?.modbus?.modbus1[4196]?.secondary_blower_value === "0"
-                ? "Off"
-                : data?.data?.modbus?.modbus1[4196]?.secondary_blower_value === "1"
+            secondary_blower:
+              phase === 2
+                ? data?.data?.modbus?.modbus1[4196]?.secondary_blower_value ===
+                  "0"
+                  ? "Off"
+                  : data?.data?.modbus?.modbus1[4196]
+                      ?.secondary_blower_value === "1"
                   ? "On"
                   : "Off"
-              : "Off",
-            payload_power: phase === 2
-              ? data?.data?.modbus?.modbus1[4196]?.payload_power_value === "0"
-                ? "Off"
-                : data?.data?.modbus?.modbus1[4196]?.payload_power_value === "1"
+                : "Off",
+            payload_power:
+              phase === 2
+                ? data?.data?.modbus?.modbus1[4196]?.payload_power_value === "0"
+                  ? "Off"
+                  : data?.data?.modbus?.modbus1[4196]?.payload_power_value ===
+                    "1"
                   ? "On"
                   : "Off"
-              : "Off",
-            strobe_lights: phase === 2
-              ? data?.data?.modbus?.modbus1[4196]?.strobe_lights_value === "0"
-                ? "Off"
-                : data?.data?.modbus?.modbus1[4196]?.strobe_lights_value === "1"
+                : "Off",
+            strobe_lights:
+              phase === 2
+                ? data?.data?.modbus?.modbus1[4196]?.strobe_lights_value === "0"
+                  ? "Off"
+                  : data?.data?.modbus?.modbus1[4196]?.strobe_lights_value ===
+                    "1"
                   ? "On"
                   : "Off"
-              : "Off",
+                : "Off",
           },
           time: formatDateTime(),
-          loading: data?.status === "connected" || "success" ? "Connected" : "Disconnected",
+          loading:
+            data?.status === "connected" || "success"
+              ? "Connected"
+              : "Disconnected",
           port_4002: data?.data?.tcp?.tcp1[4002]?.connection_status
             ? data?.data?.tcp?.tcp1[4002]?.connection_status
             : "Disconnected",
@@ -257,9 +427,8 @@ const Phase1 = React.memo(() => {
         };
 
         setResponses(parsedResponses);
-      }
-      else {
-        console.log("IN ELSE")
+      } else {
+        console.log("IN ELSE");
         setResponses({
           ...lastPerfectResponses.current,
           time: formatDateTime(),
@@ -271,17 +440,18 @@ const Phase1 = React.memo(() => {
           loading: "Disconnected",
         });
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error parsing WebSocket data:", error);
-      console.log("IN CATCH", error)
+      console.log("IN CATCH", error);
     }
   };
 
-  useEffect(() => { console.log("LOADING:::", loading) }, [loading])
+  useEffect(() => {
+    console.log("LOADING:::", loading);
+  }, [loading]);
 
   useEffect(() => {
-    if (!startFetchingFromFile && (startFetchData && phase1Start)) {
+    if (!startFetchingFromFile && ((startFetchData && phase1Start) || phase2Start)) {
       // console.log("HELLO")
       // const interval = setInterval(fetchData, 1500);
       // return () => clearInterval(interval);
@@ -290,7 +460,7 @@ const Phase1 = React.memo(() => {
     else {
       setActivateWebSocket(false);
     }
-  }, [startFetchingFromFile, startFetchData, phase1Start]);
+  }, [startFetchingFromFile, startFetchData, phase1Start, phase2Start]);
 
   useEffect(() => {
     if (lastMessage && activateWebSocket) {
@@ -319,7 +489,7 @@ const Phase1 = React.memo(() => {
     if (errors.length > 0) {
       return;
     }
-    let newForm = {}
+    let newForm = {};
     if (phase === 1) {
       newForm = {
         method: "alfa.server.connection.settings.set",
@@ -332,29 +502,29 @@ const Phase1 = React.memo(() => {
                 ports: [
                   {
                     port: form?.weather,
-                    name: "weather_station"
+                    name: "weather_station",
                   },
                   {
                     port: form?.hmr,
-                    name: "digital_compass"
+                    name: "digital_compass",
                   },
                   {
                     port: form?.ballonet,
-                    name: "ballonet_pressure"
+                    name: "ballonet_pressure",
                   },
                   {
                     port: form?.helium,
-                    name: "hellium_pressure"
+                    name: "hellium_pressure",
                   },
                   {
                     port: form?.adam,
-                    name: "adam_sensor"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+                    name: "adam_sensor",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       };
     }
     if (phase === 2) {
@@ -369,33 +539,33 @@ const Phase1 = React.memo(() => {
                 ports: [
                   {
                     port: "5001",
-                    name: "hull_pressure"
+                    name: "hull_pressure",
                   },
                   {
                     port: "5002",
-                    "name": "ballonet_pressure"
+                    name: "ballonet_pressure",
                   },
                   {
                     port: "5003",
-                    "name": "ahrs"
+                    name: "ahrs",
                   },
                   {
                     port: "5004",
-                    name: "ultrasonic"
+                    name: "ultrasonic",
                   },
                   {
                     port: "5005",
-                    "name": "load_cell"
+                    name: "load_cell",
                   },
                   {
                     port: "5006",
-                    "name": "temp_humidity"
+                    name: "temp_humidity",
                   },
                   {
                     port: "5007",
-                    name: "weather_station"
-                  }
-                ]
+                    name: "weather_station",
+                  },
+                ],
               },
               {
                 name: "modbus-relay",
@@ -403,37 +573,37 @@ const Phase1 = React.memo(() => {
                 ports: [
                   {
                     port: form?.relayPort,
-                    name: "relay"
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
+                    name: "relay",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      };
     }
     try {
       setStartFetchData(true);
-      setPhase1Start(true)
+      setPhase1Start(true);
       setOpenModal(false);
       setStartFetchingFromFile(false);
       setFileFetchingStart(false);
       setErrorValues([]);
       sendJsonMessage(newForm);
       sendJsonMessage({
-        "method": "alfa.braodcast.settings.set",
-        "enable": true
-      })
+        method: "alfa.braodcast.settings.set",
+        enable: true,
+      });
       console.log("Form successfully posted:", newForm);
       if (phase === 1) {
-        setIsPhase1Starts(true)
+        setIsPhase1Starts(true);
       }
       if (phase === 2) {
-        setIsPhase2Starts(true)
+        setIsPhase2Starts(true);
       }
     } catch (error) {
       console.log("In catch", error);
-      console.log(newForm)
+      console.log(newForm);
       setOpenModal(false);
       setErrorValues([]);
     }
@@ -475,7 +645,7 @@ const Phase1 = React.memo(() => {
           [fileData[currentIndex]],
           currentResult
         );
-        console.log(result)
+        console.log(result);
         setCurrentResult(result);
         setResponses(result);
 
@@ -484,7 +654,7 @@ const Phase1 = React.memo(() => {
         clearInterval(intervalId);
 
         setStartFetchingFromFile(false);
-        setFileFetchingStart(false)
+        setFileFetchingStart(false);
         setFwdBtn(false);
         setPlayBtn(false);
         setFileContent("");
@@ -495,7 +665,7 @@ const Phase1 = React.memo(() => {
         setStopBtn(false);
         setFetchingSpeed(1000);
         setStartFetchData(false);
-        setPhase1Start(false)
+        setPhase1Start(false);
 
         const fileInput = document.getElementById("fileInput");
         if (fileInput) fileInput.value = "";
@@ -539,11 +709,11 @@ const Phase1 = React.memo(() => {
 
   const HandlePlay = () => {
     setStartFetchingFromFile(true);
-    setFileFetchingStart(true)
+    setFileFetchingStart(true);
     setFwdBtn(true);
     setStopBtn(true);
     setStartFetchData(false);
-    setPhase1Start(false)
+    setPhase1Start(false);
     setPlayBtn(false);
   };
   const HandleForward = () => {
@@ -553,7 +723,7 @@ const Phase1 = React.memo(() => {
   };
   const HandleStop = () => {
     setStartFetchingFromFile(false);
-    setFileFetchingStart(false)
+    setFileFetchingStart(false);
     setFwdBtn(false);
     setPlayBtn(false);
     setFileContent("");
@@ -564,7 +734,7 @@ const Phase1 = React.memo(() => {
     setStopBtn(false);
     setFetchingSpeed(1000);
     setStartFetchData(false);
-    setPhase1Start(false)
+    setPhase1Start(false);
 
     const fileInput = document.getElementById("fileInput");
     if (fileInput) fileInput.value = "";
@@ -640,11 +810,12 @@ const Phase1 = React.memo(() => {
         />
       </div>
       <div
-        className={`watermark ${theme === "light" ? "watermark-light" : "watermark-dark"
-          }`}
+        className={`watermark ${
+          theme === "light" ? "watermark-light" : "watermark-dark"
+        }`}
       ></div>
     </>
   );
-})
+});
 
 export default Phase1;

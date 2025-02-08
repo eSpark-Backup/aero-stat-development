@@ -67,7 +67,7 @@ export const windGaugeOptions = (theme, min = 0, max = 70, seriesData, size) => 
                     thickness: '20%'
                 },
                 {
-                    from: 39,
+                    from: 30,
                     to: needleValue < 70 ? needleValue : 70,
                     color: needleValue >= 39 ? "#e0403b" : "transparent",
                     thickness: '20%'
@@ -266,13 +266,13 @@ export const confluenceGaugeOptions = (theme, min = 0, max = 700, seriesData, si
                     color: needleValue >= 0 ? '#eeed2c' : "transparent",
                     thickness: "20%",
                 }, {
-                    from: 49,
-                    to: needleValue < 350 ? needleValue : 350,
+                    from: 50,
+                    to: needleValue < 50 ? needleValue : 250,
                     color: needleValue >= 49 ? "#5fd400" : "transparent",
                     thickness: "20%",
                 }
                 , {
-                    from: 350,
+                    from: 250,
                     to: needleValue < 500 ? needleValue : 500,
                     color: needleValue >= 350 ? "#eeef2c" : "transparent",
                     thickness: "20%",
@@ -400,3 +400,43 @@ export const details = [
         unit: null
     },
 ];
+
+export const lineChartOptions = (theme, data) => ({
+    chart: {
+        type: 'line',
+        height: 390,
+        backgroundColor: 'transparent',
+    },
+    title: {
+        text: 'Hull Helium Over Time',
+        style: {
+            color: theme === 'light' ? '#000000' : '#FFFFFF',
+        }
+    },
+    xAxis: {
+        title: { text: '' },
+        labels: { enabled: false },
+    },
+    yAxis: {
+        title: { text: 'Hull Helium' },
+        min: 0,
+        max: 10,
+        tickInterval: 2,
+        tickColor: theme === 'light' ? '#000000' : '#FFFFFF',
+        labels: {
+            style: {
+                color: theme === 'light' ? '#666666' : '#FC030F', // Tick labels color
+            },
+        },
+    },
+    series: [
+        {
+            name: 'Hull Helium',
+            data: data,
+            color: '#666666',
+            marker: {
+                enabled: true,
+            },
+        },
+    ],
+});
