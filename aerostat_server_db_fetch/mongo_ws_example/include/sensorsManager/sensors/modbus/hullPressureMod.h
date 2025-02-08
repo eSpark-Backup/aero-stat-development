@@ -41,7 +41,8 @@ public:
                 LOG_DEBUG("Hull Pressure : %f", hullPressureValue);
                 data->hullPressure = hullPressureValue;               
             } else {
-                std::cout << "'value' field not found in the JSON" << std::endl;
+                // std::cout << "'value' field not found in the JSON" << std::endl;
+                LOG_ERROR("value field not found in the JSON");
             }
         }
 

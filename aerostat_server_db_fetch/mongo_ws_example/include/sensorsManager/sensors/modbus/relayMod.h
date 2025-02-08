@@ -123,7 +123,8 @@ public:
             for(const auto& relay_nums : config.relay_nums)
             {
                 if (!modbus.read_coil(relay_nums - 1, relay_value, mb_relay)) {
-                    std::cerr << "Failed to read to relay " << relay_nums << " (" << config.name << ").\n";
+                    // std::cerr << "Failed to read to relay " << relay_nums << " (" << config.name << ").\n";
+                    LOG_ERROR("Error reading to relay at address : %d (%s)", relay_nums, config.name.c_str());
                     return data;
                 } 
                 data->relayStatusArr[i] = relay_value;
@@ -157,7 +158,8 @@ public:
                 // }
                 for (int relay_num : config.relay_nums) {
                     if (!modbus.write_coil(relay_num - 1, value->relayStates[i], mb_relay)) {
-                        std::cerr << "Failed to write to relay " << relay_num << " (" << config.name << ").\n";
+                        // std::cerr << "Failed to write to relay " << relay_num << " (" << config.name << ").\n";
+                        LOG_ERROR("Error writing to relay at address : %d (%s)", relay_num, config.name.c_str());
                         return false;
                     }
 

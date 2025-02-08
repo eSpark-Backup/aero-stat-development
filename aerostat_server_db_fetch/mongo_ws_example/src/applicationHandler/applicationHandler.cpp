@@ -56,6 +56,7 @@ void ApplicationHandler::continuouslyReadSensorData() {
         // Get the list of sensor IDs
         auto sensorIds = sensorManager.getSensorIDs();
         // Iterate over all sensor IDs
+        LOG_WARNING("=========================================================\n");
         for (const auto& sensorId : sensorIds) {
             // LOG_DEBUG("Found Sensor and Reading %s", sensorId.c_str());
             auto sensorData = sensorManager.readSensorData<void>(sensorId);
@@ -83,9 +84,11 @@ void ApplicationHandler::continuouslyReadSensorData() {
                     break;
                 }
             } else {
-                std::cerr << "Failed to read data from sensor: weatherStation1\n";
+                // std::cerr << "Failed to read data from sensor: weatherStation1\n";
+                LOG_ERROR("Failed to read data from sensor: %s", sensorId.c_str());
             }
         }
+        LOG_WARNING("=========================================================");
         // ServerConfig serverInformation = configManager.getServerConfig();
         // serverInformation.print();
         sensorConfigManager_mtx.unlock();

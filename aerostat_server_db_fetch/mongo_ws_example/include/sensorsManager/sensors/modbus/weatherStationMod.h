@@ -115,7 +115,7 @@ public:
                 if (value.contains("wind_direction")) {
                     double wind_direction = value["wind_direction"]["value"].get<double>();
                     std::string wind_direction_unit = value["wind_direction"]["unit"].get<std::string>();
-                    std::cout << "Wind Direction: " << wind_direction << " " << wind_direction_unit << std::endl;
+                    LOG_DEBUG("Wind Direction: %.2f %s", wind_direction, wind_direction_unit.c_str());
                     // data->windAngle = wind_direction - normalizedAerostatHeading; //TODO: Normalization
                     data->windAngle = wind_direction;
                 }
@@ -124,7 +124,8 @@ public:
                 if (value.contains("wind_speed")) {
                     double wind_speed = value["wind_speed"]["value"].get<double>();
                     std::string wind_speed_unit = value["wind_speed"]["unit"].get<std::string>();
-                    std::cout << "Wind Speed: " << wind_speed << " " << wind_speed_unit << std::endl;
+                    // std::cout << "Wind Speed: " << wind_speed << " " << wind_speed_unit << std::endl;
+                    LOG_DEBUG("Wind Speed: %.2f %s", wind_speed, wind_speed_unit.c_str());
                     data->windSpeed= wind_speed;
                 }
 
@@ -132,7 +133,8 @@ public:
                 if (value.contains("outside_air_temperature")) {
                     double outside_air_temperature = value["outside_air_temperature"]["value"].get<double>();
                     std::string temperature_unit = value["outside_air_temperature"]["unit"].get<std::string>();
-                    std::cout << "Outside Air Temperature: " << outside_air_temperature << " " << temperature_unit << std::endl;
+                    // std::cout << "Outside Air Temperature: " << outside_air_temperature << " " << temperature_unit << std::endl;
+                    LOG_DEBUG("Outside Air Temperature: %.2f %s", outside_air_temperature, temperature_unit.c_str());
                     data->airTemperature = outside_air_temperature;
                 }
 
@@ -140,7 +142,8 @@ public:
                 if (value.contains("outside_air_humidity")) {
                     double outside_air_humidity = value["outside_air_humidity"]["value"].get<double>();
                     std::string humidity_unit = value["outside_air_humidity"]["unit"].get<std::string>();
-                    std::cout << "Outside Air Humidity: " << outside_air_humidity << " " << humidity_unit << std::endl;
+                    // std::cout << "Outside Air Humidity: " << outside_air_humidity << " " << humidity_unit << std::endl;
+                    LOG_DEBUG("Outside Air Humidity: %.2f %s", outside_air_humidity, humidity_unit.c_str());
                     data->humidity = outside_air_humidity;
                 }
 
@@ -148,11 +151,13 @@ public:
                 if (value.contains("outside_air_pressure")) {
                     double outside_air_pressure = value["outside_air_pressure"]["value"].get<double>();
                     std::string pressure_unit = value["outside_air_pressure"]["unit"].get<std::string>();
-                    std::cout << "Outside Air Pressure: " << outside_air_pressure << " " << pressure_unit << std::endl;
+                    // std::cout << "Outside Air Pressure: " << outside_air_pressure << " " << pressure_unit << std::endl;
+                    LOG_DEBUG("Outside Air Pressure: %.2f %s", outside_air_pressure, pressure_unit.c_str());
                     data->barometricPressure = outside_air_pressure;
                 }
             } else {
-                std::cout << "'value' field not found in the JSON" << std::endl;
+                // std::cout << "'value' field not found in the JSON" << std::endl;
+                LOG_ERROR("value field not found in the JSON");
             }
         }
         

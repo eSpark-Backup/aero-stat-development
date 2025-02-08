@@ -85,7 +85,8 @@ bool MongoDBDatabase::insert(const std::string& table, const std::string& jsonDa
 
         for (auto it = json.begin(); it != json.end(); ++it) {
             if (it->is_primitive()) {  // Only print if it's not an object or array
-                std::cout << "Key: " << it.key() << ", Value: " << it.value() << std::endl;
+                // std::cout << "Key: " << it.key() << ", Value: " << it.value() << std::endl;
+                LOG_WARNING("Key: %s, Value: %s", it.key().c_str(), it.value().dump().c_str());
                 document << std::string(it.key()) << std::string(it.value());
             }
         }
