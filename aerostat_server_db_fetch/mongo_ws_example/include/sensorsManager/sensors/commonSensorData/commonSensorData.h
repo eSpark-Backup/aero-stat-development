@@ -7,6 +7,8 @@
 #include "sensorsManager/base/sensorBase.h"
 #include "logger/log_file.h"
 
+extern float normalizedAerostatHeading;
+
 #define LOAD_CELL_REGISTER 0x9C40
 #define ULTRASONIC_REGISTER 0x0101
 #define PRESSURE_SENSOR_REGISTER 0x0004

@@ -11,6 +11,8 @@
 
 #include "sensorsManager/sensors/commonSensorData/sensorsDef.h"
 
+std::mutex sensorConfigManager_mtx;
+
 void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventParams) {
     switch (eventParams.type) {
         case ProtocolEvent::MESSAGE_RECEIVED:
@@ -43,12 +45,18 @@ void ApplicationHandler::handleProtocolEvent(const ProtocolEventParams& eventPar
     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Thread 1 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     - Reads sensors, update FE and DB
 */
-void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& configManager) {
+void ApplicationHandler::continuouslyReadSensorData() {
     LOG_WARNING("Data read thread started");
+    ConfigManager& configManager = ConfigManager::getInstance();
+    SensorManager& sensorManager = SensorManager::getInstance();
+    
     while (true) {
+        // std::lock_guard<std::mutex> lock(sensorConfigManager_mtx);
+        sensorConfigManager_mtx.lock();
         // Get the list of sensor IDs
         auto sensorIds = sensorManager.getSensorIDs();
         // Iterate over all sensor IDs
+        LOG_WARNING("=========================================================\n");
         for (const auto& sensorId : sensorIds) {
             // LOG_DEBUG("Found Sensor and Reading %s", sensorId.c_str());
             auto sensorData = sensorManager.readSensorData<void>(sensorId);
@@ -76,11 +84,14 @@ void continuouslyReadSensorData(SensorManager& sensorManager, ConfigManager& con
                     break;
                 }
             } else {
-                std::cerr << "Failed to read data from sensor: weatherStation1\n";
+                // std::cerr << "Failed to read data from sensor: weatherStation1\n";
+                LOG_ERROR("Failed to read data from sensor: %s", sensorId.c_str());
             }
         }
+        LOG_WARNING("=========================================================");
         // ServerConfig serverInformation = configManager.getServerConfig();
         // serverInformation.print();
+        sensorConfigManager_mtx.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Adjust time as needed
     }
 }
@@ -97,7 +108,8 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
     while (true) {
         if (configManager.getServerConfig().broadcastEnable) {
             // LOG_DEBUG("Updating Frontend");
-
+            // std::lock_guard<std::mutex> lock(sensorConfigManager_mtx);
+            sensorConfigManager_mtx.lock();
             const ServerConfig& serverConfig = configManager.getServerConfig();
             TcpConnectionManager& connectionMan = TcpConnectionManager::getInstance();
             json responseJson = {
@@ -137,6 +149,7 @@ void ApplicationHandler::continuouslyUpdateFrontend() {
             // Convert the JSON to a string and send it to the frontend
             std::string jsonOutput = responseJson.dump(4); // Pretty print with 4 spaces
             protocol_->sendData(jsonOutput);
+            sensorConfigManager_mtx.unlock();
         }
 
         // Sleep for 1 second before checking again
@@ -184,6 +197,38 @@ void ApplicationHandler::start() {
     messageHandler_->registerMethodHandler("alfa.tcp.reading.get", NULL);
     messageHandler_->registerMethodHandler("alfa.db.status.get", NULL);
     */
+
+    json forcedConnectionParams = {
+            {"method", "alfa.server.connection.settings.set"},
+            {"servers", {
+                {
+                    {"modbus", {
+                        {
+                            {"name", "modbus1"},
+                            {"ip", "10.85.5.12"},
+                            {"ports", {
+                                {{"port", "5001"}, {"name", "hull_pressure"}},
+                                {{"port", "5002"}, {"name", "ballonet_pressure"}},
+                                {{"port", "5003"}, {"name", "ahrs"}},
+                                {{"port", "5004"}, {"name", "ultrasonic"}},
+                                {{"port", "5005"}, {"name", "load_cell"}},
+                                {{"port", "5006"}, {"name", "temp_humidity"}},
+                                {{"port", "5007"}, {"name", "weather_station"}}
+                            }}
+                        },
+                        {
+                            {"name", "modbus-relay"},
+                            {"ip", "10.85.5.13"},
+                            {"ports", {
+                                {{"port", "4196"}, {"name", "relay"}}
+                            }}
+                        }
+                    }}
+                }
+            }}
+        };
+
+   handleServerConnectionSettingsSet(forcedConnectionParams);
     
     try {
         LOG_INFO("Application Starting");
@@ -225,7 +270,7 @@ void ApplicationHandler::start() {
         SensorManager& sensorManager = SensorManager::getInstance();
         ConfigManager& configManager = ConfigManager::getInstance();
 
-        std::thread sensorReadingThread(continuouslyReadSensorData, std::ref(sensorManager), std::ref(configManager));
+        std::thread sensorReadingThread(&ApplicationHandler::continuouslyReadSensorData, this);
         sensorReadingThread.detach();
 
 
@@ -247,6 +292,14 @@ void ApplicationHandler::start() {
             read information from db and broadcast to FE
             pauses T2 only.
         */
+
+       /* TEST FOR DOCKER RESTART ROUTINE
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+
+        char* codeCrasherPtr = nullptr;  // Null pointer
+        *codeCrasherPtr = 'A';  // Explicitly write to null pointer (segmentation fault)
+       */
+
 
     } catch (const std::exception& ex) {
         LOG_ERROR("Application Exception");

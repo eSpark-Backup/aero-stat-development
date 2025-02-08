@@ -11,6 +11,7 @@
 #include "sensorsManager/base/sensorFactory.h"
 #include "logger/trace_util.h"
 
+float normalizedAerostatHeading = 0;
 
 std::map<std::string, RegisterInfoAHRS> AHRS_GPS_REGISTERS = {
     {"roll", {ROLL_REGISTER, 1}},
@@ -95,6 +96,10 @@ public:
                     if (value.contains("roll") && value["roll"].contains("value")) {
                         float ahrsRollValue = value["roll"]["value"].get<float>();
                         LOG_DEBUG("AHRS Roll: %f", ahrsRollValue);
+                        data->roll = ahrsRollValue;                    
+                    } else if(value.contains("roll")) {
+                        float ahrsRollValue = value["roll"].get<float>();
+                        LOG_DEBUG("AHRS Roll: %f", ahrsRollValue);
                         data->roll = ahrsRollValue;
                     } else {
                         LOG_WARNING("Roll field is missing in the JSON");
@@ -105,17 +110,34 @@ public:
                         float ahrsPitchValue = value["pitch"]["value"].get<float>();
                         LOG_DEBUG("AHRS Pitch: %f", ahrsPitchValue);
                         data->pitch = ahrsPitchValue;
+                    } else if(value.contains("pitch")) {
+                        float ahrsPitchValue = value["pitch"].get<float>();
+                        LOG_DEBUG("AHRS Pitch: %f", ahrsPitchValue);
+                        data->pitch = ahrsPitchValue;
                     } else {
                         LOG_WARNING("Pitch field is missing in the JSON");
                     }
-
+                    float ahrsHeadingValue = 0;
                     // Check if "heading" field exists
                     if (value.contains("heading") && value["heading"].contains("value")) {
-                        float ahrsHeadingValue = value["heading"]["value"].get<float>();
+                        ahrsHeadingValue = value["heading"]["value"].get<float>();
                         LOG_DEBUG("AHRS Heading: %f", ahrsHeadingValue);
-                        data->heading = ahrsHeadingValue;
+                    } else if(value.contains("heading")) {
+                        ahrsHeadingValue = value["heading"].get<float>();
+                        LOG_DEBUG("AHRS Heading: %f", ahrsHeadingValue);
                     } else {
                         LOG_WARNING("Heading field is missing in the JSON");
+                    }
+
+                    if(ahrsHeadingValue < 0)
+                    {
+                        data->heading = ahrsHeadingValue + 360.0f;
+                        normalizedAerostatHeading = data->heading;
+                    }
+                    else 
+                    {
+                        data->heading = ahrsHeadingValue;
+                        normalizedAerostatHeading = data->heading;
                     }
 
                     // Check if "latitude" field exists
@@ -123,13 +145,21 @@ public:
                         float ahrsLatValue = value["latitude"]["value"].get<float>();
                         LOG_DEBUG("AHRS Latitude: %f", ahrsLatValue);
                         data->latitude = ahrsLatValue;
-                    } else {
+                    } else if(value.contains("latitude")) {
+                        float ahrsLatValue = value["latitude"].get<float>();
+                        LOG_DEBUG("AHRS Latitude: %f", ahrsLatValue);
+                        data->latitude = ahrsLatValue;
+                    }else {
                         LOG_WARNING("Latitude field is missing in the JSON");
                     }
 
                     // Check if "longitude" field exists
                     if (value.contains("longitude") && value["longitude"].contains("value")) {
                         float ahrsLongValue = value["longitude"]["value"].get<float>();
+                        LOG_DEBUG("AHRS Longitude: %f", ahrsLongValue);
+                        data->longitude = ahrsLongValue;
+                    } else if(value.contains("longitude")) {
+                        float ahrsLongValue = value["longitude"].get<float>();
                         LOG_DEBUG("AHRS Longitude: %f", ahrsLongValue);
                         data->longitude = ahrsLongValue;
                     } else {
@@ -141,11 +171,15 @@ public:
                         float ahrsAltValue = value["altitude"]["value"].get<float>();
                         LOG_DEBUG("AHRS Altitude: %f", ahrsAltValue);
                         data->altitude = ahrsAltValue;
-                    } else {
+                    } else if(value.contains("altitude")) {
+                        float ahrsAltValue = value["altitude"].get<float>();
+                        LOG_DEBUG("AHRS Altitude: %f", ahrsAltValue);
+                        data->altitude = ahrsAltValue;
+                    }else {
                         LOG_WARNING("Altitude field is missing in the JSON");
                     }
                 } else {
-                    LOG_ERROR("'value' field not found in the JSON");
+                    LOG_ERROR("value field not found in the JSON");
                 }
             }
 

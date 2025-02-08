@@ -14,6 +14,7 @@ services:
     build: ./mongo_ws_example
     ports:
       - "9001:9001"
+    restart: unless-stopped
     volumes:
       - ./logs:/home/logs
 
@@ -27,12 +28,43 @@ services:
       - "5005:5006"
       - "5007:5007"
       - "4196:4196"
+    profiles:
+      - dev
 
+
+  mongodb:
+    build: ./mongo_ws_example/assets/mongodb-docker
+    container_name: alfa-compose-mongo-container
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+    profiles:
+      - dev
+
+volumes:
+  mongodb_data:
+
+    
+    ##                    DEPLOYEMENT
     ##====================================================
-    ##
-    ## COMMANDS TO SPIN ALL THE SERVICES
+    ##                    
+    ## COMMAND:
     ##
     ## docker-compose up -d --build
+    ##
+    ##
+    ##====================================================
+
+
+
+    ##                    DEVELOPMENT
+    ##====================================================
+    ##
+    ## COMMAND:
+    ##
+    ## docker-compose --profile dev up -d
     ##
     ##====================================================
 

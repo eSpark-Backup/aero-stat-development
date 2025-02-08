@@ -9,6 +9,7 @@
 #include <arpa/inet.h>  
 #include <sys/socket.h>  
 #include <netinet/in.h>
+#include "logger/logger.h"
 
 #define SOCKET_ERROR -1
 #ifndef INVALID_SOCKET
@@ -37,14 +38,17 @@ class TcpConnectionManager {
             int return_code = system(command.c_str());
 
             if (return_code == 0) {
-                std::cout << "Host " << ip_address << " is reachable." << std::endl;
+                // std::cout << "Host " << ip_address << " is reachable." << std::endl;
+                LOG_SUCCESS("Host %s is reachable.", ip_address.c_str());
                 return true;
             } else {
-                std::cout << "Host " << ip_address << " is unreachable." << std::endl;
+                // std::cout << "Host " << ip_address << " is unreachable." << std::endl;
+                LOG_ERROR("Host %s is unreachable.", ip_address.c_str());
                 return false;
             }
         } catch (const std::exception &e) {
-            std::cerr << "Error occurred while pinging " << ip_address << ": " << e.what() << std::endl;
+            // std::cerr << "Error occurred while pinging " << ip_address << ": " << e.what() << std::endl;
+            LOG_ERROR("Error occurred while pinging %s : %s", ip_address, e.what());
             return false;
         }
     }
@@ -58,7 +62,8 @@ class TcpConnectionManager {
         try {
             int sock = socket(AF_INET, SOCK_STREAM, 0);
             if (sock < 0) {
-                std::cerr << "Socket creation failed\n";
+                // std::cerr << "Socket creation failed\n";
+                LOG_ERROR("Socket creation failed");
                 return "Socket creation failed";
             }
 
@@ -73,7 +78,8 @@ class TcpConnectionManager {
                 return "Connection failed";
             }
 
-            std::cout << "Connected to " << host << ":" << target_port << std::endl;
+            // std::cout << "Connected to " << host << ":" << target_port << std::endl;
+            LOG_SUCCESS("Connected to %s : port %d", host.c_str(), target_port);
             send(sock, command.c_str(), command.size(), 0);
 
             char buffer[1024] = {0};
