@@ -9,7 +9,7 @@ const OptionBox = ({ option1, option2, selectedOption, handleChange, name, fetch
             <div
                 onClick={() => handleChange(name, option1)}
                 className={`${selectedOption?.toLowerCase() === option1.toLowerCase() ? "selected" : "not-selected"
-                    } ${(phase === 1 && !isPhase1Starts) || (phase === 2 && !isPhase2Starts) ? "disable" : ""}`}
+                    } ${(phase === 1 && !isPhase1Starts) || (phase === 2 && !isPhase2Starts) ? "" : ""}`}
             >
                 {option1}
             </div>
@@ -17,7 +17,7 @@ const OptionBox = ({ option1, option2, selectedOption, handleChange, name, fetch
             <div
                 onClick={() => handleChange(name, option2)}
                 className={`${selectedOption?.toLowerCase() === option2.toLowerCase() ? "selected" : "not-selected"
-                    } ${(phase === 1 && !isPhase1Starts) || (phase === 2 && !isPhase2Starts) ? "disable" : ""}`}
+                    } ${(phase === 1 && !isPhase1Starts) || (phase === 2 && !isPhase2Starts) ? "" : ""}`}
             >
                 {option2}
             </div>
