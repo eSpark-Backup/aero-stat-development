@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import MainCard from "../../common/MainCard";
@@ -16,7 +16,7 @@ const LineChartWithDropdown = ({
   phase,
   isPhase1Starts,
   isPhase2Starts,
-  data, // Changed from dataPoints to data
+  data,
 }) => {
   const [selectedValues, setSelectedValues] = useState(availableOptions);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -29,49 +29,37 @@ const LineChartWithDropdown = ({
     );
   };
 
-  // Ensure data is correctly formatted
   const filteredData =
     (phase === 1 && !isPhase1Starts) || (phase === 2 && !isPhase2Starts)
       ? [0.4] // Default when conditions are met
       : data; // Otherwise, use actual data
+  
 
-  const lineChartOptions = (theme, data) => ({
-    chart: {
-      type: "line",
-      backgroundColor: "transparent",
-    },
+  // Format chart data for Highcharts
+  const formatChartData = (selectedValues, data) => {
+    return selectedValues.map((value, index) => {
+      const seriesData = data.find((item) => item.name === value)?.data || [0, 0, 0];
+      return {
+        name: value,
+        data: seriesData,
+        color: theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
+      };
+    });
+  };
+
+  const lineChartOptions = {
+    chart: { type: "line", backgroundColor: "transparent" },
     title: { text: "Hull Helium Over Time" },
     xAxis: { categories: ["Point 1", "Point 2", "Point 3"] },
-    yAxis: {
-      title: {
-        text: "Hull Helium",
-        align: "middle",
-        rotation: 270,
-        y: 0,
-        x: -10,
-        style: { color: "#000", fontSize: "14px", fontWeight: "bold" },
-      },
-      gridLineColor: "#D3DAE6",
-      labels: {
-        style: { color: "#000", fontSize: "12px" },
-      },
-    },
-    series: selectedValues.map((value, index) => ({
-      name: value,
-      data: data?.[value] ?? [0, 0, 0], // Ensure default array if data is missing
-      color:
-        theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
-    })),
-  });
+    yAxis: { title: { text: "Hull Helium" }, min: 0, max: 3 },
+    series: formatChartData(selectedValues, filteredData),
+  };
 
   return (
-    <MainCard title={"Line Charts"}>
+    <div className="chart-container">
       {/* Dropdown for selecting values */}
-      <div className="dropdown">
-        <button
-          className="dropdown-button"
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-        >
+      <div className="dropdown-wrapper">
+        <button className="dropdown-button" onClick={() => setDropdownOpen(!dropdownOpen)}>
           Select Data Points ⏷
         </button>
         {dropdownOpen && (
@@ -90,51 +78,52 @@ const LineChartWithDropdown = ({
         )}
       </div>
 
-      {/* Highcharts Graph */}
-      <HighchartsReact
-        highcharts={Highcharts}
-        options={lineChartOptions(theme, filteredData)}
-      />
+      {/* Highcharts Graph inside MainCard */}
+      <MainCard title={"Line Charts"}>
+        <HighchartsReact highcharts={Highcharts} options={lineChartOptions} />
+      </MainCard>
 
       {/* Styles */}
       <style>{`
-  .dropdown {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 10px;
-  }
-  .dropdown-button {
-    padding: 8px 12px;
-    background: ${theme?.buttonBackground || "#007bff"};
-    color: ${theme?.buttonText || "white"};
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: ${
-      theme?.menuBackground || "#fff"
-    }; /* Ensure dark background */
-    color: ${theme?.menuText || "Black"};
-    border: 1px solid ${theme?.menuBorder || "#555"};
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-    padding: 5px;
-    z-index: 10;
-  }
-  .dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px;
-  }
-  .dropdown-item input {
-    margin-right: 5px;
-  }
-`}</style>
-    </MainCard>
+        .chart-container {
+          position: relative;
+        }
+        .dropdown-wrapper {
+          position: absolute;
+          top: 25px; /* Moves it above the chart */
+          left: 10px;
+          z-index: 1000; /* Ensures dropdown stays above other elements */
+        }
+        .dropdown-button {
+          padding: 8px 12px;
+          background: ${theme?.buttonBackground || "#007bff"};
+          color: ${theme?.buttonText || "white"};
+          border: none;
+          cursor: pointer;
+          border-radius: 4px;
+        }
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: ${theme?.menuBackground || "#fff"};
+          color: ${theme?.menuText || "black"};
+          border: 1px solid ${theme?.menuBorder || "#555"};
+          box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+          padding: 5px;
+          z-index: 10;
+        }
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px;
+        }
+        .dropdown-item input {
+          margin-right: 5px;
+        }
+      `}</style>
+    </div>
   );
 };
 

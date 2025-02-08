@@ -706,12 +706,7 @@ const Home = ({
       {phase === 2 && (
         <div
           style={{
-            width: "100%",
-            height: "auto",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "0px 50px",
+            padding: "0px 30px",
           }}
         >
           {/* <MainCard title={"Line Charts"}>
