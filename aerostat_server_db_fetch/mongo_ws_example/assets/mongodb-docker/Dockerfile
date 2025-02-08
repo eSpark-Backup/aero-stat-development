@@ -19,6 +19,7 @@ RUN chmod +x /entrypoint.sh
 # Start MongoDB
 CMD ["mongod"]
 
+## docker build -t mongodb-alfaops .
 
 ## docker run -it --rm --name alfa-mongo-container -p 27017:27017 mongodb-alfaops
 

@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#define BUILD_DATE 1738921553
-#define MAJOR 1
+#define BUILD_DATE 1739010296
+#define MAJOR 2
 #define MINOR 0
 #define BATCH 0
 
@@ -16,9 +16,9 @@ extern "C" {
 #define VERSION_STR TOSTRING(MAJOR) "." TOSTRING(MINOR) "." TOSTRING(BATCH)
 
 #define DEVELOPER "maaz@esparkconsultants.com"
-#define COMPILE_TIME "Fri Feb 07  2:45:53 PM PST 2025"
-#define CURRENT_BRANCH "fix-backend-crash"
-#define COMMIT_HASH "d04a052a9ada234b7ee83bde2c565b59b2f76b36"
+#define COMPILE_TIME "Sat Feb 08  3:24:56 PM PST 2025"
+#define CURRENT_BRANCH "fe-be-staging-v1.0.0"
+#define COMMIT_HASH "028f94789ab5b85a9a9c31478758037f044c3d96"
 
 #ifdef __cplusplus
 }

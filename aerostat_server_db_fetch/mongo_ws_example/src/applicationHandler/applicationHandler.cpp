@@ -205,7 +205,7 @@ void ApplicationHandler::start() {
                     {"modbus", {
                         {
                             {"name", "modbus1"},
-                            {"ip", "172.17.0.5"},
+                            {"ip", "10.85.5.12"},
                             {"ports", {
                                 {{"port", "5001"}, {"name", "hull_pressure"}},
                                 {{"port", "5002"}, {"name", "ballonet_pressure"}},
@@ -218,7 +218,7 @@ void ApplicationHandler::start() {
                         },
                         {
                             {"name", "modbus-relay"},
-                            {"ip", "172.17.0.5"},
+                            {"ip", "10.85.5.13"},
                             {"ports", {
                                 {{"port", "4196"}, {"name", "relay"}}
                             }}
