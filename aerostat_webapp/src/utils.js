@@ -181,11 +181,9 @@ export const sendDeviceCommands = async (FansLight) => {
 
 export const getValueForKey = (key, data) => {
   const formatNumber = (value) => {
-
     if (isNaN(value) || value === null || value === undefined || value < 0) {
       return "0.00";
     }
-
     return parseFloat(value).toFixed(2);
   };
 
@@ -203,11 +201,19 @@ export const getValueForKey = (key, data) => {
     case "Yaw:":
       return formatNumber(data?.port_data?.port_5003?.yaw);
     case "Temperature:":
-      return formatNumber(data?.port_data?.port_5007?.temperature);
-    case "Longitude:":
+      return formatNumber(data?.port_data?.port_5007?.air_temperature);
+      case "Longitude:":
       return formatNumber(data?.port_data?.port_5003?.longitude);
+
     case "Humidity:":
-      return formatNumber(data?.port_data?.port_5007?.humidity);
+      const humidityData = data?.port_data?.port_5007?.humidity;
+
+      if (Array.isArray(humidityData) && humidityData.length > 0) {
+        return formatNumber(humidityData[humidityData.length - 1]); // Get the last value in the array
+      }
+
+      return formatNumber(humidityData); // If it's a single value, return it formatted
+
     case "Latitude:":
       return formatNumber(data?.port_data?.port_5003?.latitude);
     case "Barometric Pressure:":
@@ -226,8 +232,10 @@ export const getValueForKey = (key, data) => {
       return formatNumber(data?.port_data?.port_5001?.hull_pressure);
     case "Heading:":
       return formatNumber(data?.port_data?.port_5003?.heading);
+    
     default:
       return "0.00";
   }
 };
+
 

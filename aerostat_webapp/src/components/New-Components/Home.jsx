@@ -22,7 +22,11 @@ import {
   windGaugeOptions,
 } from "../../constant";
 import { ThemeContext } from "../../ThemeHandler";
-import { useWindowWidth, sendDeviceCommands } from "../../utils";
+import {
+  useWindowWidth,
+  sendDeviceCommands,
+  getValueForKey,
+} from "../../utils";
 import Modal from "../Modal";
 import { formatDateTime } from "../../Js_parsing";
 import { WebSocketContext } from "../../App";
@@ -361,16 +365,14 @@ const Home = ({
               <ChartsData
                 position={"between"}
                 description1={"Air Temp (C):"}
-                value1={`${parseFloat(response?.weather?.air_tempe).toFixed(
-                  2
-                )} °C`}
+                value1={`${getValueForKey("Temperature:", response)} °C`}
                 description2={"Baro Press:"}
                 value2={`${parseFloat(
-                  response?.weather?.baro_presssure
+                  response?.weather?.baro_presssure || 0
                 ).toFixed(2)} hPa`}
-                graphValue={parseFloat(response?.weather?.wind_speed).toFixed(
-                  2
-                )}
+                graphValue={parseFloat(
+                  response?.weather?.wind_speed || 0
+                ).toFixed(2)}
                 graphName={"Wind Speed"}
                 unit={"Knots"}
               />
@@ -483,7 +485,7 @@ const Home = ({
                           {/* <StatusChip color={"red"} description={"Humidity"} /> */}
                           <ChartChip
                             name={"Humidity"}
-                            value={parseFloat().toFixed(2)}
+                            value={getValueForKey("Humidity:", response)}
                           />
                         </div>
                       )}
