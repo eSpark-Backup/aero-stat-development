@@ -461,6 +461,7 @@ const Phase1 = React.memo(() => {
       setActivateWebSocket(false);
     }
   }, [startFetchingFromFile, startFetchData, phase1Start, phase2Start]);
+  
 
   useEffect(() => {
     if (lastMessage && activateWebSocket) {
@@ -798,7 +799,7 @@ const Phase1 = React.memo(() => {
           openModal={openModal}
           setOpenModal={setOpenModal}
           handleOpenModal={handleOpenModal}
-          fetchingStart={startFetchData || phase1Start}
+          fetchingStart={startFetchData || phase1Start || phase2Start}
           HandleBrowse={handleBrowse}
           fileName={logFile}
           HandleForward={HandleForward}

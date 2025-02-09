@@ -95,39 +95,38 @@ const Home = ({
   }, [response]);
 
   const handleChange = (name, value) => {
+    console.log("Fetching Start:", fetchingStart);
     if (fetchingStart) {
+      console.log(`Changing ${name} to ${value}`);
       switch (name) {
         case "fan1":
           setFan1(value);
-          setSendData(true);
           break;
         case "fan2":
           setFan2(value);
-          setSendData(true);
           break;
         case "light":
           setLight(value);
-          setSendData(true);
           break;
         case "primary_blower":
           setPrimaryBlower(value);
-          setSendData(true);
           break;
         case "secondary_blower":
           setSecondaryBlower(value);
-          setSendData(true);
           break;
         case "strobe_light":
           setStrobeLight(value);
-          setSendData(true);
           break;
         case "payload_power":
           setPayloadPower(value);
-          setSendData(true);
           break;
         default:
           break;
       }
+      setSendData(true);
+      console.log("sendData set to true");
+    } else {
+      console.log("fetchingStart is FALSE, ignoring change.");
     }
   };
 
@@ -179,6 +178,7 @@ const Home = ({
       };
     }
     if (sendData) {
+      console.log("Sending data to WebSocket:", relayControls);
       sendJsonMessage(relayControls);
       console.log("Controls successfully posted:", relayControls);
       setSendData(false);
@@ -421,12 +421,12 @@ const Home = ({
                 unit={""}
               />
               <StatusChip
-                color={"green"}
+                color={fetchingStart ? "green" : "red"}
                 description={
-                  !fetchingStart
-                    ? "Disconnected"
-                    : isLoading
+                  fetchingStart
                     ? isLoading
+                      ? "Connecting..."
+                      : "Connected"
                     : "Disconnected"
                 }
               />
