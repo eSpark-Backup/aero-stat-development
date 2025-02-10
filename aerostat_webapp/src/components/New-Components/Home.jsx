@@ -274,6 +274,10 @@ const Home = ({
     windGaugeOptions(theme, 0, 50, [0], getChartSize())
   );
 
+  const [ballonetGaugeOpts, setBallonetGaugeOpts] = useState(
+    pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
+  );
+
   useEffect(() => {
     if (response) {
       setPressureGaugeOpts(
@@ -315,9 +319,23 @@ const Home = ({
           getChartSize()
         )
       );
-    }
-  }, [response, theme]); // Re-run when response or theme changes
 
+      setBallonetGaugeOpts(
+        pressureGaugeOptions(
+          theme,
+          0,
+          6,
+          [
+            Math.min(
+              6,
+              Math.max(0, parseFloat(response?.ballonet?.bal_pressure))
+            ),
+          ],
+          getChartSize()
+        )
+      );
+    }
+  }, [response, theme]);
   return (
     <>
       <div className="main">
@@ -548,16 +566,15 @@ const Home = ({
                         rowGap: "10px",
                       }}
                     >
-                      {/* Section for Phase 2 */}
-                      {phase === 2 && (
+                      {/* {phase === 2 && (
                         <div className="phase-2-section">
-                          {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                          <StatusChip color={"red"} description={"Humidity"} />
                           <ChartChip
                             name={"Humidity"}
                             value={getValueForKey("Humidity:", response)}
                           />
                         </div>
-                      )}
+                      )} */}
                       {phase === 1 && (
                         <ChartChip
                           name={"Heading"}
@@ -569,6 +586,26 @@ const Home = ({
                       )}
                       {phase === 2 && (
                         <>
+                          <ChartChip
+                            name={"Longitude:"}
+                            value={
+                              response?.weather?.longitude === "NaN" ||
+                              !response?.weather?.longitude
+                                ? "N/A"
+                                : `${response?.weather?.longitude}°`
+                            }
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Latitude:"}
+                            value={
+                              response?.weather?.latitude === "NaN" ||
+                              !response?.weather?.latitude
+                                ? "N/A"
+                                : `${response?.weather?.latitude}°`
+                            }
+                            unit={""}
+                          />
                           <ChartChip
                             name={"Altitude:"}
                             value={
@@ -632,7 +669,7 @@ const Home = ({
                             ).toFixed(2)}
                             unit={"°"}
                           />
-                          <ChartChip
+                          {/* <ChartChip
                             name={"Longitude:"}
                             value={
                               response?.weather?.longitude === "NaN" ||
@@ -651,7 +688,14 @@ const Home = ({
                                 : `${response?.weather?.latitude}°`
                             }
                             unit={""}
-                          />
+                          /> */}
+                          <div className="phase-2-section">
+                            {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                            <ChartChip
+                              name={"Humidity"}
+                              value={getValueForKey("Humidity:", response)}
+                            />
+                          </div>
                         </>
                       )}
                     </div>
@@ -685,20 +729,9 @@ const Home = ({
                   <div>
                     <HighchartsReact
                       highcharts={Highcharts}
-                      options={pressureGaugeOptions(
-                        theme,
-                        0,
-                        6,
-                        [
-                          parseFloat(response?.ballonet?.bal_pressure) > 6
-                            ? 6
-                            : parseFloat(response?.ballonet?.bal_pressure) < 0
-                            ? 0
-                            : parseFloat(response?.ballonet?.bal_pressure),
-                        ],
-                        getChartSize()
-                      )}
+                      options={ballonetGaugeOpts}
                     />
+
                     <ChartsData
                       position={phase === 1 ? "around" : "between"}
                       graphValue={parseFloat(
