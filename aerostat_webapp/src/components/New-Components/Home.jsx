@@ -73,26 +73,52 @@ const Home = ({
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
 
-  const [dataPoints, setDataPoints] = useState([]);
+  const [dataPoints, setDataPoints] = useState({
+    "Hull Pressure": [],
+    "Barometric Pressure": [],
+    "Outside Temperature": [],
+    "Ballonet Pressure": [],
+    "Ballonet Curtain": [],
+  });
 
   useEffect(() => {
-    if (response?.helium?.hel_pressure !== undefined) {
-      // Add new data point to the array
-      setDataPoints((prevDataPoints) => {
-        const newDataPoints = [
-          ...prevDataPoints,
-          parseFloat(response?.helium?.hel_pressure),
-        ];
-
-        // If the array has more than 10 points, remove the first one
-        if (newDataPoints.length > 10) {
-          newDataPoints.shift();
-        }
-
-        return newDataPoints;
+    if (response) {
+      setDataPoints((prevData) => {
+        const newData = {
+          "Hull Pressure": updateData(
+            prevData["Hull Pressure"],
+            response?.helium?.hel_pressure
+          ),
+          "Barometric Pressure": updateData(
+            prevData["Barometric Pressure"],
+            response?.weather?.baro_presssure
+          ),
+          "Outside Temperature": updateData(
+            prevData["Outside Temperature"],
+            getValueForKey("Temperature:", response)
+          ),
+          "Ballonet Pressure": updateData(
+            prevData["Ballonet Pressure"],
+            response?.ballonet?.bal_pressure
+          ),
+          "Ballonet Curtain": updateData(
+            prevData["Ballonet Curtain"],
+            response?.ballonet?.ballonet_height
+          ),
+        };
+        console.log("Updated DataPoints:", newData); // ✅ Debug data
+        return newData;
       });
     }
   }, [response]);
+
+  // Helper function to maintain only last 10 values
+  const updateData = (prevArray, newValue) => {
+    if (newValue === undefined || isNaN(parseFloat(newValue))) return prevArray; // Ignore invalid data
+    const newArray = [...prevArray, parseFloat(newValue)];
+    if (newArray.length > 10) newArray.shift(); // Keep only last 10 points
+    return newArray;
+  };
 
   const handleChange = (name, value) => {
     console.log("Fetching Start:", fetchingStart);
@@ -724,8 +750,8 @@ const Home = ({
             phase={phase}
             isPhase1Starts={isPhase1Starts}
             isPhase2Starts={isPhase2Starts}
-            data={dataPoints} // Pass updated data
-          />
+            data={dataPoints} // ✅ Pass data from parent correctly
+          />{" "}
         </div>
       )}
       <div className="main2" style={{ marginTop: "20px" }}>

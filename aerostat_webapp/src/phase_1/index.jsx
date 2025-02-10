@@ -784,12 +784,6 @@ const Phase1 = React.memo(() => {
   if (!isThemeLoaded) {
     return null;
   }
-
-  console.log("Start Fetch Data:", startFetchData);
-  console.log("Phase 1 Start:", phase1Start);
-  console.log("Phase 2 Start:", phase2Start);
-  console.log("responses:", responses);
-
   return (
     <>
       <div style={{ display: "flex", flexDirection: "column", rowGap: "0px" }}>

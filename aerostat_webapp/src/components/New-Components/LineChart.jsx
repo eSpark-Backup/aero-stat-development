@@ -4,62 +4,37 @@ import Highcharts from "highcharts";
 import MainCard from "../../common/MainCard";
 
 const availableOptions = [
-  "Barometric Pressure",
   "Hull Pressure",
+  "Barometric Pressure",
+  "Outside Temperature",
   "Ballonet Pressure",
   "Ballonet Curtain",
-  "Outside Temperature",
 ];
 
-const LineChartWithDropdown = ({ theme, response }) => {
+const LineChartWithDropdown = ({ theme, data }) => {
   const [selectedValues, setSelectedValues] = useState(availableOptions);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Initialize Data for All Available Options
-  const [dataPoints, setDataPoints] = useState(
-    availableOptions.map((option) => ({ name: option, data: [] }))
-  );
-
-  // Handle WebSocket Response Update
-  useEffect(() => {
-    if (response) {
-      setDataPoints((prevDataPoints) => {
-        return prevDataPoints.map((item) => {
-          const newValue =
-            parseFloat(
-              response?.helium?.[item.name.toLowerCase().replace(/\s+/g, "_")]
-            ) || 0;
-
-          return {
-            ...item,
-            data: [...item.data, newValue].slice(-10), // Keep last 10 points
-          };
-        });
-      });
-    }
-  }, [response]);
+  console.log("Received data in Chart Component:", data); // ✅ Debug received data
+  console.log("Formatted Chart Data:", formatChartData()); // ✅ Debug formatted data
 
   // Format chart data for Highcharts
   const formatChartData = () => {
-    return selectedValues.map((value, index) => {
-      const seriesData =
-        dataPoints.find((item) => item.name === value)?.data || [];
-      return {
-        name: value,
-        data: seriesData,
-        color:
-          theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
-      };
-    });
+    return selectedValues.map((value, index) => ({
+      name: value,
+      data: data[value] || [], // ✅ Fix: Use data directly from props
+      color:
+        theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
+    }));
   };
 
   const lineChartOptions = {
     chart: { type: "line", backgroundColor: "transparent" },
     title: { text: "Hull Helium Over Time" },
     xAxis: {
-      categories: dataPoints[0]?.data.map((_, i) => `Point ${i + 1}`) || [],
+      categories: data["Hull Pressure"]?.map((_, i) => `Point ${i + 1}`) || [],
     },
-    yAxis: { title: { text: "Hulll Helium" }, min: 0, max: 3 },
+    yAxis: { title: { text: "Hull Helium" }, min: 0, max: 3 },
     series: formatChartData(),
   };
 
@@ -94,14 +69,8 @@ const LineChartWithDropdown = ({ theme, response }) => {
           </div>
         )}
       </div>
-
-      {/* Highcharts Graph inside MainCard */}
       <MainCard title={"Line Chart"}>
-        <HighchartsReact
-          key={JSON.stringify(lineChartOptions.series)} // Forces re-render on data update
-          highcharts={Highcharts}
-          options={lineChartOptions}
-        />
+        <HighchartsReact highcharts={Highcharts} options={lineChartOptions} />
       </MainCard>
       <style>{`
         .chart-container {
