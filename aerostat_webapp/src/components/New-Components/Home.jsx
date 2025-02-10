@@ -73,61 +73,86 @@ const Home = ({
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
 
-  const [dataPoints, setDataPoints] = useState([]);
+  const [dataPoints, setDataPoints] = useState({
+    "Hull Pressure": [],
+    "Barometric Pressure": [],
+    "Outside Temperature": [],
+    "Ballonet Pressure": [],
+    "Ballonet Curtain": [],
+  });
 
   useEffect(() => {
-    if (response?.helium?.hel_pressure !== undefined) {
-      // Add new data point to the array
-      setDataPoints((prevDataPoints) => {
-        const newDataPoints = [
-          ...prevDataPoints,
-          parseFloat(response?.helium?.hel_pressure),
-        ];
-
-        // If the array has more than 10 points, remove the first one
-        if (newDataPoints.length > 10) {
-          newDataPoints.shift();
-        }
-
-        return newDataPoints;
+    if (response) {
+      setDataPoints((prevData) => {
+        const newData = {
+          "Hull Pressure": updateData(
+            prevData["Hull Pressure"],
+            response?.helium?.hel_pressure
+          ),
+          "Barometric Pressure": updateData(
+            prevData["Barometric Pressure"],
+            response?.weather?.baro_presssure
+          ),
+          "Outside Temperature": updateData(
+            prevData["Outside Temperature"],
+            getValueForKey("Temperature:", response)
+          ),
+          "Ballonet Pressure": updateData(
+            prevData["Ballonet Pressure"],
+            response?.ballonet?.bal_pressure
+          ),
+          "Ballonet Curtain": updateData(
+            prevData["Ballonet Curtain"],
+            response?.ballonet?.ballonet_height
+          ),
+        };
+        console.log("Updated DataPoints:", newData); // ✅ Debug data
+        return newData;
       });
     }
   }, [response]);
 
+  // Helper function to maintain only last 10 values
+  const updateData = (prevArray, newValue) => {
+    if (newValue === undefined || isNaN(parseFloat(newValue))) return prevArray; // Ignore invalid data
+    const newArray = [...prevArray, parseFloat(newValue)];
+    if (newArray.length > 10) newArray.shift(); // Keep only last 10 points
+    return newArray;
+  };
+
   const handleChange = (name, value) => {
+    console.log("Fetching Start:", fetchingStart);
     if (fetchingStart) {
+      console.log(`Changing ${name} to ${value}`);
       switch (name) {
         case "fan1":
           setFan1(value);
-          setSendData(true);
           break;
         case "fan2":
           setFan2(value);
-          setSendData(true);
           break;
         case "light":
           setLight(value);
-          setSendData(true);
           break;
         case "primary_blower":
           setPrimaryBlower(value);
-          setSendData(true);
           break;
         case "secondary_blower":
           setSecondaryBlower(value);
-          setSendData(true);
           break;
         case "strobe_light":
           setStrobeLight(value);
-          setSendData(true);
           break;
         case "payload_power":
           setPayloadPower(value);
-          setSendData(true);
           break;
         default:
           break;
       }
+      setSendData(true);
+      console.log("sendData set to true");
+    } else {
+      console.log("fetchingStart is FALSE, ignoring change.");
     }
   };
 
@@ -179,6 +204,7 @@ const Home = ({
       };
     }
     if (sendData) {
+      console.log("Sending data to WebSocket:", relayControls);
       sendJsonMessage(relayControls);
       console.log("Controls successfully posted:", relayControls);
       setSendData(false);
@@ -236,6 +262,80 @@ const Home = ({
     }
   }, [lastMessage]);
 
+  const [pressureGaugeOpts, setPressureGaugeOpts] = useState(
+    pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
+  );
+
+  const [confluenceGaugeOpts, setConfluenceGaugeOpts] = useState(
+    confluenceGaugeOptions(theme, 0, 350, [0], getChartSize())
+  );
+
+  const [windGaugeOpts, setWindGaugeOpts] = useState(
+    windGaugeOptions(theme, 0, 50, [0], getChartSize())
+  );
+
+  const [ballonetGaugeOpts, setBallonetGaugeOpts] = useState(
+    pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
+  );
+
+  useEffect(() => {
+    if (response) {
+      setPressureGaugeOpts(
+        pressureGaugeOptions(
+          theme,
+          0,
+          6,
+          [
+            Math.min(
+              6,
+              Math.max(0, parseFloat(response?.helium?.hel_pressure))
+            ),
+          ],
+          getChartSize()
+        )
+      );
+
+      setConfluenceGaugeOpts(
+        confluenceGaugeOptions(
+          theme,
+          0,
+          350,
+          [Math.min(350, Math.max(0, parseFloat(response?.adams?.tension)))],
+          getChartSize()
+        )
+      );
+
+      setWindGaugeOpts(
+        windGaugeOptions(
+          theme,
+          0,
+          50,
+          [
+            Math.min(
+              50,
+              Math.max(0, parseFloat(response?.weather?.wind_speed))
+            ),
+          ],
+          getChartSize()
+        )
+      );
+
+      setBallonetGaugeOpts(
+        pressureGaugeOptions(
+          theme,
+          0,
+          6,
+          [
+            Math.min(
+              6,
+              Math.max(0, parseFloat(response?.ballonet?.bal_pressure))
+            ),
+          ],
+          getChartSize()
+        )
+      );
+    }
+  }, [response, theme]);
   return (
     <>
       <div className="main">
@@ -347,21 +447,8 @@ const Home = ({
             <div className="wind-speed-card">
               <HighchartsReact
                 highcharts={Highcharts}
-                options={windGaugeOptions(
-                  theme,
-                  0,
-                  50,
-                  [
-                    parseFloat(response?.weather?.wind_speed) > 50
-                      ? 50
-                      : parseFloat(response?.weather?.wind_speed) < 0
-                      ? 0
-                      : parseFloat(response?.weather?.wind_speed),
-                  ],
-                  getChartSize()
-                )}
+                options={windGaugeOpts}
               />
-
               <ChartsData
                 position={"between"}
                 description1={"Air Temp (C):"}
@@ -423,10 +510,10 @@ const Home = ({
               <StatusChip
                 color={"green"}
                 description={
-                  !fetchingStart
-                    ? "Disconnected"
-                    : isLoading
+                  fetchingStart
                     ? isLoading
+                      ? "Loading..."
+                      : "Connected"
                     : "Disconnected"
                 }
               />
@@ -479,16 +566,15 @@ const Home = ({
                         rowGap: "10px",
                       }}
                     >
-                      {/* Section for Phase 2 */}
-                      {phase === 2 && (
+                      {/* {phase === 2 && (
                         <div className="phase-2-section">
-                          {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                          <StatusChip color={"red"} description={"Humidity"} />
                           <ChartChip
                             name={"Humidity"}
                             value={getValueForKey("Humidity:", response)}
                           />
                         </div>
-                      )}
+                      )} */}
                       {phase === 1 && (
                         <ChartChip
                           name={"Heading"}
@@ -500,6 +586,26 @@ const Home = ({
                       )}
                       {phase === 2 && (
                         <>
+                          <ChartChip
+                            name={"Longitude:"}
+                            value={
+                              response?.weather?.longitude === "NaN" ||
+                              !response?.weather?.longitude
+                                ? "N/A"
+                                : `${response?.weather?.longitude}°`
+                            }
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Latitude:"}
+                            value={
+                              response?.weather?.latitude === "NaN" ||
+                              !response?.weather?.latitude
+                                ? "N/A"
+                                : `${response?.weather?.latitude}°`
+                            }
+                            unit={""}
+                          />
                           <ChartChip
                             name={"Altitude:"}
                             value={
@@ -563,7 +669,7 @@ const Home = ({
                             ).toFixed(2)}
                             unit={"°"}
                           />
-                          <ChartChip
+                          {/* <ChartChip
                             name={"Longitude:"}
                             value={
                               response?.weather?.longitude === "NaN" ||
@@ -582,7 +688,14 @@ const Home = ({
                                 : `${response?.weather?.latitude}°`
                             }
                             unit={""}
-                          />
+                          /> */}
+                          <div className="phase-2-section">
+                            {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                            <ChartChip
+                              name={"Humidity"}
+                              value={getValueForKey("Humidity:", response)}
+                            />
+                          </div>
                         </>
                       )}
                     </div>
@@ -602,20 +715,9 @@ const Home = ({
                   <div>
                     <HighchartsReact
                       highcharts={Highcharts}
-                      options={pressureGaugeOptions(
-                        theme,
-                        0,
-                        6,
-                        [
-                          parseFloat(response?.helium?.hel_pressure) > 6
-                            ? 6
-                            : parseFloat(response?.helium?.hel_pressure) < 0
-                            ? 0
-                            : parseFloat(response?.helium?.hel_pressure),
-                        ],
-                        getChartSize()
-                      )}
+                      options={pressureGaugeOpts}
                     />
+
                     <ChartsData
                       position={"around"}
                       graphValue={parseFloat(
@@ -627,20 +729,9 @@ const Home = ({
                   <div>
                     <HighchartsReact
                       highcharts={Highcharts}
-                      options={pressureGaugeOptions(
-                        theme,
-                        0,
-                        6,
-                        [
-                          parseFloat(response?.ballonet?.bal_pressure) > 6
-                            ? 6
-                            : parseFloat(response?.ballonet?.bal_pressure) < 0
-                            ? 0
-                            : parseFloat(response?.ballonet?.bal_pressure),
-                        ],
-                        getChartSize()
-                      )}
+                      options={ballonetGaugeOpts}
                     />
+
                     <ChartsData
                       position={phase === 1 ? "around" : "between"}
                       graphValue={parseFloat(
@@ -674,20 +765,9 @@ const Home = ({
                   <div className="confluence-graph">
                     <HighchartsReact
                       highcharts={Highcharts}
-                      options={confluenceGaugeOptions(
-                        theme,
-                        0,
-                        350,
-                        [
-                          parseFloat(response?.adams?.tension) > 350
-                            ? 350
-                            : parseFloat(response?.adams?.tension) < 0
-                            ? 0
-                            : parseFloat(response?.adams?.tension),
-                        ],
-                        getChartSize()
-                      )}
+                      options={confluenceGaugeOpts}
                     />
+
                     <ChartsData
                       position={"center"}
                       graphName={"Current Tension"}
@@ -720,13 +800,8 @@ const Home = ({
             phase={phase}
             isPhase1Starts={isPhase1Starts}
             isPhase2Starts={isPhase2Starts}
-            data={
-              (phase === 1 && !isPhase1Starts) ||
-              (phase === 2 && !isPhase2Starts)
-                ? [0.4]
-                : dataPoints
-            }
-          />
+            data={dataPoints} // ✅ Pass data from parent correctly
+          />{" "}
         </div>
       )}
       <div className="main2" style={{ marginTop: "20px" }}>

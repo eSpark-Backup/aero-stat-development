@@ -1,65 +1,68 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import MainCard from "../../common/MainCard";
 
 const availableOptions = [
-  "Barometric Pressure",
   "Hull Pressure",
+  "Barometric Pressure",
+  "Outside Temperature",
   "Ballonet Pressure",
   "Ballonet Curtain",
-  "Outside Temperature",
 ];
 
-const LineChartWithDropdown = ({
-  theme,
-  phase,
-  isPhase1Starts,
-  isPhase2Starts,
-  data,
-}) => {
-  const [selectedValues, setSelectedValues] = useState(availableOptions);
+const colorMap = {
+  "Hull Pressure": "#ff5733",
+  "Barometric Pressure": "#33ff57",
+  "Outside Temperature": "#3357ff",
+  "Ballonet Pressure": "#ff33a8",
+  "Ballonet Curtain": "#ffcc33",
+};
+
+const yAxisRanges = {
+  "Hull Pressure": { min: 0, max: 6 },
+  "Barometric Pressure": { min: 0, max: 1500 },
+  "Outside Temperature": { min: 0, max: 50 },
+  "Ballonet Pressure": { min: 0, max: 6 },
+  "Ballonet Curtain": { min: 0, max: 12 },
+};
+
+const LineChartWithDropdown = ({ theme, data }) => {
+  const [selectedValue, setSelectedValue] = useState("Hull Pressure");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleSelectionChange = (value) => {
-    setSelectedValues((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
-    );
-  };
+  console.log("Received data in Chart Component:", data);
 
-  const filteredData =
-    (phase === 1 && !isPhase1Starts) || (phase === 2 && !isPhase2Starts)
-      ? [0.4] // Default when conditions are met
-      : data; // Otherwise, use actual data
-  
+  const formatChartData = () => [
+    {
+      name: selectedValue,
+      data: data[selectedValue] || [],
+      color: colorMap[selectedValue] || "#000000",
+    },
+  ];
 
-  // Format chart data for Highcharts
-  const formatChartData = (selectedValues, data) => {
-    return selectedValues.map((value, index) => {
-      const seriesData = data.find((item) => item.name === value)?.data || [0, 0, 0];
-      return {
-        name: value,
-        data: seriesData,
-        color: theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
-      };
-    });
-  };
+  const getYAxisRange = () => yAxisRanges[selectedValue] || { min: 0, max: 10 };
 
   const lineChartOptions = {
     chart: { type: "line", backgroundColor: "transparent" },
-    title: { text: "Hull Helium Over Time" },
-    xAxis: { categories: ["Point 1", "Point 2", "Point 3"] },
-    yAxis: { title: { text: "Hull Helium" }, min: 0, max: 3 },
-    series: formatChartData(selectedValues, filteredData),
+    title: { text: `${selectedValue} Over Time` },
+    xAxis: {
+      categories: data[selectedValue]?.map((_, i) => `Point ${i + 1}`) || [],
+    },
+    yAxis: {
+      title: { text: selectedValue },
+      ...getYAxisRange(),
+    },
+    series: formatChartData(),
   };
 
   return (
     <div className="chart-container">
-      {/* Dropdown for selecting values */}
       <div className="dropdown-wrapper">
-        <button className="dropdown-button" onClick={() => setDropdownOpen(!dropdownOpen)}>
+        <button
+          className="dropdown-button"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
           Select Data Points ⏷
         </button>
         {dropdownOpen && (
@@ -67,9 +70,9 @@ const LineChartWithDropdown = ({
             {availableOptions.map((option) => (
               <label key={option} className="dropdown-item">
                 <input
-                  type="checkbox"
-                  checked={selectedValues.includes(option)}
-                  onChange={() => handleSelectionChange(option)}
+                  type="radio"
+                  checked={selectedValue === option}
+                  onChange={() => setSelectedValue(option)}
                 />
                 {option}
               </label>
@@ -77,22 +80,18 @@ const LineChartWithDropdown = ({
           </div>
         )}
       </div>
-
-      {/* Highcharts Graph inside MainCard */}
-      <MainCard title={"Line Charts"}>
+      <MainCard title={"Line Chart"}>
         <HighchartsReact highcharts={Highcharts} options={lineChartOptions} />
       </MainCard>
-
-      {/* Styles */}
       <style>{`
         .chart-container {
           position: relative;
         }
         .dropdown-wrapper {
           position: absolute;
-          top: 25px; /* Moves it above the chart */
+          top: 25px;
           left: 10px;
-          z-index: 1000; /* Ensures dropdown stays above other elements */
+          z-index: 1000;
         }
         .dropdown-button {
           padding: 8px 12px;

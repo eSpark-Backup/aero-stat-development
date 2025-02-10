@@ -106,7 +106,7 @@ const Phase1 = React.memo(() => {
       sendJsonMessage(PHASE_2_DATA);
       sendJsonMessage({
         method: "alfa.braodcast.settings.set",
-        enable: true
+        enable: true,
       });
 
       console.log("Phase 2 Data Sent:", PHASE_2_DATA);
@@ -451,16 +451,27 @@ const Phase1 = React.memo(() => {
   }, [loading]);
 
   useEffect(() => {
-    if (!startFetchingFromFile && ((startFetchData && phase1Start) || phase2Start)) {
-      // console.log("HELLO")
-      // const interval = setInterval(fetchData, 1500);
-      // return () => clearInterval(interval);
+    console.log("Effect triggered:", {
+      startFetchingFromFile,
+      startFetchData,
+      phase1Start,
+      phase2Start,
+    });
+    if (
+      !startFetchingFromFile &&
+      (startFetchData || phase1Start || phase2Start)
+    ) {
       setActivateWebSocket(true);
-    }
-    else {
+    } else {
       setActivateWebSocket(false);
     }
   }, [startFetchingFromFile, startFetchData, phase1Start, phase2Start]);
+
+  useEffect(() => {
+    if (activateWebSocket) {
+      console.log("WebSocket is active, waiting for data...");
+    }
+  }, [activateWebSocket]);
 
   useEffect(() => {
     if (lastMessage && activateWebSocket) {
@@ -791,14 +802,16 @@ const Phase1 = React.memo(() => {
         />
         <Home
           response={responses}
-          isLoading={responses?.loading}
+          isLoading={responses?.loading === "Loading"} // Fix here
           handleSubmit={handleSubmit}
           errorValues={errorValues}
           setErrorValues={setErrorValues}
           openModal={openModal}
           setOpenModal={setOpenModal}
           handleOpenModal={handleOpenModal}
-          fetchingStart={startFetchData || phase1Start}
+          fetchingStart={
+            (startFetchData || phase1Start || phase2Start) && activateWebSocket
+          }
           HandleBrowse={handleBrowse}
           fileName={logFile}
           HandleForward={HandleForward}
