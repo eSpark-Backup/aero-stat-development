@@ -11,38 +11,44 @@ const availableOptions = [
   "Outside Temperature",
 ];
 
-const LineChartWithDropdown = ({
-  theme,
-  phase,
-  isPhase1Starts,
-  isPhase2Starts,
-  data,
-}) => {
+const LineChartWithDropdown = ({ theme, response }) => {
   const [selectedValues, setSelectedValues] = useState(availableOptions);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const handleSelectionChange = (value) => {
-    setSelectedValues((prev) =>
-      prev.includes(value)
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
-    );
-  };
+  // Initialize Data for All Available Options
+  const [dataPoints, setDataPoints] = useState(
+    availableOptions.map((option) => ({ name: option, data: [] }))
+  );
 
-  const filteredData =
-    (phase === 1 && !isPhase1Starts) || (phase === 2 && !isPhase2Starts)
-      ? [0.4] // Default when conditions are met
-      : data; // Otherwise, use actual data
-  
+  // Handle WebSocket Response Update
+  useEffect(() => {
+    if (response) {
+      setDataPoints((prevDataPoints) => {
+        return prevDataPoints.map((item) => {
+          const newValue =
+            parseFloat(
+              response?.helium?.[item.name.toLowerCase().replace(/\s+/g, "_")]
+            ) || 0;
+
+          return {
+            ...item,
+            data: [...item.data, newValue].slice(-10), // Keep last 10 points
+          };
+        });
+      });
+    }
+  }, [response]);
 
   // Format chart data for Highcharts
-  const formatChartData = (selectedValues, data) => {
+  const formatChartData = () => {
     return selectedValues.map((value, index) => {
-      const seriesData = data.find((item) => item.name === value)?.data || [0, 0, 0];
+      const seriesData =
+        dataPoints.find((item) => item.name === value)?.data || [];
       return {
         name: value,
         data: seriesData,
-        color: theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
+        color:
+          theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
       };
     });
   };
@@ -50,16 +56,21 @@ const LineChartWithDropdown = ({
   const lineChartOptions = {
     chart: { type: "line", backgroundColor: "transparent" },
     title: { text: "Hull Helium Over Time" },
-    xAxis: { categories: ["Point 1", "Point 2", "Point 3"] },
-    yAxis: { title: { text: "Hull Helium" }, min: 0, max: 3 },
-    series: formatChartData(selectedValues, filteredData),
+    xAxis: {
+      categories: dataPoints[0]?.data.map((_, i) => `Point ${i + 1}`) || [],
+    },
+    yAxis: { title: { text: "Hulll Helium" }, min: 0, max: 3 },
+    series: formatChartData(),
   };
 
   return (
     <div className="chart-container">
       {/* Dropdown for selecting values */}
       <div className="dropdown-wrapper">
-        <button className="dropdown-button" onClick={() => setDropdownOpen(!dropdownOpen)}>
+        <button
+          className="dropdown-button"
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+        >
           Select Data Points ⏷
         </button>
         {dropdownOpen && (
@@ -69,7 +80,13 @@ const LineChartWithDropdown = ({
                 <input
                   type="checkbox"
                   checked={selectedValues.includes(option)}
-                  onChange={() => handleSelectionChange(option)}
+                  onChange={() =>
+                    setSelectedValues((prev) =>
+                      prev.includes(option)
+                        ? prev.filter((item) => item !== option)
+                        : [...prev, option]
+                    )
+                  }
                 />
                 {option}
               </label>
@@ -79,11 +96,13 @@ const LineChartWithDropdown = ({
       </div>
 
       {/* Highcharts Graph inside MainCard */}
-      <MainCard title={"Line Charts"}>
-        <HighchartsReact highcharts={Highcharts} options={lineChartOptions} />
+      <MainCard title={"Line Chart"}>
+        <HighchartsReact
+          key={JSON.stringify(lineChartOptions.series)} // Forces re-render on data update
+          highcharts={Highcharts}
+          options={lineChartOptions}
+        />
       </MainCard>
-
-      {/* Styles */}
       <style>{`
         .chart-container {
           position: relative;

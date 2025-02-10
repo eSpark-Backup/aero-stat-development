@@ -239,7 +239,6 @@ const Home = ({
   useEffect(() => {
     console.log("isLoading state:", isLoading);
   }, [isLoading]);
-  
 
   return (
     <>
@@ -725,12 +724,7 @@ const Home = ({
             phase={phase}
             isPhase1Starts={isPhase1Starts}
             isPhase2Starts={isPhase2Starts}
-            data={
-              (phase === 1 && !isPhase1Starts) ||
-              (phase === 2 && !isPhase2Starts)
-                ? [0.4]
-                : dataPoints
-            }
+            data={dataPoints} // Pass updated data
           />
         </div>
       )}
