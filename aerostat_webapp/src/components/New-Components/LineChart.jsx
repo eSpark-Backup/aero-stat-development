@@ -16,7 +16,6 @@ const LineChartWithDropdown = ({ theme, data }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   console.log("Received data in Chart Component:", data); // ✅ Debug received data
-  console.log("Formatted Chart Data:", formatChartData()); // ✅ Debug formatted data
 
   // Format chart data for Highcharts
   const formatChartData = () => {
