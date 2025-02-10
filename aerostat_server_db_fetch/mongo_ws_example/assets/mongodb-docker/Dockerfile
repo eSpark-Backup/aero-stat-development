@@ -24,7 +24,8 @@ CMD ["mongod"]
 ## docker run -it --rm --name alfa-mongo-container -p 27017:27017 mongodb-alfaops
 
 ## COPY THE DB DUMP TP CONTAINER
-## docker cp C:/GitHub/aerostat-development/aerostat_server_db_fetch/mongo_ws_example/assets/alfacor01dump alfa-mongo-container:/dump
+## OPEN THIS DIRECTORY WHERE DOCKERFILE IS then run
+## docker cp alfacor01dump alfa-mongo-container:/dump
 
 ## docker exec -it alfa-mongo-container /bin/bash
 
