@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import MainCard from "../../common/MainCard";
@@ -11,35 +11,53 @@ const availableOptions = [
   "Ballonet Curtain",
 ];
 
+const colorMap = {
+  "Hull Pressure": "#ff5733",
+  "Barometric Pressure": "#33ff57",
+  "Outside Temperature": "#3357ff",
+  "Ballonet Pressure": "#ff33a8",
+  "Ballonet Curtain": "#ffcc33",
+};
+
+const yAxisRanges = {
+  "Hull Pressure": { min: 0, max: 6 },
+  "Barometric Pressure": { min: 0, max: 1500 },
+  "Outside Temperature": { min: 0, max: 50 },
+  "Ballonet Pressure": { min: 0, max: 6 },
+  "Ballonet Curtain": { min: 0, max: 12 },
+};
+
 const LineChartWithDropdown = ({ theme, data }) => {
-  const [selectedValues, setSelectedValues] = useState(availableOptions);
+  const [selectedValue, setSelectedValue] = useState("Hull Pressure");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  console.log("Received data in Chart Component:", data); // ✅ Debug received data
+  console.log("Received data in Chart Component:", data);
 
-  // Format chart data for Highcharts
-  const formatChartData = () => {
-    return selectedValues.map((value, index) => ({
-      name: value,
-      data: data[value] || [], // ✅ Fix: Use data directly from props
-      color:
-        theme?.[value] || ["red", "blue", "green", "purple", "orange"][index],
-    }));
-  };
+  const formatChartData = () => [
+    {
+      name: selectedValue,
+      data: data[selectedValue] || [],
+      color: colorMap[selectedValue] || "#000000",
+    },
+  ];
+
+  const getYAxisRange = () => yAxisRanges[selectedValue] || { min: 0, max: 10 };
 
   const lineChartOptions = {
     chart: { type: "line", backgroundColor: "transparent" },
-    title: { text: "Hull Helium Over Time" },
+    title: { text: `${selectedValue} Over Time` },
     xAxis: {
-      categories: data["Hull Pressure"]?.map((_, i) => `Point ${i + 1}`) || [],
+      categories: data[selectedValue]?.map((_, i) => `Point ${i + 1}`) || [],
     },
-    yAxis: { title: { text: "Hull Helium" }, min: 0, max: 3 },
+    yAxis: {
+      title: { text: selectedValue },
+      ...getYAxisRange(),
+    },
     series: formatChartData(),
   };
 
   return (
     <div className="chart-container">
-      {/* Dropdown for selecting values */}
       <div className="dropdown-wrapper">
         <button
           className="dropdown-button"
@@ -52,15 +70,9 @@ const LineChartWithDropdown = ({ theme, data }) => {
             {availableOptions.map((option) => (
               <label key={option} className="dropdown-item">
                 <input
-                  type="checkbox"
-                  checked={selectedValues.includes(option)}
-                  onChange={() =>
-                    setSelectedValues((prev) =>
-                      prev.includes(option)
-                        ? prev.filter((item) => item !== option)
-                        : [...prev, option]
-                    )
-                  }
+                  type="radio"
+                  checked={selectedValue === option}
+                  onChange={() => setSelectedValue(option)}
                 />
                 {option}
               </label>
@@ -77,9 +89,9 @@ const LineChartWithDropdown = ({ theme, data }) => {
         }
         .dropdown-wrapper {
           position: absolute;
-          top: 25px; /* Moves it above the chart */
+          top: 25px;
           left: 10px;
-          z-index: 1000; /* Ensures dropdown stays above other elements */
+          z-index: 1000;
         }
         .dropdown-button {
           padding: 8px 12px;
