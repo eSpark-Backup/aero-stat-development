@@ -262,9 +262,61 @@ const Home = ({
     }
   }, [lastMessage]);
 
+  const [pressureGaugeOpts, setPressureGaugeOpts] = useState(
+    pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
+  );
+
+  const [confluenceGaugeOpts, setConfluenceGaugeOpts] = useState(
+    confluenceGaugeOptions(theme, 0, 350, [0], getChartSize())
+  );
+
+  const [windGaugeOpts, setWindGaugeOpts] = useState(
+    windGaugeOptions(theme, 0, 50, [0], getChartSize())
+  );
+
   useEffect(() => {
-    console.log("isLoading state:", isLoading);
-  }, [isLoading]);
+    if (response) {
+      setPressureGaugeOpts(
+        pressureGaugeOptions(
+          theme,
+          0,
+          6,
+          [
+            Math.min(
+              6,
+              Math.max(0, parseFloat(response?.helium?.hel_pressure))
+            ),
+          ],
+          getChartSize()
+        )
+      );
+
+      setConfluenceGaugeOpts(
+        confluenceGaugeOptions(
+          theme,
+          0,
+          350,
+          [Math.min(350, Math.max(0, parseFloat(response?.adams?.tension)))],
+          getChartSize()
+        )
+      );
+
+      setWindGaugeOpts(
+        windGaugeOptions(
+          theme,
+          0,
+          50,
+          [
+            Math.min(
+              50,
+              Math.max(0, parseFloat(response?.weather?.wind_speed))
+            ),
+          ],
+          getChartSize()
+        )
+      );
+    }
+  }, [response, theme]); // Re-run when response or theme changes
 
   return (
     <>
@@ -377,21 +429,8 @@ const Home = ({
             <div className="wind-speed-card">
               <HighchartsReact
                 highcharts={Highcharts}
-                options={windGaugeOptions(
-                  theme,
-                  0,
-                  50,
-                  [
-                    parseFloat(response?.weather?.wind_speed) > 50
-                      ? 50
-                      : parseFloat(response?.weather?.wind_speed) < 0
-                      ? 0
-                      : parseFloat(response?.weather?.wind_speed),
-                  ],
-                  getChartSize()
-                )}
+                options={windGaugeOpts}
               />
-
               <ChartsData
                 position={"between"}
                 description1={"Air Temp (C):"}
@@ -632,20 +671,9 @@ const Home = ({
                   <div>
                     <HighchartsReact
                       highcharts={Highcharts}
-                      options={pressureGaugeOptions(
-                        theme,
-                        0,
-                        6,
-                        [
-                          parseFloat(response?.helium?.hel_pressure) > 6
-                            ? 6
-                            : parseFloat(response?.helium?.hel_pressure) < 0
-                            ? 0
-                            : parseFloat(response?.helium?.hel_pressure),
-                        ],
-                        getChartSize()
-                      )}
+                      options={pressureGaugeOpts}
                     />
+
                     <ChartsData
                       position={"around"}
                       graphValue={parseFloat(
@@ -704,20 +732,9 @@ const Home = ({
                   <div className="confluence-graph">
                     <HighchartsReact
                       highcharts={Highcharts}
-                      options={confluenceGaugeOptions(
-                        theme,
-                        0,
-                        350,
-                        [
-                          parseFloat(response?.adams?.tension) > 350
-                            ? 350
-                            : parseFloat(response?.adams?.tension) < 0
-                            ? 0
-                            : parseFloat(response?.adams?.tension),
-                        ],
-                        getChartSize()
-                      )}
+                      options={confluenceGaugeOpts}
                     />
+
                     <ChartsData
                       position={"center"}
                       graphName={"Current Tension"}
