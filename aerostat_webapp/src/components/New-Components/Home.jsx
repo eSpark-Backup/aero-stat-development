@@ -236,6 +236,11 @@ const Home = ({
     }
   }, [lastMessage]);
 
+  useEffect(() => {
+    console.log("isLoading state:", isLoading);
+  }, [isLoading]);
+  
+
   return (
     <>
       <div className="main">
@@ -421,11 +426,11 @@ const Home = ({
                 unit={""}
               />
               <StatusChip
-                color={fetchingStart ? "green" : "red"}
+                color={"green"}
                 description={
                   fetchingStart
                     ? isLoading
-                      ? "Connecting..."
+                      ? "Loading..."
                       : "Connected"
                     : "Disconnected"
                 }
