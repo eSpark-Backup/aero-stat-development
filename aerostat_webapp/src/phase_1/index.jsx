@@ -808,6 +808,9 @@ const Phase1 = React.memo(() => {
           onClose={() => setIsSidebarOpen(false)}
           phase={1}
           theme="light"
+          fetchingStart={
+            (startFetchData || phase1Start || phase2Start) && activateWebSocket
+          }
         />
 
         <Home

@@ -70,18 +70,30 @@ const LineChartWithDropdown = ({ theme, data }) => {
   };
 
   const lineChartOptions = {
-    chart: { type: "line", backgroundColor: "transparent" },
+    chart: {
+      type: "line",
+      backgroundColor: "transparent",
+      zooming: { type: "xy" }, // Enables zooming on both axes
+      panning: { enabled: true, type: "xy" }, // Enables panning
+      panKey: "shift", // Hold shift to enable panning
+    },
     title: { text: `Hull Pressure Over Time` },
     xAxis: {
       categories:
         data[selectedValues[0]]?.map((_, i) => `Point ${i + 1}`) || [],
+      min: 0, // Ensures panning works properly
     },
     yAxis: {
       title: { text: "Values" },
       ...getYAxisRange(),
     },
     series: formatChartData(),
+    tooltip: { shared: true, crosshairs: true }, // Enhances the tooltip experience
+    credits: { enabled: false }, // Hides the Highcharts watermark
+    legend: { enabled: true },
+    accessibility: { enabled: false },
   };
+  
 
   return (
     <div className="chart-container">
@@ -114,6 +126,7 @@ const LineChartWithDropdown = ({ theme, data }) => {
         {`
         .chart-container {
           position: relative;
+          margin-bottom: 20px;
         }
         .dropdown-wrapper {
           position: absolute;
