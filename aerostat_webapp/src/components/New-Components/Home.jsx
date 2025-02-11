@@ -424,12 +424,21 @@ const Home = ({
                   <div className="weather-station-chips">
                     <StatusChip color={"blue"} description={"Wind Angle"} />
                     {/* Section for Phase 1 */}
-                    <div className="phase-1-section">
-                      <StatusChip
-                        color={"red"}
-                        description={"Aerostat Heading"}
+                    {phase === 1 && (
+                      <div className="phase-1-section">
+                        <StatusChip
+                          color={"red"}
+                          description={"Aerostat Heading"}
+                        />
+                      </div>
+                    )}
+
+                    {phase === 2 && (
+                      <ChartChip
+                        name={"Humidity"}
+                        value={getValueForKey("Humidity:", response)}
                       />
-                    </div>
+                    )}
 
                     {/* <ChartChip
                       name={"Heading"}
@@ -548,9 +557,9 @@ const Home = ({
               </div>
             </div>
           </div>
-          <MainCard title={"Magnetometer"}>
+          <MainCard title={"Aerostat Position and Orientation"}>
             <div className="magnetometer-box">
-              <div className="heading-box">
+              <div className="heading-box2">
                 <ChildCard>
                   <div
                     className={
@@ -691,9 +700,16 @@ const Home = ({
                           /> */}
                           <div className="phase-2-section">
                             {/* <StatusChip color={"red"} description={"Humidity"} /> */}
-                            <ChartChip
+                            {/* <ChartChip
                               name={"Humidity"}
                               value={getValueForKey("Humidity:", response)}
+                            /> */}
+                            <ChartChip
+                              name={"Heading"}
+                              value={parseFloat(
+                                response?.digitalCompass?.mag_heading
+                              ).toFixed(2)}
+                              unit={"°"}
                             />
                           </div>
                         </>
@@ -804,7 +820,7 @@ const Home = ({
           />{" "}
         </div>
       )}
-      <div className="main2" style={{ marginTop: "20px" }}>
+      {/* <div className="main2" style={{ marginTop: "20px" }}>
         <MainCard title={"Controls & Radio Link"}>
           <div className="control-box-card">
             {phase === 1 ? (
@@ -945,9 +961,9 @@ const Home = ({
                 theme === "light" ? "log-detail-light" : "log-detail-dark"
               }`}
             >
-              {/* <p>Tether Link:</p> */}
-              {/* <p>Comms Status:</p> */}
-              {/* <StatusChip
+              <p>Tether Link:</p>
+              <p>Comms Status:</p>
+              <StatusChip
                 color={"green"}
                 description={
                   !fetchingStart
@@ -956,7 +972,7 @@ const Home = ({
                     ? isLoading
                     : "Disconnected"
                 }
-              /> */}
+              />
             </div>
           </div>
         </MainCard>
@@ -1050,7 +1066,7 @@ const Home = ({
             </MainCard>
           </div>
         </div>
-      </div>
+      </div> */}
       <Modal
         theme={theme}
         open={openModal}
