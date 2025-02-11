@@ -9,6 +9,7 @@ import "./phase1.css";
 import { WebSocketContext } from "../App";
 import useWebSocket from "react-use-websocket";
 import { PHASE_2_DATA } from "./phase2Data";
+import RightSidebar from "../components/New-Components/RightSidebar";
 
 const Phase1 = React.memo(() => {
   const { readyState, sendJsonMessage, lastMessage } =
@@ -85,6 +86,7 @@ const Phase1 = React.memo(() => {
     setFileFetchingStart,
   } = useContext(ThemeContext);
   const [sidebar, setSidebar] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [responses, setResponses] = useState(lastPerfectResponses.current);
   const [openModal, setOpenModal] = useState(false);
@@ -789,6 +791,7 @@ const Phase1 = React.memo(() => {
       <div style={{ display: "flex", flexDirection: "column", rowGap: "0px" }}>
         <Header
           handleSidebarOpen={() => setSidebar(true)}
+          handleRightSidebarOpen={() => setIsSidebarOpen(true)}
           time={responses?.time}
           fileFetching={startFetchingFromFile}
         />
@@ -800,6 +803,16 @@ const Phase1 = React.memo(() => {
           fwdBtn={fwdBtn}
           StopBtn={stopBtn}
         />
+        <RightSidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+          phase={1}
+          theme="light"
+          fetchingStart={
+            (startFetchData || phase1Start || phase2Start) && activateWebSocket
+          }
+        />
+
         <Home
           response={responses}
           isLoading={responses?.loading === "Loading"} // Fix here
