@@ -637,7 +637,14 @@ const Home = ({
                     )}
 
                     {/* Show LeafletMap only in phase 2 */}
-                    {phase === 2 && <LeafletMap />}
+                    {phase === 2 &&
+                      response?.weather?.latitude &&
+                      response?.weather?.longitude && (
+                        <LeafletMap
+                          lat={response.weather.latitude}
+                          lng={response.weather.longitude}
+                        />
+                      )}
                   </div>
                 </ChildCard>
               </div>
