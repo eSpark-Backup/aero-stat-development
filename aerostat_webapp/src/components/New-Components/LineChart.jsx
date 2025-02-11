@@ -28,29 +28,56 @@ const yAxisRanges = {
 };
 
 const LineChartWithDropdown = ({ theme, data }) => {
-  const [selectedValue, setSelectedValue] = useState("Hull Pressure");
+  const [selectedValues, setSelectedValues] = useState(availableOptions);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   console.log("Received data in Chart Component:", data);
 
-  const formatChartData = () => [
-    {
-      name: selectedValue,
-      data: data[selectedValue] || [],
-      color: colorMap[selectedValue] || "#000000",
-    },
-  ];
+  const toggleSelection = (option) => {
+    setSelectedValues((prev) =>
+      prev.includes(option)
+        ? prev.filter((item) => item !== option)
+        : [...prev, option]
+    );
+  };
 
-  const getYAxisRange = () => yAxisRanges[selectedValue] || { min: 0, max: 10 };
+  const formatChartData = () =>
+    selectedValues.map((metric) => ({
+      name: metric,
+      data: data[metric] || [],
+      color: colorMap[metric] || "#000000",
+    }));
+
+  const getYAxisRange = () => {
+    const maxDataValue = Math.max(
+      ...selectedValues.flatMap((metric) => data[metric] || [])
+    );
+
+    let maxYAxis;
+    if (maxDataValue > 1000) {
+      maxYAxis = 1500;
+    } else if (maxDataValue > 800) {
+      maxYAxis = 1200;
+    } else if (maxDataValue > 500) {
+      maxYAxis = 800;
+    } else if (maxDataValue > 200) {
+      maxYAxis = 500;
+    } else {
+      maxYAxis = Math.max(maxDataValue * 1.2, 10);
+    }
+
+    return { min: 0, max: maxYAxis };
+  };
 
   const lineChartOptions = {
     chart: { type: "line", backgroundColor: "transparent" },
-    title: { text: `${selectedValue} Over Time` },
+    title: { text: `Hull Pressure Over Time` },
     xAxis: {
-      categories: data[selectedValue]?.map((_, i) => `Point ${i + 1}`) || [],
+      categories:
+        data[selectedValues[0]]?.map((_, i) => `Point ${i + 1}`) || [],
     },
     yAxis: {
-      title: { text: selectedValue },
+      title: { text: "Values" },
       ...getYAxisRange(),
     },
     series: formatChartData(),
@@ -70,9 +97,9 @@ const LineChartWithDropdown = ({ theme, data }) => {
             {availableOptions.map((option) => (
               <label key={option} className="dropdown-item">
                 <input
-                  type="radio"
-                  checked={selectedValue === option}
-                  onChange={() => setSelectedValue(option)}
+                  type="checkbox"
+                  checked={selectedValues.includes(option)}
+                  onChange={() => toggleSelection(option)}
                 />
                 {option}
               </label>
@@ -83,7 +110,8 @@ const LineChartWithDropdown = ({ theme, data }) => {
       <MainCard title={"Line Chart"}>
         <HighchartsReact highcharts={Highcharts} options={lineChartOptions} />
       </MainCard>
-      <style>{`
+      <style>
+        {`
         .chart-container {
           position: relative;
         }
@@ -121,7 +149,8 @@ const LineChartWithDropdown = ({ theme, data }) => {
         .dropdown-item input {
           margin-right: 5px;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
