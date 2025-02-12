@@ -1,9 +1,7 @@
-import React, { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet"; 
+import React, { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
-const center = [24.8607, 67.0011]; 
 
 const redMarker = new L.Icon({
   iconUrl:
@@ -13,15 +11,23 @@ const redMarker = new L.Icon({
   popupAnchor: [1, -34],
 });
 
-const LeafletMap = () => {
-  const [showCoords, setShowCoords] = useState(false);
+// Component to update map center dynamically
+const UpdateMapCenter = ({ lat, lng }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], map.getZoom(), { animate: true });
+  }, [lat, lng, map]);
 
+  return null;
+};
+
+const LeafletMap = ({ lat, lng }) => {
   return (
     <div
       style={{
         width: "220px",
         height: "220px",
-        aspectRatio: "1 / 1", 
+        aspectRatio: "1 / 1",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -39,22 +45,16 @@ const LeafletMap = () => {
         }}
       >
         <MapContainer
-          center={center}
+          center={[lat, lng]}
           zoom={13}
           style={{ width: "100%", height: "100%" }}
           className="custom-leaflet-map"
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-          <Marker
-            position={center}
-            icon={redMarker} 
-            eventHandlers={{
-              click: () => setShowCoords((prev) => !prev), 
-            }}
-          >
+          <UpdateMapCenter lat={lat} lng={lng} />
+          <Marker position={[lat, lng]} icon={redMarker}>
             <Popup autoClose={false} closeOnClick={false}>
-              {showCoords ? `Lat: ${center[0]}, Lng: ${center[1]}` : ""}
+              Lat: {lat}, Lng: {lng}
             </Popup>
           </Marker>
         </MapContainer>
