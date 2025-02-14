@@ -114,7 +114,7 @@ const Sidebar = ({
           </button>
         </div>
       </div>
-      <div style={{color:"grey", position:"absolute", bottom:"0"}}>v2.1.6</div>
+      <div style={{color:"grey", position:"absolute", bottom:"0"}}>v2.1.7</div>
     </div>
   );
 };

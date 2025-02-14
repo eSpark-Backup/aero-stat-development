@@ -58,6 +58,7 @@ const Phase1 = React.memo(() => {
       air_temp: parseFloat(18.8).toFixed(2),
       baro_presssure: parseFloat(29.3).toFixed(29.3),
       heading: parseFloat(128).toFixed(2),
+      humidity: parseFloat(0).toFixed(2),
       wind_angle: parseFloat(158.4).toFixed(2),
       wind_speed: parseFloat(70).toFixed(2),
       longitude: parseFloat(0).toFixed(2),
@@ -183,6 +184,14 @@ const Phase1 = React.memo(() => {
                     ? data?.data?.tcp?.tcp1["4002"]?.heading
                     : data?.data?.modbus?.modbus1[5007]?.humidity
                 ).toFixed(2),
+            humidity: isInvalidValue(
+              data?.data?.modbus?.modbus1[5007]?.humidity
+            )
+              ? lastPerfectResponses.current.weather.humidity
+              : parseFloat(data?.data?.modbus?.modbus1[5007]?.humidity).toFixed(
+                  2
+                ),
+
             wind_angle: isInvalidValue(
               phase === 1
                 ? data?.data?.tcp?.tcp1["4002"]?.wind_angle
