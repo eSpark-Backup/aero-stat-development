@@ -95,7 +95,7 @@ const Home = ({
           ),
           "Outside Temperature": updateData(
             prevData["Outside Temperature"],
-            getValueForKey("Temperature:", response)
+            response?.weather?.air_temp
           ),
           "Ballonet Pressure": updateData(
             prevData["Ballonet Pressure"],
@@ -436,7 +436,7 @@ const Home = ({
                     {phase === 2 && (
                       <ChartChip
                         name={"Humidity"}
-                        value={getValueForKey("Humidity:", response)}
+                        value={response?.weather?.humidity ?? "N/A"}
                       />
                     )}
 
@@ -460,8 +460,10 @@ const Home = ({
               />
               <ChartsData
                 position={"between"}
-                description1={"Air Temp (C):"}
-                value1={`${getValueForKey("Temperature:", response)} °C`}
+                description1={"Air Temp:"}
+                value1={`${parseFloat(
+                  response?.weather?.air_temp || 0
+                ).toFixed(2)} °C`}
                 description2={"Baro Press:"}
                 value2={`${parseFloat(
                   response?.weather?.baro_presssure || 0
