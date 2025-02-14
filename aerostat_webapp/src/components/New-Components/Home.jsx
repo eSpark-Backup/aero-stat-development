@@ -173,6 +173,8 @@ const Home = ({
     return num.toString(); // Small numbers remain unchanged
   };
 
+  console.log("Humidity Data:", response?.weather?.humidity);
+
   useEffect(() => {
     let relayControls = {};
     if (phase === 1) {
@@ -436,7 +438,7 @@ const Home = ({
                     {phase === 2 && (
                       <ChartChip
                         name={"Humidity"}
-                        value={response?.weather?.humidity ?? "N/A"}
+                        value={response?.weather?.humidity}
                       />
                     )}
 
@@ -461,9 +463,9 @@ const Home = ({
               <ChartsData
                 position={"between"}
                 description1={"Air Temp:"}
-                value1={`${parseFloat(
-                  response?.weather?.air_temp || 0
-                ).toFixed(2)} °C`}
+                value1={`${parseFloat(response?.weather?.air_temp || 0).toFixed(
+                  2
+                )} °C`}
                 description2={"Baro Press:"}
                 value2={`${parseFloat(
                   response?.weather?.baro_presssure || 0
