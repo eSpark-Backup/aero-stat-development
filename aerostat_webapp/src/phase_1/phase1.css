@@ -2384,6 +2384,7 @@ input[type="number"] {
   justify-content: center;
   padding-bottom: 15px;
   border-bottom: 1px solid;
+  margin-top: 20px;
 }
 
 .data-logging-title.light {
@@ -2560,3 +2561,54 @@ img.sidebar-close.dark {
     justify-content: center;
   }
 }
+
+.container {
+  /* display: flex; */
+  height: 100vh;
+}
+
+
+
+.right-section {
+  /* width: 10%; */
+  /* background-color: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 8px;  */
+  visibility: hidden;
+}
+
+.toggle-container {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.toggle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toggle-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 80px;
+  text-align: center;
+}
+
+.toggle-btn.on {
+  background-color: #4caf50;
+  color: white;
+}
+
+.toggle-btn.off {
+  background-color: #f44336;
+  color: white;
+}
+
