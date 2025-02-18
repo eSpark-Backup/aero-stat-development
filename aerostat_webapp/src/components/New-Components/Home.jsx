@@ -76,35 +76,35 @@ const Home = ({
   const { t } = useTranslation();
 
   const [dataPoints, setDataPoints] = useState({
-    [t("hullPressure")]: [],
-    [t("barometricPressure")]: [],
-    [t("outsideTemperature")]: [],
-    [t("ballonetPressure")]: [],
-    [t("ballonetCurtain")]: [],
+    "Hull Pressure": [],
+    "Barometric Pressure": [],
+    "Outside Temperature": [],
+    "Ballonet Pressure": [],
+    "Ballonet Curtain": [],
   });
 
   useEffect(() => {
     if (response) {
       setDataPoints((prevData) => {
         const newData = {
-          [t("hullPressure")]: updateData(
-            prevData[t("hullPressure")] || [],
+          "Hull Pressure": updateData(
+            prevData["Hull Pressure"],
             response?.helium?.hel_pressure
           ),
-          [t("barometricPressure")]: updateData(
-            prevData[t("barometricPressure")] || [],
+          "Barometric Pressure": updateData(
+            prevData["Barometric Pressure"],
             response?.weather?.baro_presssure
           ),
-          [t("outsideTemperature")]: updateData(
-            prevData[t("outsideTemperature")] || [],
+          "Outside Temperature": updateData(
+            prevData["Outside Temperature"],
             getValueForKey("Temperature:", response)
           ),
-          [t("ballonetPressure")]: updateData(
-            prevData[t("ballonetPressure")] || [],
+          "Ballonet Pressure": updateData(
+            prevData["Ballonet Pressure"],
             response?.ballonet?.bal_pressure
           ),
-          [t("ballonetCurtain")]: updateData(
-            prevData[t("ballonetCurtain")] || [],
+          "Ballonet Curtain": updateData(
+            prevData["Ballonet Curtain"],
             response?.ballonet?.ballonet_height
           ),
         };

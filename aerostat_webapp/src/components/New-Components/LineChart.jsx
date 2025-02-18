@@ -5,22 +5,25 @@ import MainCard from "../../common/MainCard";
 import { useTranslation } from "react-i18next";
 
 const availableOptions = [
-  
+  "Hull Pressure",
+  "Barometric Pressure",
+  "Outside Temperature",
+  "Ballonet Pressure",
+  "Ballonet Curtain",
 ];
 
 const colorMap = {
-  
-};
-
-const yAxisRanges = {
- 
+  "Hull Pressure": "#ff5733",
+  "Barometric Pressure": "#33ff57",
+  "Outside Temperature": "#3357ff",
+  "Ballonet Pressure": "#ff33a8",
+  "Ballonet Curtain": "#ffcc33",
 };
 
 const LineChartWithDropdown = ({ theme, data }) => {
   const [selectedValues, setSelectedValues] = useState(availableOptions);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { t } = useTranslation();
-  
 
   console.log("Received data in Chart Component:", data);
 
@@ -84,7 +87,6 @@ const LineChartWithDropdown = ({ theme, data }) => {
     legend: { enabled: true },
     accessibility: { enabled: false },
   };
-  
 
   return (
     <div className="chart-container">

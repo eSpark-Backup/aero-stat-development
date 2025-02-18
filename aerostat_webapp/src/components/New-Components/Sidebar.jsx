@@ -9,6 +9,7 @@ import { WebSocketContext } from "../../App";
 import play from "../../assets/play.svg";
 import forward from "../../assets/forward.svg";
 import stop from "../../assets/stop.svg";
+import { useTranslation } from "react-i18next";
 
 const Sidebar = ({
   open,
@@ -80,6 +81,7 @@ const Sidebar = ({
   const [strobe_light, setStrobeLight] = useState("Off");
   const [payload_power, setPayloadPower] = useState("Off");
   const [sendData, setSendData] = useState(false);
+  const { t } = useTranslation();
 
   const handleChange = (name, value) => {
     console.log("Fetching Start:", fetchingStart);
@@ -241,7 +243,7 @@ const Sidebar = ({
               theme === "light" ? "light" : "dark"
             }`}
           >
-            Data Logging
+            {t("dataLogging")}
           </h2>
           <div className="log-box-content">
             <div
@@ -249,7 +251,7 @@ const Sidebar = ({
                 theme === "light" ? "log-input-box-light" : "log-input-box-dark"
               }`}
             >
-              <h4>Log File</h4>
+              <h4>{t("logFile")}</h4>
               <div
                 className={`file-name-box ${
                   theme === "light"
@@ -272,7 +274,7 @@ const Sidebar = ({
                   phase === 2 || (!playBtn && StopBtn) ? "disable" : ""
                 }`}
               >
-                Browse
+                {t("browse")}
               </label>
             </div>
             <div className="button-groups">
@@ -354,5 +356,3 @@ const Sidebar = ({
 };
 
 export default Sidebar;
-
-
