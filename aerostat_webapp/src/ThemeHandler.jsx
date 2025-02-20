@@ -7,7 +7,7 @@ const ThemeHandler = ({ children }) => {
         return window.localStorage.getItem('theme') || 'light';
     });
 
-    const [phase, setPhase] = useState(1);
+    const [phase, setPhase] = useState(2);
     const [phase2Start, setPhase2Start] = useState(false)
     const [phase1Start, setPhase1Start] = useState(false)
     const [isPhase1Starts, setIsPhase1Starts] = useState(false)

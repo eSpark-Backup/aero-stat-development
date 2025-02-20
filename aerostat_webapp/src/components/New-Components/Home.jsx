@@ -662,6 +662,15 @@ const Home = ({
                     }
                   >
                     <div className="pitch-roll-chips">
+                      {phase === 2 && (
+                        <ChartChip
+                          name={"Pitch:"}
+                          value={parseFloat(
+                            response?.digitalCompass?.pitch
+                          ).toFixed(2)}
+                          unit={"°"}
+                        />
+                      )}
                       <ChartChip
                         name={"Roll:"}
                         value={parseFloat(
@@ -682,13 +691,6 @@ const Home = ({
 
                       {phase === 2 && (
                         <>
-                          <ChartChip
-                            name={"Pitch:"}
-                            value={parseFloat(
-                              response?.digitalCompass?.pitch
-                            ).toFixed(2)}
-                            unit={"°"}
-                          />
                           {/* <ChartChip
                             name={"Longitude:"}
                             value={
@@ -737,7 +739,7 @@ const Home = ({
           </MainCard>
           <div className="horizontal-box1">
             <div className="pressure-box">
-              <MainCard title={"Pressures (inWG)"}>
+              <MainCard title={"Pressure Readings"}>
                 <div className="pressure-box-content">
                   <div>
                     <HighchartsReact
@@ -764,7 +766,7 @@ const Home = ({
                       graphValue={parseFloat(
                         response?.ballonet?.bal_pressure
                       ).toFixed(2)}
-                      graphName={"Ballonet Air"}
+                      graphName={"Ballonet Pressure"}
                       description1={phase === 2 && "Curtain Height"}
                       // value1={response?.ballonet?.ballonet_height === "NaN" ? "N/A" : `${parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}m`}
                       value1={
@@ -782,7 +784,7 @@ const Home = ({
               </MainCard>
             </div>
             <div className="confluence-box">
-              <MainCard title={"Lift Force"}>
+              <MainCard title={"Lift"}>
                 <div className="confluence-box-content">
                   <ChartChip
                     name={"Max Tension"}
@@ -822,13 +824,13 @@ const Home = ({
             options={lineChartOptions(theme, phase === 1 && !isPhase1Starts || phase === 2 && !isPhase2Starts ? [0.4] : dataPoints)}
           />
         </MainCard> */}
-          <LineChartWithDropdown
+          {/* <LineChartWithDropdown
             theme={theme}
             phase={phase}
             isPhase1Starts={isPhase1Starts}
             isPhase2Starts={isPhase2Starts}
             data={dataPoints} // ✅ Pass data from parent correctly
-          />{" "}
+          />{" "} */}
         </div>
       )}
       {/* <div className="main2" style={{ marginTop: "20px" }}>

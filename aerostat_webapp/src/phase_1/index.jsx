@@ -61,8 +61,8 @@ const Phase1 = React.memo(() => {
       humidity: parseFloat(0).toFixed(2),
       wind_angle: parseFloat(158.4).toFixed(2),
       wind_speed: parseFloat(70).toFixed(2),
-      longitude: parseFloat(0).toFixed(2),
-      latitude: parseFloat(0).toFixed(2),
+      longitude: parseFloat(54.3773).toFixed(2),
+      latitude: parseFloat(24.4539).toFixed(2),
       altitude: parseFloat(0).toFixed(2),
       ground_speed: parseFloat(0).toFixed(2),
     },
@@ -811,6 +811,7 @@ const Phase1 = React.memo(() => {
           playBtn={playBtn}
           fwdBtn={fwdBtn}
           StopBtn={stopBtn}
+          response={responses}
         />
         <RightSidebar
           isOpen={isSidebarOpen}

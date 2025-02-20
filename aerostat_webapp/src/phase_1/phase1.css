@@ -86,6 +86,7 @@ input[type="number"] {
 }
 
 .logo {
+  /* height: 70px; */
   height: 90px;
   border-radius: 20px;
   display: flex;
@@ -280,6 +281,7 @@ input[type="number"] {
   /* align-items: center;
     justify-content: center; */
   flex-direction: column;
+  /* row-gap: 10px; */
   row-gap: 20px;
 }
 
@@ -452,6 +454,7 @@ input[type="number"] {
 
 .magnetometer-box {
   width: 100%;
+  /* padding: 10px 30px 10px 30px; */
   padding: 14px 30px;
   display: flex;
   justify-content: space-between;
@@ -465,7 +468,9 @@ input[type="number"] {
 
 .heading-box .child-card,
 .heading-box2 .child-card {
-  padding: 30px 30px;
+  /* padding: 15px 30px;
+   */
+   padding: 30px 30px;
 }
 
 .heading-box-content {
@@ -1376,6 +1381,7 @@ input[type="number"] {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* height: 50px; */
   height: fit-content;
   /* border: 2px solid;
     border-image-source: linear-gradient(140.24deg, rgba(82, 82, 82, 0.333333) -80.69%, #FFFFFF 72.38%); */
@@ -2559,4 +2565,73 @@ img.sidebar-close.dark {
     flex-wrap: wrap;
     justify-content: center;
   }
+}
+
+/* @media (min-width: 1920px) {
+  .magnetometer-box {
+    padding: 10px 30px 10px 30px;
+  }
+  .main-card {
+    height: auto;
+  }
+  .child-card {
+    padding: 22px;
+  }
+  .charts-data-between {
+    padding: 25px 25px;
+  }
+  .charts-data-box-light, .charts-data-box2-light {
+    width: 91%;
+    height: 70px;
+  }
+  .chart-value h2{
+    font-size: 25px
+  }
+} */
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.popup-btn {
+  margin-top: 10px;
+  padding: 8px 15px;
+  border: none;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.popup-btn:hover {
+  background: #0056b3;
+}
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-size: 18px;
 }

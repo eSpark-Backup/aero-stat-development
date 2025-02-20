@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
-import logo from "../../assets/logo.svg";
+import logowhite from "../../assets/Alfa dark.png";
 // import logo from "../../assets/black_logo.png"
-import logowhite from "../../assets/logo-white.svg";
+import logo from "../../assets/Alfa light.png";
 import { ThemeContext } from "../../ThemeHandler";
 import { formatDateTime } from "../../Js_parsing";
 import menuLight from "../../assets/menu-light.svg";
@@ -56,7 +56,11 @@ const Header = ({
         <div
           className={`logo ${theme === "light" ? "logo-light" : "logo-dark"}`}
         >
-          <img src={theme === "light" ? logo : logowhite} alt="Logo" />
+          <img
+            style={{ height: "80px" }}
+            src={theme === "light" ? logo : logowhite}
+            alt="Logo"
+          />
         </div>
         <div
           className={`header-details ${
@@ -71,13 +75,13 @@ const Header = ({
                   alt="menu-icon"
                 />
               </div>
-              <h2
+              {/* <h2
                 className={`data-type ${
                   theme === "light" ? "data-type-light" : "data-type-dark"
                 }`}
               >
                 {fileFetching ? "Recorded Data:" : "Live Data:"}
-              </h2>
+              </h2> */}
             </div>
             <div
               className={`day ${theme === "light" ? "day-light" : "day-dark"}`}

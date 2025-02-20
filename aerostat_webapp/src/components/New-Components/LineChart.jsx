@@ -93,7 +93,6 @@ const LineChartWithDropdown = ({ theme, data }) => {
     legend: { enabled: true },
     accessibility: { enabled: false },
   };
-  
 
   return (
     <div className="chart-container">
@@ -127,6 +126,9 @@ const LineChartWithDropdown = ({ theme, data }) => {
         .chart-container {
           position: relative;
           margin-bottom: 20px;
+          width: 80%;
+          background: #eff2f7;
+          border-radius: 12px;
         }
         .dropdown-wrapper {
           position: absolute;
