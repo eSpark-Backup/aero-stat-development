@@ -72,6 +72,25 @@ const Home = ({
   const [payload_power, setPayloadPower] = useState("Off");
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
+  const [tempUnit, setTempUnit] = useState("C"); // Default: Celsius
+  const [windUnit, setWindUnit] = useState(""); // Default: Knots
+  const [heightUnit, setHeightUnit] = useState("m"); // Default: Meters
+  const [maxTensionUnit, setMaxTensionUnit] = useState("kg");
+  const [currentTensionUnit, setCurrentTensionUnit] = useState("");
+
+  // Extract values
+  const airTempC = parseFloat(response?.weather?.air_temp || 0);
+  const windSpeedKnots = parseFloat(response?.weather?.wind_speed || 0);
+  const ballonetHeight = parseFloat(response?.ballonet?.ballonet_height || 0);
+  const maxTensionKg = parseFloat(response?.adams?.max_tension || 0);
+  const currentTensionKg = parseFloat(response?.adams?.tension || 0);
+
+  // Precompute converted values
+  const airTempF = (airTempC * 9) / 5 + 32;
+  const windSpeedMS = windSpeedKnots * 0.514444;
+  const ballonetHeightFt = ballonetHeight * 3.28084;
+  const maxTensionLbs = maxTensionKg * 2.20462;
+  const currentTensionLbs = currentTensionKg * 2.20462;
 
   const [dataPoints, setDataPoints] = useState({
     "Hull Pressure": [],
@@ -463,18 +482,44 @@ const Home = ({
               <ChartsData
                 position={"between"}
                 description1={"Air Temp:"}
-                value1={`${parseFloat(response?.weather?.air_temp || 0).toFixed(
-                  2
-                )} °C`}
+                value1={
+                  <select
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#4260ff",
+                      fontWeight: "800",
+                      fontSize: "16px",
+                    }}
+                    value={tempUnit}
+                    onChange={(e) => setTempUnit(e.target.value)}
+                  >
+                    <option value="C">{airTempC.toFixed(2)} °C</option>
+                    <option value="F">{airTempF.toFixed(2)} °F</option>
+                  </select>
+                }
                 description2={"Baro Press:"}
                 value2={`${parseFloat(
                   response?.weather?.baro_presssure || 0
                 ).toFixed(2)} hPa`}
-                graphValue={parseFloat(
-                  response?.weather?.wind_speed || 0
-                ).toFixed(2)}
-                graphName={"Wind Speed"}
-                unit={"Knots"}
+                graphValue={
+                  <select
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#4260ff",
+                      fontWeight: "800",
+                      fontSize: "16px",
+                    }}
+                    value={windUnit}
+                    onChange={(e) => setWindUnit(e.target.value)}
+                  >
+                    <option value="Knots">
+                      {windSpeedKnots.toFixed(2)} Knots
+                    </option>
+                    <option value="m/s">{windSpeedMS.toFixed(2)} m/s</option>
+                  </select>
+                }
               />
             </div>
           </MainCard>
@@ -765,16 +810,33 @@ const Home = ({
                         response?.ballonet?.bal_pressure
                       ).toFixed(2)}
                       graphName={"Ballonet Air"}
-                      description1={phase === 2 && "Curtain Height"}
-                      // value1={response?.ballonet?.ballonet_height === "NaN" ? "N/A" : `${parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}m`}
+                      description1={phase === 2 ? "Curtain Height" : ""}
                       value1={
                         phase === 2 &&
                         (response?.ballonet?.ballonet_height === "NaN" ||
                           !response?.ballonet?.ballonet_height)
                           ? "N/A"
-                          : phase === 2 && response?.ballonet?.ballonet_height
-                          ? `${response?.ballonet?.ballonet_height}m`
-                          : ""
+                          : phase === 2 &&
+                            response?.ballonet?.ballonet_height && (
+                              <select
+                                style={{
+                                  background: "transparent",
+                                  border: "none",
+                                  color: "#4260ff",
+                                  fontWeight: "800",
+                                  fontSize: "16px",
+                                }}
+                                value={heightUnit}
+                                onChange={(e) => setHeightUnit(e.target.value)}
+                              >
+                                <option value="m">
+                                  {ballonetHeight.toFixed(2)} m
+                                </option>
+                                <option value="ft">
+                                  {ballonetHeightFt} ft
+                                </option>
+                              </select>
+                            )
                       }
                     />
                   </div>
@@ -786,9 +848,28 @@ const Home = ({
                 <div className="confluence-box-content">
                   <ChartChip
                     name={"Max Tension"}
-                    value={parseFloat(response?.adams?.max_tension).toFixed(2)}
-                    unit={"kg"}
+                    value={
+                      <select
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          color: "#4260ff",
+                          fontWeight: "800",
+                          fontSize: "16px",
+                          textAlign: "right",
+                          marginLeft: "-23px",
+                        }}
+                        value={maxTensionUnit}
+                        onChange={(e) => setMaxTensionUnit(e.target.value)}
+                      >
+                        <option value="kg">{maxTensionKg.toFixed(2)} kg</option>
+                        <option value="lbs">
+                          {maxTensionLbs.toFixed(2)} lbs
+                        </option>
+                      </select>
+                    }
                   />
+
                   <div className="confluence-graph">
                     <HighchartsReact
                       highcharts={Highcharts}
@@ -798,10 +879,29 @@ const Home = ({
                     <ChartsData
                       position={"center"}
                       graphName={"Current Tension"}
-                      graphValue={parseFloat(response?.adams?.tension).toFixed(
-                        2
-                      )}
-                      unit={"Kg"}
+                      graphValue={
+                        <select
+                          style={{
+                            background: "transparent",
+                            border: "none",
+                            color: "#4260ff",
+                            fontWeight: "800",
+                            fontSize: "16px",
+                            textAlign: "right",
+                          }}
+                          value={currentTensionUnit}
+                          onChange={(e) =>
+                            setCurrentTensionUnit(e.target.value)
+                          }
+                        >
+                          <option value="kg">
+                            {currentTensionKg.toFixed(2)} kg
+                          </option>
+                          <option value="lbs">
+                            {currentTensionLbs.toFixed(2)} lbs
+                          </option>
+                        </select>
+                      }
                     />
                   </div>
                 </div>
