@@ -1853,7 +1853,8 @@ input[type="number"] {
 
   .heading-box .chart-chip > div,
   .confluence-box-content .chart-chip > div {
-    width: 105px;
+    min-width: 105px;
+    width: auto;
   }
 
   .config-details-items {

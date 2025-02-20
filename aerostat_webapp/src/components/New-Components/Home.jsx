@@ -458,6 +458,7 @@ const Home = ({
                       <ChartChip
                         name={"Humidity"}
                         value={response?.weather?.humidity}
+                        unit={"%"}
                       />
                     )}
 
@@ -856,8 +857,6 @@ const Home = ({
                           color: "#4260ff",
                           fontWeight: "800",
                           fontSize: "16px",
-                          textAlign: "right",
-                          marginLeft: "-23px",
                         }}
                         value={maxTensionUnit}
                         onChange={(e) => setMaxTensionUnit(e.target.value)}
@@ -887,7 +886,6 @@ const Home = ({
                             color: "#4260ff",
                             fontWeight: "800",
                             fontSize: "16px",
-                            textAlign: "right",
                           }}
                           value={currentTensionUnit}
                           onChange={(e) =>
