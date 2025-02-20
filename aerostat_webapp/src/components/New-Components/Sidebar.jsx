@@ -150,7 +150,7 @@ const Sidebar = ({
 
         {/* Button to Open Popup */}
         <button onClick={() => setIsPopupOpen(true)} className="popup-btn">
-          Open Popup
+          Analysis
         </button>
       </div>
 
@@ -161,17 +161,17 @@ const Sidebar = ({
       {/* Popup Modal */}
       {isPopupOpen && (
         <div className="popup-overlay">
-            <button className="close-btn" onClick={() => setIsPopupOpen(false)}>
-              ✖
-            </button>
-            <LineChartWithDropdown
-              theme={theme}
-              phase={phase}
-              isPhase1Starts={isPhase1Starts}
-              isPhase2Starts={isPhase2Starts}
-              data={dataPoints}
-            />
-          </div>
+          <button className="close-btn" onClick={() => setIsPopupOpen(false)}>
+            ✖
+          </button>
+          <LineChartWithDropdown
+            theme={theme}
+            phase={phase}
+            isPhase1Starts={isPhase1Starts}
+            isPhase2Starts={isPhase2Starts}
+            data={dataPoints}
+          />
+        </div>
       )}
     </div>
   );
