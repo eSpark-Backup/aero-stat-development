@@ -176,6 +176,22 @@ const Home = ({
     return num.toString(); // Small numbers remain unchanged
   };
 
+  // const [pressedButtons, setPressedButtons] = useState({
+  //   primary_blower: false,
+  //   secondary_blower: false,
+  //   strobe_light: false,
+  //   payload_power: false,
+  // });
+
+  // const toggleButton = (buttonName) => {
+  //   setPressedButtons((prev) => ({
+  //     ...prev,
+  //     [buttonName]: !prev[buttonName],
+  //   }));
+
+  //   handleChange(buttonName, pressedButtons[buttonName] ? "Off" : "On");
+  // };
+
   useEffect(() => {
     let relayControls = {};
     if (phase === 1) {
@@ -264,6 +280,13 @@ const Home = ({
       }
     }
   }, [lastMessage]);
+  const [pressedButtons, setPressedButtons] = useState({});
+
+  const toggleButton = (key) => {
+    const newState = pressedButtons[key] ? "Off" : "On";
+    setPressedButtons((prev) => ({ ...prev, [key]: !prev[key] }));
+    handleChange(key, newState);
+  };
 
   const [pressureGaugeOpts, setPressureGaugeOpts] = useState(
     pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
@@ -539,7 +562,7 @@ const Home = ({
                     }
                   />
                 </div>
-                <div className="prefrence-box-new">
+                {/* <div className="prefrence-box-new">
                   <p
                     style={{
                       fontSize: "20px",
@@ -567,7 +590,7 @@ const Home = ({
                       </>
                     )}
                   </div>
-                </div>
+                </div> */}
               </div>
               <MainCard title={t("aerostatPosition")}>
                 <div className="magnetometer-box">
@@ -835,13 +858,13 @@ const Home = ({
             options={lineChartOptions(theme, phase === 1 && !isPhase1Starts || phase === 2 && !isPhase2Starts ? [0.4] : dataPoints)}
           />
         </MainCard> */}
-              <LineChartWithDropdown
+              {/* <LineChartWithDropdown
                 theme={theme}
                 phase={phase}
                 isPhase1Starts={isPhase1Starts}
                 isPhase2Starts={isPhase2Starts}
                 data={dataPoints} // ✅ Pass data from parent correctly
-              />{" "}
+              />{" "} */}
             </div>
           )}
           {/* <div className="main2" style={{ marginTop: "20px" }}>
@@ -1092,98 +1115,48 @@ const Home = ({
         </div>
       </div> */}
         </div>
-        <div className="right-section">
-          <div
-            className={`controls-box ${
-              theme === "light" ? "controls-box-light" : "controls-box-dark"
-            }`}
-          >
-            <h2>Relay Controls</h2>
-
-            {/* Primary Blower */}
-            <div
-              className={`fan-box ${
-                theme === "light" ? "fan-box-light" : "fan-box-dark"
-              }`}
-            >
-              {/* <p>Primary Blower</p> */}
-              <button
-                className={`toggle-btn ${
-                  primary_blower === "On" ? "on" : "off"
-                }`}
-                onClick={() =>
-                  handleChange(
-                    "primary_blower",
-                    primary_blower === "On" ? "Off" : "On"
-                  )
-                }
-              >
-                {primary_blower}
-              </button>
-            </div>
-
-            {/* Secondary Blower */}
-            <div
-              className={`fan-box ${
-                theme === "light" ? "fan-box-light" : "fan-box-dark"
-              }`}
-            >
-              {/* <p>Secondary Blower</p> */}
-              <button
-                className={`toggle-btn ${
-                  secondary_blower === "On" ? "on" : "off"
-                }`}
-                onClick={() =>
-                  handleChange(
-                    "secondary_blower",
-                    secondary_blower === "On" ? "Off" : "On"
-                  )
-                }
-              >
-                {secondary_blower}
-              </button>
-            </div>
-
-            {/* Strobe Lights */}
-            <div
-              className={`fan-box ${
-                theme === "light" ? "fan-box-light" : "fan-box-dark"
-              }`}
-            >
-              {/* <p>Strobe Lights</p> */}
-              <button
-                className={`toggle-btn ${strobe_light === "On" ? "on" : "off"}`}
-                onClick={() =>
-                  handleChange(
-                    "strobe_light",
-                    strobe_light === "On" ? "Off" : "On"
-                  )
-                }
-              >
-                {strobe_light}
-              </button>
-            </div>
-
-            {/* Payload Power */}
-            <div
-              className={`fan-box ${
-                theme === "light" ? "fan-box-light" : "fan-box-dark"
-              }`}
-            >
-              {/* <p>Payload Power</p> */}
-              <button
-                className={`toggle-btn ${
-                  payload_power === "On" ? "on" : "off"
-                }`}
-                onClick={() =>
-                  handleChange(
-                    "payload_power",
-                    payload_power === "On" ? "Off" : "On"
-                  )
-                }
-              >
-                {payload_power}
-              </button>
+        <div>
+          <div className="right-sidebar-content">
+            <div className="right-section-design">
+              <div className="controls-box">
+                {[
+                  {
+                    key: "primary_blower",
+                    imgLight: "/src/assets/primary_blower.png",
+                    imgDark: "/src/assets/primary_blower-dark.png",
+                  },
+                  {
+                    key: "secondary_blower",
+                    imgLight: "/src/assets/secondary_blower.png",
+                    imgDark: "/src/assets/secondary_blower-dark.png",
+                  },
+                  {
+                    key: "strobe_light",
+                    imgLight: "/src/assets/strobe_lights.png",
+                    imgDark: "/src/assets/strobe_light-dark.png",
+                  },
+                  {
+                    key: "payload_power",
+                    imgLight: "/src/assets/payload_power.png",
+                    imgDark: "/src/assets/payload_power-dark.png",
+                  },
+                ].map(({ key, imgLight, imgDark }) => (
+                  <div key={key} className="fan-box">
+                    <div
+                      className={`button-container ${
+                        pressedButtons[key] ? "pressed" : ""
+                      }`}
+                      onClick={() => toggleButton(key)}
+                    >
+                      <img
+                        src={theme === "light" ? imgLight : imgDark}
+                        alt={key}
+                        className="button-img"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

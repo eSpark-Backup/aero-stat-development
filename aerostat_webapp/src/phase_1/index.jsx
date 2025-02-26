@@ -803,7 +803,7 @@ const Phase1 = React.memo(() => {
           fwdBtn={fwdBtn}
           StopBtn={stopBtn}
         />
-        <RightSidebar
+        {/* <RightSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           phase={1}
@@ -811,7 +811,7 @@ const Phase1 = React.memo(() => {
           fetchingStart={
             (startFetchData || phase1Start || phase2Start) && activateWebSocket
           }
-        />
+        /> */}
 
         <Home
           response={responses}
