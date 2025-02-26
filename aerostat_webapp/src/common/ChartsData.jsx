@@ -1,7 +1,7 @@
 import React, { useContext } from 'react'
 import { ThemeContext } from '../ThemeHandler';
 
-const ChartsData = ({ position, description1, description2, value1, value2, graphValue, graphName, unit }) => {
+const ChartsData = ({ position, description1, description2, description3, value1, value2, value3 ,graphValue, graphName, unit }) => {
     const { theme } = useContext(ThemeContext);
 
     return (
@@ -25,6 +25,7 @@ const ChartsData = ({ position, description1, description2, value1, value2, grap
                     <div className={`box-values ${theme === "light" ? "box-values-light" : "box-values-dark"}`}>
                         <p>{description1} <span>{value1}</span></p>
                         <p>{description2} <span>{value2}</span></p>
+                        <p>{description3} <span>{value3}</span></p>
                     </div>
                     <div className={`chart-value ${theme === "light" ? "chart-value-light" : "chart-value-dark"}`}>
                         <h2>{graphValue}{" "}<span style={{ fontSize: "16px" }}>{unit && unit}</span></h2>

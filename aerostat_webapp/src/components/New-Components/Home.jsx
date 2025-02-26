@@ -404,9 +404,10 @@ const Home = ({
           </div>
         </div>
         <div className="box1">
-          <MainCard title={"Weather Station"}>
+          {/* Weather Station - Compass + Wind Speed */}
+          <MainCard style={{ width: "120%" }} title={"Weather Station"}>
             <div className="weather-station-card">
-              <ChildCard>
+              <ChildCard style={{ width: "100%" }}>
                 <div
                   style={{
                     width: "100%",
@@ -418,72 +419,72 @@ const Home = ({
                     paddingTop: "10px",
                   }}
                 >
-                  <NewCompass
-                    size={getCompassSize()}
-                    needle1={response?.weather?.heading}
-                    needle2={response?.weather?.wind_angle}
-                  />
+                  <div style={{ display: "flex", justifyContent:"center", alignItems:"center",marginRight:"-50px" }}>
+                    {/* Compass for Wind Angle & Heading */}
+                    <NewCompass
+                      size={getCompassSize()}
+                      needle1={response?.weather?.heading}
+                      needle2={response?.weather?.wind_angle}
+                    />
+                    <div style={{marginLeft:"15px"}}>
+                    {/* Wind Speed Gauge */}
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={windGaugeOpts}
+                    />
+                    </div>
+                  </div>
+
+                  {/* Wind Angle & Air Temperature */}
                   <div className="weather-station-chips">
                     <StatusChip color={"blue"} description={"Wind Angle"} />
-                    {/* Section for Phase 1 */}
-                    {phase === 1 && (
-                      <div className="phase-1-section">
-                        <StatusChip
-                          color={"red"}
-                          description={"Aerostat Heading"}
-                        />
-                      </div>
-                    )}
-
-                    {phase === 2 && (
-                      <ChartChip
-                        name={"Humidity"}
-                        value={response?.weather?.humidity}
-                      />
-                    )}
-
-                    {/* <ChartChip
-                      name={"Heading"}
-                      value={parseFloat(
-                        response?.digitalCompass?.mag_heading
+                    <ChartsData
+                      position={"between"}
+                      graphValue={parseFloat(
+                        response?.weather?.wind_speed || 0
                       ).toFixed(2)}
-                      unit={"°"}
-                    /> */}
+                      graphName={"Wind Speed"}
+                      unit={"Knots"}
+                    />
                   </div>
                 </div>
               </ChildCard>
             </div>
           </MainCard>
-          <MainCard title={"Wind Speed"}>
+
+          {/* Wind Data - Wind Speed + Humidity + Baro Pressure */}
+          <MainCard title={"Wind Data"}>
             <div className="wind-speed-card">
               <HighchartsReact
                 highcharts={Highcharts}
                 options={windGaugeOpts}
               />
+
               <ChartsData
                 position={"between"}
-                description1={"Air Temp:"}
-                value1={`${parseFloat(response?.weather?.air_temp || 0).toFixed(
+                description1={"Humidity:"}
+                value1={`${parseFloat(response?.weather?.humidity || 0).toFixed(
                   2
-                )} °C`}
+                )} %`}
                 description2={"Baro Press:"}
                 value2={`${parseFloat(
                   response?.weather?.baro_presssure || 0
                 ).toFixed(2)} hPa`}
-                graphValue={parseFloat(
-                  response?.weather?.wind_speed || 0
-                ).toFixed(2)}
-                graphName={"Wind Speed"}
-                unit={"Knots"}
+                description3={"Air Temp:"}
+                value3={`${parseFloat(response?.weather?.air_temp || 0).toFixed(
+                  2
+                )} °C`}
               />
             </div>
           </MainCard>
         </div>
+
         <div className="box2">
           <div
             className={`preferences ${
               theme === "light" ? "preferences-light" : "preferences-dark"
             }`}
+            style={{ marginLeft: "85px", width: "95%" }}
           >
             <div className="pref-data-new">
               <h3
@@ -561,7 +562,10 @@ const Home = ({
               </div>
             </div>
           </div>
-          <MainCard title={"Aerostat Position and Orientation"}>
+          <MainCard
+            style={{ marginLeft: "85px", width: "95%" }}
+            title={"Aerostat Position and Orientation"}
+          >
             <div className="magnetometer-box">
               <div className="heading-box2">
                 <ChildCard>
@@ -737,7 +741,10 @@ const Home = ({
           </MainCard>
           <div className="horizontal-box1">
             <div className="pressure-box">
-              <MainCard title={"Pressures (inWG)"}>
+              <MainCard
+                style={{ marginLeft: "25px" }}
+                title={"Pressures (inWG)"}
+              >
                 <div className="pressure-box-content">
                   <div>
                     <HighchartsReact
@@ -782,7 +789,7 @@ const Home = ({
               </MainCard>
             </div>
             <div className="confluence-box">
-              <MainCard title={"Lift Force"}>
+              <MainCard style={{ marginLeft: "25px" }} title={"Lift Force"}>
                 <div className="confluence-box-content">
                   <ChartChip
                     name={"Max Tension"}
@@ -822,13 +829,13 @@ const Home = ({
             options={lineChartOptions(theme, phase === 1 && !isPhase1Starts || phase === 2 && !isPhase2Starts ? [0.4] : dataPoints)}
           />
         </MainCard> */}
-          <LineChartWithDropdown
+          {/* <LineChartWithDropdown
             theme={theme}
             phase={phase}
             isPhase1Starts={isPhase1Starts}
             isPhase2Starts={isPhase2Starts}
-            data={dataPoints} // ✅ Pass data from parent correctly
-          />{" "}
+            data={dataPoints}
+          />{" "} */}
         </div>
       )}
       {/* <div className="main2" style={{ marginTop: "20px" }}>
