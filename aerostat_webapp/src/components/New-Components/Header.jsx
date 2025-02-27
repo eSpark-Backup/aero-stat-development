@@ -60,10 +60,10 @@ const Header = ({
     <div className="header">
       <div className={`logo ${theme === "light" ? "logo-light" : "logo-dark"}`}>
         <img
-            style={{ height: "80px" }}
-            src={theme === "light" ? logo : logowhite}
-            alt="Logo"
-          />
+          style={{ height: "80px" }}
+          src={theme === "light" ? logo : logowhite}
+          alt="Logo"
+        />
       </div>
       <div
         className={`header-details ${
@@ -195,8 +195,8 @@ const Header = ({
                     : "0 2px 10px rgba(255,255,255,0.1)",
                 padding: "10px",
                 borderRadius: "5px",
-                top: "65px",
-                right: "63px",
+                top: "87px",
+                [i18n.language === "ar" ? "left" : "right"]: "99px", // Change dynamically
                 zIndex: 90,
                 display: "flex",
                 flexDirection: "column",
