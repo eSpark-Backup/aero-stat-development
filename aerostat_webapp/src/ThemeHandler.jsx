@@ -6,6 +6,8 @@ const ThemeHandler = ({ children }) => {
     const [theme, setTheme] = useState(() => {
         return window.localStorage.getItem('theme') || 'light';
     });
+   
+    
 
     const [phase, setPhase] = useState(2);
     const [phase2Start, setPhase2Start] = useState(false)
@@ -13,7 +15,11 @@ const ThemeHandler = ({ children }) => {
     const [isPhase1Starts, setIsPhase1Starts] = useState(false)
     const [isPhase2Starts, setIsPhase2Starts] = useState(false)
     const [fileFetchingStart, setFileFetchingStart] = useState(false)
+    console.log("Initial Phase:", phase);
 
+    useEffect(() => {
+        console.log("Phase Updated:", phase);
+    }, [phase]);
     const [form, setForm] = useState({
         rawtcp_host_ip: "172.17.0.2",
         weather: "4002",

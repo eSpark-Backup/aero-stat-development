@@ -147,6 +147,7 @@ const Phase1 = React.memo(() => {
   const fetchData = (message) => {
     try {
       const data = JSON.parse(message.data);
+      if (!data?.data?.modbus?.modbus1[4196]) return; // Prevent errors if data is missing
       console.log(data, "RECEIVING DATA");
       if (data) {
         const parsedResponses = {
@@ -456,6 +457,7 @@ const Phase1 = React.memo(() => {
       console.log("IN CATCH", error);
     }
   };
+  
 
   useEffect(() => {
     console.log("LOADING:::", loading);

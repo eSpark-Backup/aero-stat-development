@@ -48,6 +48,7 @@ const Home = ({
   setOpenModal,
   handleOpenModal,
   fetchingStart,
+  data,
   HandleBrowse,
   fileName,
   HandlePlay,
@@ -308,6 +309,22 @@ const Home = ({
     setPressedButtons((prev) => ({ ...prev, [key]: !prev[key] }));
     handleChange(key, newState);
   };
+
+
+  useEffect(() => {
+    if (phase === 2 && data?.data?.modbus?.modbus1?.[4196]) {
+      const modbusData = data.data.modbus.modbus1[4196];
+
+      setRelay({
+        primary_blower: modbusData.primary_blower_value === "1" ? "On" : "Off",
+        secondary_blower:
+          modbusData.secondary_blower_value === "1" ? "On" : "Off",
+        payload_power: modbusData.payload_power_value === "1" ? "On" : "Off",
+        strobe_lights: modbusData.strobe_lights_value === "1" ? "On" : "Off",
+      });
+    }
+  }, [data, phase]);
+  
 
   const [pressureGaugeOpts, setPressureGaugeOpts] = useState(
     pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
