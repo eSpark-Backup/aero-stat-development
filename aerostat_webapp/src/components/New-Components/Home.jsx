@@ -746,6 +746,15 @@ const Home = ({
                         }
                       >
                         <div className="pitch-roll-chips">
+                      {phase === 2 && (
+                        <ChartChip
+                          name={"Pitch:"}
+                          value={parseFloat(
+                            response?.digitalCompass?.pitch
+                          ).toFixed(2)}
+                          unit={"°"}
+                        />
+                      )}
                           <ChartChip
                             name={t("roll")}
                             value={parseFloat(
@@ -764,15 +773,7 @@ const Home = ({
                             />
                           )}
 
-                          {phase === 2 && (
-                            <>
-                              <ChartChip
-                                name={t("pitch")}
-                                value={parseFloat(
-                                  response?.digitalCompass?.pitch
-                                ).toFixed(2)}
-                                unit={"°"}
-                              />
+                        
                               {/* <ChartChip
                             name={"Longitude:"}
                             value={
@@ -793,6 +794,8 @@ const Home = ({
                             }
                             unit={""}
                           /> */}
+                            {phase === 2 && (
+                        
                               <div className="phase-2-section">
                                 {/* <StatusChip color={"red"} description={"Humidity"} /> */}
                                 {/* <ChartChip
@@ -807,7 +810,7 @@ const Home = ({
                                   unit={"°"}
                                 />
                               </div>
-                            </>
+                          
                           )}
                         </div>
                         <NewRollMeter
@@ -819,7 +822,7 @@ const Home = ({
                   </div>
                 </div>
               </MainCard>
-              <div className="horizontal-box1">
+              {/* <div className="horizontal-box1">
                 <div className="pressure-box">
                   <MainCard title={t("pressures")}>
                     <div className="pressure-box-content">
@@ -828,6 +831,37 @@ const Home = ({
                           highcharts={Highcharts}
                           options={pressureGaugeOpts}
                         />
+                            <ChartChip
+                              name={"Heading"}
+                              value={parseFloat(
+                                response?.digitalCompass?.mag_heading
+                              ).toFixed(2)}
+                              unit={"°"}
+                            />
+                          </div>
+                        
+                      )}
+                      
+                    </div>
+                    />
+                    <NewRollMeter
+                      roll={response?.digitalCompass?.roll}
+                      pitch={response?.digitalCompass?.pitch}
+                    />
+                  </div>
+                </ChildCard>
+              </div>
+            </div> */}
+         
+          <div className="horizontal-box1">
+            <div className="pressure-box">
+              <MainCard title={t("pressures")}>
+                <div className="pressure-box-content">
+                  <div>
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={pressureGaugeOpts}
+                    />
 
                         <ChartsData
                           position={"around"}
@@ -848,7 +882,7 @@ const Home = ({
                       graphValue={parseFloat(
                         response?.ballonet?.bal_pressure
                       ).toFixed(2)}
-                      graphName={t("ballonetAir")}
+                      graphName={t("ballonetPressure")}
                       description1={phase === 2 && t("curtainHeight")}
                       value1={
                         phase === 2 &&
@@ -883,7 +917,7 @@ const Home = ({
               </MainCard>
             </div>
             <div className="confluence-box">
-              <MainCard title={t("liftForce")}>
+              <MainCard title={t("lift")}>
                 <div className="confluence-box-content">
                   <ChartChip
                     name={t("maxTension")}
@@ -945,276 +979,15 @@ const Home = ({
             </div>
           </div>
         </div>
-      </div>
       {phase === 2 && (
-        <div
-          style={{
-            padding: "0px 30px",
-          }}
-        >
-          {/* <MainCard title={"Line Charts"}>
-          <HighchartsReact
-            highcharts={Highcharts}
-            options={lineChartOptions(theme, phase === 1 && !isPhase1Starts || phase === 2 && !isPhase2Starts ? [0.4] : dataPoints)}
-          />
-        </MainCard> */}
-              {/* <LineChartWithDropdown
-                theme={theme}
-                phase={phase}
-                isPhase1Starts={isPhase1Starts}
-                isPhase2Starts={isPhase2Starts}
-                data={dataPoints} // ✅ Pass data from parent correctly
-              />{" "} */}
-            </div>
-          )}
-          {/* <div className="main2" style={{ marginTop: "20px" }}>
-        <MainCard title={"Controls & Radio Link"}>
-          <div className="control-box-card">
-            {phase === 1 ? (
-              <div
-                className={`controls-box ${
-                  theme === "light" ? "controls-box-light" : "controls-box-dark"
-                }`}
-              >
-                <h2>Fan Control</h2>
-                <div
-                  className={`fan-box ${
-                    theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-                >
-                  <p>
-                    Fan 1 <span>(Left direction)</span>
-                  </p>
-                  <OptionBox
-                    fetchingStart={fetchingStart}
-                    handleChange={handleChange}
-                    name="fan1"
-                    option1={"Continuous"}
-                    option2={"Pressured"}
-                    selectedOption={fan1}
-                    phase={1}
-                  />
-                </div>
-                <div
-                  className={`fan-box ${
-                    theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-                >
-                  <p>
-                    Fan 2 <span>(Right direction)</span>
-                  </p>
-                  <OptionBox
-                    fetchingStart={fetchingStart}
-                    handleChange={handleChange}
-                    name="fan2"
-                    option1={"Continuous"}
-                    option2={"Off"}
-                    selectedOption={fan2}
-                    phase={1}
-                  />
-                </div>
-                <div
-                  className={`strobe fan-box ${
-                    theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-                >
-                  <p>Strobe Lights Control</p>
-                  <OptionBox
-                    fetchingStart={fetchingStart}
-                    handleChange={handleChange}
-                    name="light"
-                    option1={"On"}
-                    option2={"Off"}
-                    selectedOption={light}
-                    phase={1}
-                  />
-                </div>
-              </div>
-            ) : (
-              <div
-                className={`controls-box ${
-                  theme === "light" ? "controls-box-light" : "controls-box-dark"
-                }`}
-              >
-                <h2>Relay Controls</h2>
-                <div
-                  className={`fan-box ${
-                    theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-                >
-                  <p>Primary Blower</p>
-                  <OptionBox
-                    fetchingStart={fetchingStart}
-                    handleChange={handleChange}
-                    name={"primary_blower"}
-                    option1={"On"}
-                    option2={"Off"}
-                    selectedOption={primary_blower}
-                    phase={2}
-                  />
-                </div>
-                <div
-                  className={`fan-box ${
-                    theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-                >
-                  <p>Secondary Blower</p>
-                  <OptionBox
-                    fetchingStart={fetchingStart}
-                    handleChange={handleChange}
-                    name={"secondary_blower"}
-                    option1={"On"}
-                    option2={"Off"}
-                    selectedOption={secondary_blower}
-                    phase={2}
-                  />
-                </div>
-                <div
-                  className={`fan-box ${
-                    theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-                >
-                  <p>Strobe Lights</p>
-                  <OptionBox
-                    fetchingStart={fetchingStart}
-                    handleChange={handleChange}
-                    name={"strobe_light"}
-                    option1={"On"}
-                    option2={"Off"}
-                    selectedOption={strobe_light}
-                    phase={2}
-                  />
-                </div>
-                <div
-                  className={`fan-box ${
-                    theme === "light" ? "fan-box-light" : "fan-box-dark"
-                  }`}
-                >
-                  <p>Payload Power</p>
-                  <OptionBox
-                    fetchingStart={fetchingStart}
-                    handleChange={handleChange}
-                    name={"payload_power"}
-                    option1={"On"}
-                    option2={"Off"}
-                    selectedOption={payload_power}
-                    phase={2}
-                  />
-                </div>
-              </div>
-            )}
-            <div
-              className={`log-detail ${
-                theme === "light" ? "log-detail-light" : "log-detail-dark"
-              }`}
-            >
-              <p>Tether Link:</p>
-              <p>Comms Status:</p>
-              <StatusChip
-                color={"green"}
-                description={
-                  !fetchingStart
-                    ? "Disconnected"
-                    : isLoading
-                    ? isLoading
-                    : "Disconnected"
-                }
-              />
-            </div>
-          </div>
-        </MainCard>
-        <div className="horizontal-box2">
-          <div className="log-box">
-            <MainCard title={"Data Logging"}>
-              <div className="log-box-content">
-                <div
-                  className={`log-input-box ${
-                    theme === "light"
-                      ? "log-input-box-light"
-                      : "log-input-box-dark"
-                  }`}
-                >
-                  <p>Log File</p>
-                  <div
-                    className={`file-name-box ${
-                      theme === "light"
-                        ? "file-name-box-light"
-                        : "file-name-box-dark"
-                    }`}
-                  >
-                    {fileName ? fileName : ""}
-                  </div>
-                  <input
-                    type="file"
-                    id="fileInput"
-                    style={{ display: "none" }}
-                    onChange={HandleBrowse}
-                    disabled={
-                      phase === 2 || (!playBtn && StopBtn) ? true : false
-                    }
-                  />
-                  <label
-                    htmlFor="fileInput"
-                    className={`custom-file-input ${theme} ${
-                      phase === 2 || (!playBtn && StopBtn) ? "disable" : ""
-                    }`}
-                  >
-                    Browse
-                  </label>
-                </div>
-                <div className="button-groups">
-                  <div
-                    className={`tdbutton ${
-                      theme === "light" ? "td-light" : "td-dark"
-                    }`}
-                  >
-                    <button
-                      className={`upper-part ${
-                        phase === 2 || !playBtn ? "disable" : ""
-                      }`}
-                      disabled={phase === 2 || !playBtn}
-                      onClick={HandlePlay}
-                    >
-                      <img src={play} alt="" />
-                    </button>
-                  </div>
-                  <div
-                    className={`tdbutton ${
-                      theme === "light" ? "td-light" : "td-dark"
-                    }`}
-                  >
-                    <button
-                      className={`upper-part ${
-                        phase === 2 || !fwdBtn ? "disable" : ""
-                      }`}
-                      disabled={phase === 2 || !fwdBtn}
-                      onClick={HandleForward}
-                    >
-                      <img src={forward} alt="" />
-                    </button>
-                  </div>
-                  <div
-                    className={`tdbutton ${
-                      theme === "light" ? "td-light" : "td-dark"
-                    }`}
-                  >
-                    <button
-                      className={`upper-part ${
-                        phase === 2 || !StopBtn ? "disable" : ""
-                      }`}
-                      disabled={phase === 2 || !StopBtn}
-                      onClick={HandleStop}
-                    >
-                      <img src={stop} alt="" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </MainCard>
-          </div>
-        </div>
-      </div> */}
-        </div>
+        // <div
+        //   style={{
+        //     padding: "0px 30px",
+        //   }}
+        // >
+        
+        
+       
         <div>
           <div className="right-sidebar-content">
             <div className="right-section-design">
@@ -1260,6 +1033,9 @@ const Home = ({
             </div>
           </div>
         </div>
+      )}
+      </div>
+      </div>
       </div>
       <Modal
         theme={theme}
