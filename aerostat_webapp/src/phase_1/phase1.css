@@ -254,7 +254,7 @@ input[type="number"] {
 .main {
   display: grid;
   grid-template-columns: 25% 73%;
-  padding: 0px 50px;
+  padding: 0px 40px 0px 40px;
   gap: 2%;
   padding-bottom: 20px;
 }
@@ -2385,6 +2385,7 @@ input[type="number"] {
   justify-content: center;
   padding-bottom: 15px;
   border-bottom: 1px solid;
+  margin-top: 20px;
 }
 
 .data-logging-title.light {
@@ -2403,8 +2404,8 @@ input[type="number"] {
   right: -300px; /* Initially hidden off-screen */
   width: 420px;
   height: 100%;
-  background-color: #eff2f7;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  /* background-color: #eff2f7; */
+  /* box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2); */
   transition: right 0.3s ease-in-out;
   z-index: 9999;
 }
@@ -2417,12 +2418,23 @@ input[type="number"] {
   background: linear-gradient(180deg, #000000 0%, #202000 100%);
 }
 
-.right-sidebar.open {
-  right: 0; /* Move in when open */
-}
+/* .right-sidebar.open {
+  right: 0; 
+} */
 
 .right-sidebar.closed {
   right: -420px; /* Move out when closed */
+}
+
+.close-btn {
+  box-shadow: 0px 0px 6px 0px #00000040;
+  border-radius: 13px;
+  padding: 3px;
+  /* background: transparent;
+  position: absolute;
+  left: 4px;
+  top: 367px;
+  z-index: 1000; */
 }
 
 /* //sidebar// */
@@ -2560,4 +2572,125 @@ img.sidebar-close.dark {
     flex-wrap: wrap;
     justify-content: center;
   }
+}
+
+.container {
+  display: flex;
+  /* height: 100vh; */
+}
+
+.main-content {
+  width: 100%;
+}
+
+.right-section {
+  /* width: 5%; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* margin-right: 18px; */
+}
+
+/* .button-icon {
+  width: 0px;
+  height: 0px;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 10px;
+  background: #ecf0f3;
+  box-shadow: 5px 5px 10px #b8b8b8, -5px -5px 10px #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.button-icon img {
+  width: 120px;
+  height: 120px;
+}
+
+.button-icon:active {
+  box-shadow: inset 3px 3px 6px #b8b8b8, inset -3px -3px 6px #ffffff;
+  transform: translateY(3px);
+  background: #e0e0e0;
+}
+
+.button-icon.active {
+  box-shadow: inset 3px 3px 6px #b8b8b8, inset -3px -3px 6px #ffffff;
+  transform: translateY(3px);
+  background: #e0e0e0;
+} */
+
+.right-section-design {
+  position: fixed;
+  top: 50%;
+  right: -1%;
+  transform: translateY(-50%);
+  width: 100px; /* Increased width */
+  height: 370px; /* Adjusted height */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0.05)
+  );
+  backdrop-filter: blur(25px);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-left-radius: 75px;
+  border-bottom-left-radius: 75px;
+  box-shadow: -3px 0px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px 0;
+  transition: all 0.3s ease-in-out;
+  opacity: 0.95;
+}
+
+.button-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0px 3px 10px rgba(0, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Dark Mode */
+.dark-theme .button-container {
+  background: #222; /* Darker background */
+  box-shadow: 0px 3px 10px rgba(0, 255, 255, 0.1); /* Softer glow */
+}
+
+.button-img {
+  width: 92px;
+  height: 97px;
+  transition: transform 0.2s ease-in-out;
+  margin-top: 13px;
+}
+
+/* Pressed State */
+.button-container:active .button-img {
+  transform: scale(0.9);
+}
+
+/* Pressed State - Light Theme */
+.button-container.pressed {
+  box-shadow: inset 0px 4px 8px rgba(0, 0, 0, 0.3),
+    0px 3px 15px rgba(0, 255, 0, 0.6);
+  opacity: 0.8;
+}
+
+/* Pressed State - Dark Mode */
+.dark-theme .button-container.pressed {
+  box-shadow: inset 0px 4px 8px rgba(255, 255, 255, 0.2),
+    0px 3px 15px rgba(0, 255, 0, 0.8); /* Adjusted glow for dark mode */
+  opacity: 1;
 }

@@ -33,6 +33,7 @@ import { WebSocketContext } from "../../App";
 import useWebSocket from "react-use-websocket";
 import LeafletMap from "../map/Map";
 import LineChartWithDropdown from "./LineChart";
+import { useTranslation } from "react-i18next";
 
 HighchartsMore(Highcharts);
 HighchartsGauge(Highcharts);
@@ -72,6 +73,7 @@ const Home = ({
   const [payload_power, setPayloadPower] = useState("Off");
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
+  const { t } = useTranslation();
   const [tempUnit, setTempUnit] = useState("C"); // Default: Celsius
   const [windUnit, setWindUnit] = useState(""); // Default: Knots
   const [heightUnit, setHeightUnit] = useState("m"); // Default: Meters
@@ -125,6 +127,7 @@ const Home = ({
             response?.ballonet?.ballonet_height
           ),
         };
+
         console.log("Updated DataPoints:", newData); // ✅ Debug data
         return newData;
       });
@@ -191,6 +194,22 @@ const Home = ({
     }
     return num.toString(); // Small numbers remain unchanged
   };
+
+  // const [pressedButtons, setPressedButtons] = useState({
+  //   primary_blower: false,
+  //   secondary_blower: false,
+  //   strobe_light: false,
+  //   payload_power: false,
+  // });
+
+  // const toggleButton = (buttonName) => {
+  //   setPressedButtons((prev) => ({
+  //     ...prev,
+  //     [buttonName]: !prev[buttonName],
+  //   }));
+
+  //   handleChange(buttonName, pressedButtons[buttonName] ? "Off" : "On");
+  // };
 
   console.log("Humidity Data:", response?.weather?.humidity);
 
@@ -282,6 +301,13 @@ const Home = ({
       }
     }
   }, [lastMessage]);
+  const [pressedButtons, setPressedButtons] = useState({});
+
+  const toggleButton = (key) => {
+    const newState = pressedButtons[key] ? "Off" : "On";
+    setPressedButtons((prev) => ({ ...prev, [key]: !prev[key] }));
+    handleChange(key, newState);
+  };
 
   const [pressureGaugeOpts, setPressureGaugeOpts] = useState(
     pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
@@ -359,110 +385,119 @@ const Home = ({
   }, [response, theme]);
   return (
     <>
-      <div className="main">
-        <div
-          className={`preferences2 ${
-            theme === "light" ? "preferences2-light" : "preferences2-dark"
-          }`}
-        >
-          <div className="pref-data-new">
-            <ChartChip
-              name={"Temperature:"}
-              value={
-                phase === 1
-                  ? "N/A"
-                  : response?.digitalCompass.temperature === "NaN" ||
-                    !response?.digitalCompass.temperature
-                  ? "N/A"
-                  : response?.digitalCompass.temperature
-              }
-              unit={"°"}
-            />
-
-            <ChartChip
-              name={"Humidity:"}
-              value={
-                phase === 1
-                  ? "N/A"
-                  : response?.digitalCompass.humidity === "NaN" ||
-                    !response?.digitalCompass.humidity
-                  ? "N/A"
-                  : `${response?.digitalCompass.humidity}%`
-              }
-              unit={""}
-            />
-          </div>
-          <div
-            style={{ display: "flex", columnGap: "10px", alignItems: "center" }}
-          >
-            <p
-              style={{
-                fontSize: "20px",
-              }}
-            >
-              Preferences
-            </p>
+      <div className="container">
+        <div className="main-content">
+          <div className="main">
             <div
-              className={`choice ${
-                theme === "light" ? "choice-light" : "choice-dark"
+              className={`preferences2 ${
+                theme === "light" ? "preferences2-light" : "preferences2-dark"
               }`}
-              onClick={toggleTheme}
             >
-              {theme === "light" ? (
-                <>
-                  <div className="theme-light"></div>
-                  <p className="theme-text-light">Light</p>
-                </>
-              ) : (
-                <>
-                  <p className="theme-text-dark">Dark</p>
-                  <div className="theme-dark"></div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="box1">
-          <MainCard title={"Weather Station"}>
-            <div className="weather-station-card">
-              <ChildCard>
-                <div
+              <div className="pref-data-new">
+                <ChartChip
+                  name={"Temperature:"}
+                  value={
+                    phase === 1
+                      ? "N/A"
+                      : response?.digitalCompass.temperature === "NaN" ||
+                        !response?.digitalCompass.temperature
+                      ? "N/A"
+                      : response?.digitalCompass.temperature
+                  }
+                  unit={"°"}
+                />
+
+                <ChartChip
+                  name={"Humidity:"}
+                  value={
+                    phase === 1
+                      ? "N/A"
+                      : response?.digitalCompass.humidity === "NaN" ||
+                        !response?.digitalCompass.humidity
+                      ? "N/A"
+                      : `${response?.digitalCompass.humidity}%`
+                  }
+                  unit={""}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  columnGap: "10px",
+                  alignItems: "center",
+                }}
+              >
+                <p
                   style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "column",
-                    rowGap: "40px",
-                    paddingTop: "10px",
+                    fontSize: "20px",
                   }}
                 >
-                  <NewCompass
-                    size={getCompassSize()}
-                    needle1={response?.weather?.heading}
-                    needle2={response?.weather?.wind_angle}
-                  />
-                  <div className="weather-station-chips">
-                    <StatusChip color={"blue"} description={"Wind Angle"} />
-                    {/* Section for Phase 1 */}
-                    {phase === 1 && (
-                      <div className="phase-1-section">
-                        <StatusChip
-                          color={"red"}
-                          description={"Aerostat Heading"}
-                        />
-                      </div>
-                    )}
-
-                    {phase === 2 && (
-                      <ChartChip
-                        name={"Humidity"}
-                        value={response?.weather?.humidity}
-                        unit={"%"}
+                  {t("preferences")}
+                </p>
+                <div
+                  className={`choice ${
+                    theme === "light" ? "choice-light" : "choice-dark"
+                  }`}
+                  onClick={toggleTheme}
+                >
+                  {theme === "light" ? (
+                    <>
+                      <div className="theme-light"></div>
+                      <p className="theme-text-light">Light</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="theme-text-dark">Dark</p>
+                      <div className="theme-dark"></div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="box1">
+              <MainCard title={t("weatherStation")}>
+                <div className="weather-station-card">
+                  <ChildCard>
+                    <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        flexDirection: "column",
+                        rowGap: "40px",
+                        paddingTop: "10px",
+                      }}
+                    >
+                      <NewCompass
+                        size={getCompassSize()}
+                        needle1={response?.weather?.heading}
+                        needle2={response?.weather?.wind_angle}
                       />
-                    )}
+                      <div className="weather-station-chips">
+                        <StatusChip
+                          color={"blue"}
+                          description={t("windAngle")}
+                        />
+                        {/* Section for Phase 1 */}
+                        {phase === 1 && (
+                          <div className="phase-1-section">
+                            <StatusChip
+                              color={"red"}
+                              description={"Aerostat Heading"}
+                            />
+                          </div>
+                        )}
 
-                    {/* <ChartChip
+                        {phase === 2 && (
+                          <ChartChip
+                            name={t("humidity")}
+                            value={response?.weather?.humidity}
+                        unit={"%"}
+                          />
+                        )}
+
+                        {/* <ChartChip
                       name={"Heading"}
                       value={parseFloat(
                         response?.digitalCompass?.mag_heading
@@ -474,7 +509,7 @@ const Home = ({
               </ChildCard>
             </div>
           </MainCard>
-          <MainCard title={"Wind Speed"}>
+          <MainCard title={t("windSpeed")}>
             <div className="wind-speed-card">
               <HighchartsReact
                 highcharts={Highcharts}
@@ -482,7 +517,7 @@ const Home = ({
               />
               <ChartsData
                 position={"between"}
-                description1={"Air Temp:"}
+                description1={t("airTemp")}
                 value1={
                   <select
                     style={{
@@ -499,7 +534,8 @@ const Home = ({
                     <option value="F">{airTempF.toFixed(2)} °F</option>
                   </select>
                 }
-                description2={"Baro Press:"}
+                graphName={t("windSpeed")}
+                description2={t("baroPress")}
                 value2={`${parseFloat(
                   response?.weather?.baro_presssure || 0
                 ).toFixed(2)} hPa`}
@@ -542,7 +578,7 @@ const Home = ({
                 AlfaCOR:
               </h3>
               <ChartChip
-                name={"Temperature:"}
+                name={t("temperature")}
                 value={
                   phase === 1
                     ? "N/A"
@@ -554,78 +590,78 @@ const Home = ({
                 unit={phase === 1 ? "" : "°"}
               />
 
-              <ChartChip
-                name={"Humidity:"}
-                value={
-                  phase === 1
-                    ? "N/A"
-                    : response?.digitalCompass.humidity === "NaN" ||
-                      !response?.digitalCompass.humidity
-                    ? "N/A"
-                    : `${response?.digitalCompass.humidity}%`
-                }
-                unit={""}
-              />
-              <StatusChip
-                color={"green"}
-                description={
-                  fetchingStart
-                    ? isLoading
-                      ? "Loading..."
-                      : "Connected"
-                    : "Disconnected"
-                }
-              />
-            </div>
-            <div className="prefrence-box-new">
-              <p
-                style={{
-                  fontSize: "20px",
-                  color: theme === "light" ? "black" : "white",
-                }}
-              >
-                Preferences
-              </p>
-
-              <div
-                className={`choice ${
-                  theme === "light" ? "choice-light" : "choice-dark"
-                }`}
-                onClick={toggleTheme}
-              >
-                {theme === "light" ? (
-                  <>
-                    <div className="theme-light"></div>
-                    <p className="theme-text-light">Light</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="theme-text-dark">Dark</p>
-                    <div className="theme-dark"></div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-          <MainCard title={"Aerostat Position and Orientation"}>
-            <div className="magnetometer-box">
-              <div className="heading-box2">
-                <ChildCard>
-                  <div
-                    className={
+                  <ChartChip
+                    name={t("humidity")}
+                    value={
                       phase === 1
-                        ? `heading-box-content`
-                        : `heading-box-content-phase2`
+                        ? "N/A"
+                        : response?.digitalCompass.humidity === "NaN" ||
+                          !response?.digitalCompass.humidity
+                        ? "N/A"
+                        : `${response?.digitalCompass.humidity}%`
                     }
+                    unit={""}
+                  />
+                  <StatusChip
+                    color={"green"}
+                    description={
+                      fetchingStart
+                        ? isLoading
+                          ? "Loading..."
+                          : t("connected")
+                        : t("disconnected")
+                    }
+                  />
+                </div>
+                {/* <div className="prefrence-box-new">
+                  <p
+                    style={{
+                      fontSize: "20px",
+                      color: theme === "light" ? "black" : "white",
+                    }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        rowGap: "10px",
-                      }}
-                    >
-                      {/* {phase === 2 && (
+                    {t("preferences")}
+                  </p>
+
+                  <div
+                    className={`choice ${
+                      theme === "light" ? "choice-light" : "choice-dark"
+                    }`}
+                    onClick={toggleTheme}
+                  >
+                    {theme === "light" ? (
+                      <>
+                        <div className="theme-light"></div>
+                        <p className="theme-text-light">{t("light")}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="theme-text-dark">{t("dark")}</p>
+                        <div className="theme-dark"></div>
+                      </>
+                    )}
+                  </div>
+                </div> */}
+              </div>
+              <MainCard title={t("aerostatPosition")}>
+                <div className="magnetometer-box">
+                  <div className="heading-box2">
+                    <ChildCard>
+                      <div
+                        className={
+                          phase === 1
+                            ? `heading-box-content`
+                            : `heading-box-content-phase2`
+                        }
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            rowGap: "10px",
+                          }}
+                        >
+                          {/* {phase === 2 && (
                         <div className="phase-2-section">
                           <StatusChip color={"red"} description={"Humidity"} />
                           <ChartChip
@@ -634,108 +670,110 @@ const Home = ({
                           />
                         </div>
                       )} */}
-                      {phase === 1 && (
-                        <ChartChip
-                          name={"Heading"}
-                          value={parseFloat(
-                            response?.digitalCompass?.mag_heading
-                          ).toFixed(2)}
-                          unit={"°"}
-                        />
-                      )}
-                      {phase === 2 && (
-                        <>
-                          <ChartChip
-                            name={"Longitude:"}
-                            value={
-                              response?.weather?.longitude === "NaN" ||
-                              !response?.weather?.longitude
-                                ? "N/A"
-                                : `${response?.weather?.longitude}°`
-                            }
-                            unit={""}
+                          {phase === 1 && (
+                            <ChartChip
+                              name={"Heading"}
+                              value={parseFloat(
+                                response?.digitalCompass?.mag_heading
+                              ).toFixed(2)}
+                              unit={"°"}
+                            />
+                          )}
+                          {phase === 2 && (
+                            <>
+                              <ChartChip
+                                name={t("longitude")}
+                                value={
+                                  response?.weather?.longitude === "NaN" ||
+                                  !response?.weather?.longitude
+                                    ? "N/A"
+                                    : `${response?.weather?.longitude}°`
+                                }
+                                unit={""}
+                              />
+                              <ChartChip
+                                name={t("latitude")}
+                                value={
+                                  response?.weather?.latitude === "NaN" ||
+                                  !response?.weather?.latitude
+                                    ? "N/A"
+                                    : `${response?.weather?.latitude}°`
+                                }
+                                unit={""}
+                              />
+                              <ChartChip
+                                name={t("altitude")}
+                                value={
+                                  response?.weather?.altitude === "NaN" ||
+                                  !response?.weather?.altitude
+                                    ? "N/A"
+                                    : `${formatNumber(
+                                        response.weather.altitude
+                                      )}m`
+                                }
+                                unit={""}
+                              />
+                            </>
+                          )}
+                        </div>
+                        {/* Show NewCompass only in phase 1 */}
+                        {phase === 1 && (
+                          <NewCompass
+                            size={getCompassSize()}
+                            needle1={response?.digitalCompass?.mag_heading}
                           />
-                          <ChartChip
-                            name={"Latitude:"}
-                            value={
-                              response?.weather?.latitude === "NaN" ||
-                              !response?.weather?.latitude
-                                ? "N/A"
-                                : `${response?.weather?.latitude}°`
-                            }
-                            unit={""}
-                          />
-                          <ChartChip
-                            name={"Altitude:"}
-                            value={
-                              response?.weather?.altitude === "NaN" ||
-                              !response?.weather?.altitude
-                                ? "N/A"
-                                : `${formatNumber(response.weather.altitude)}m`
-                            }
-                            unit={""}
-                          />
-                        </>
-                      )}
-                    </div>
-                    {/* Show NewCompass only in phase 1 */}
-                    {phase === 1 && (
-                      <NewCompass
-                        size={getCompassSize()}
-                        needle1={response?.digitalCompass?.mag_heading}
-                      />
-                    )}
+                        )}
 
-                    {/* Show LeafletMap only in phase 2 */}
-                    {phase === 2 &&
-                      response?.weather?.latitude &&
-                      response?.weather?.longitude && (
-                        <LeafletMap
-                          lat={response.weather.latitude}
-                          lng={response.weather.longitude}
-                        />
-                      )}
+                        {/* Show LeafletMap only in phase 2 */}
+                        {phase === 2 &&
+                          response?.weather?.latitude &&
+                          response?.weather?.longitude && (
+                            <LeafletMap
+                              lat={response.weather.latitude}
+                              lng={response.weather.longitude}
+                            />
+                          )}
+                      </div>
+                    </ChildCard>
                   </div>
-                </ChildCard>
-              </div>
-              <div className="heading-box2">
-                <ChildCard>
-                  <div
-                    className={
-                      phase === 1
-                        ? `pitch-box-content`
-                        : `pitch-box-content-phase2`
-                    }
-                  >
-                    <div className="pitch-roll-chips">
-                      <ChartChip
-                        name={"Roll:"}
-                        value={parseFloat(
-                          response?.digitalCompass?.roll
-                        ).toFixed(2)}
-                        unit={"°"}
-                      />
-
-                      {phase === 1 && (
-                        <ChartChip
-                          name={"Pitch:"}
-                          value={parseFloat(
-                            response?.digitalCompass?.pitch
-                          ).toFixed(2)}
-                          unit={"°"}
-                        />
-                      )}
-
-                      {phase === 2 && (
-                        <>
+                  <div className="heading-box2">
+                    <ChildCard>
+                      <div
+                        className={
+                          phase === 1
+                            ? `pitch-box-content`
+                            : `pitch-box-content-phase2`
+                        }
+                      >
+                        <div className="pitch-roll-chips">
                           <ChartChip
-                            name={"Pitch:"}
+                            name={t("roll")}
                             value={parseFloat(
-                              response?.digitalCompass?.pitch
+                              response?.digitalCompass?.roll
                             ).toFixed(2)}
                             unit={"°"}
                           />
-                          {/* <ChartChip
+
+                          {phase === 1 && (
+                            <ChartChip
+                              name={"Pitch"}
+                              value={parseFloat(
+                                response?.digitalCompass?.pitch
+                              ).toFixed(2)}
+                              unit={"°"}
+                            />
+                          )}
+
+                          {phase === 2 && (
+                            <>
+                              <ChartChip
+                                name={t("pitch")}
+                                value={parseFloat(
+                                  response?.digitalCompass?.pitch
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                              {/* <ChartChip
                             name={"Longitude:"}
                             value={
                               response?.weather?.longitude === "NaN" ||
@@ -755,63 +793,63 @@ const Home = ({
                             }
                             unit={""}
                           /> */}
-                          <div className="phase-2-section">
-                            {/* <StatusChip color={"red"} description={"Humidity"} /> */}
-                            {/* <ChartChip
+                              <div className="phase-2-section">
+                                {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                                {/* <ChartChip
                               name={"Humidity"}
                               value={getValueForKey("Humidity:", response)}
                             /> */}
-                            <ChartChip
-                              name={"Heading"}
-                              value={parseFloat(
-                                response?.digitalCompass?.mag_heading
-                              ).toFixed(2)}
-                              unit={"°"}
-                            />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    <NewRollMeter
-                      roll={response?.digitalCompass?.roll}
-                      pitch={response?.digitalCompass?.pitch}
-                    />
+                                <ChartChip
+                                  name={t("heading")}
+                                  value={parseFloat(
+                                    response?.digitalCompass?.mag_heading
+                                  ).toFixed(2)}
+                                  unit={"°"}
+                                />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        <NewRollMeter
+                          roll={response?.digitalCompass?.roll}
+                          pitch={response?.digitalCompass?.pitch}
+                        />
+                      </div>
+                    </ChildCard>
                   </div>
-                </ChildCard>
-              </div>
-            </div>
-          </MainCard>
-          <div className="horizontal-box1">
-            <div className="pressure-box">
-              <MainCard title={"Pressures (inWG)"}>
-                <div className="pressure-box-content">
-                  <div>
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={pressureGaugeOpts}
-                    />
+                </div>
+              </MainCard>
+              <div className="horizontal-box1">
+                <div className="pressure-box">
+                  <MainCard title={t("pressures")}>
+                    <div className="pressure-box-content">
+                      <div>
+                        <HighchartsReact
+                          highcharts={Highcharts}
+                          options={pressureGaugeOpts}
+                        />
 
-                    <ChartsData
-                      position={"around"}
-                      graphValue={parseFloat(
-                        response?.helium?.hel_pressure
-                      ).toFixed(2)}
-                      graphName={"Hull Pressure"}
-                    />
-                  </div>
-                  <div>
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={ballonetGaugeOpts}
-                    />
+                        <ChartsData
+                          position={"around"}
+                          graphValue={parseFloat(
+                            response?.helium?.hel_pressure
+                          ).toFixed(2)}
+                          graphName={t("hullPressure")}
+                        />
+                      </div>
+                      <div>
+                        <HighchartsReact
+                          highcharts={Highcharts}
+                          options={ballonetGaugeOpts}
+                        />
 
                     <ChartsData
                       position={phase === 1 ? "around" : "between"}
                       graphValue={parseFloat(
                         response?.ballonet?.bal_pressure
                       ).toFixed(2)}
-                      graphName={"Ballonet Air"}
-                      description1={phase === 2 ? "Curtain Height" : ""}
+                      graphName={t("ballonetAir")}
+                      description1={phase === 2 && t("curtainHeight")}
                       value1={
                         phase === 2 &&
                         (response?.ballonet?.ballonet_height === "NaN" ||
@@ -845,10 +883,10 @@ const Home = ({
               </MainCard>
             </div>
             <div className="confluence-box">
-              <MainCard title={"Lift Force"}>
+              <MainCard title={t("liftForce")}>
                 <div className="confluence-box-content">
                   <ChartChip
-                    name={"Max Tension"}
+                    name={t("maxTension")}
                     value={
                       <select
                         style={{
@@ -877,7 +915,7 @@ const Home = ({
 
                     <ChartsData
                       position={"center"}
-                      graphName={"Current Tension"}
+                      graphName={t("currentTension")}
                       graphValue={
                         <select
                           style={{
@@ -920,16 +958,16 @@ const Home = ({
             options={lineChartOptions(theme, phase === 1 && !isPhase1Starts || phase === 2 && !isPhase2Starts ? [0.4] : dataPoints)}
           />
         </MainCard> */}
-          <LineChartWithDropdown
-            theme={theme}
-            phase={phase}
-            isPhase1Starts={isPhase1Starts}
-            isPhase2Starts={isPhase2Starts}
-            data={dataPoints} // ✅ Pass data from parent correctly
-          />{" "}
-        </div>
-      )}
-      {/* <div className="main2" style={{ marginTop: "20px" }}>
+              {/* <LineChartWithDropdown
+                theme={theme}
+                phase={phase}
+                isPhase1Starts={isPhase1Starts}
+                isPhase2Starts={isPhase2Starts}
+                data={dataPoints} // ✅ Pass data from parent correctly
+              />{" "} */}
+            </div>
+          )}
+          {/* <div className="main2" style={{ marginTop: "20px" }}>
         <MainCard title={"Controls & Radio Link"}>
           <div className="control-box-card">
             {phase === 1 ? (
@@ -1176,6 +1214,53 @@ const Home = ({
           </div>
         </div>
       </div> */}
+        </div>
+        <div>
+          <div className="right-sidebar-content">
+            <div className="right-section-design">
+              <div className="controls-box">
+                {[
+                  {
+                    key: "primary_blower",
+                    imgLight: "/src/assets/primary_blower.png",
+                    imgDark: "/src/assets/primary_blower-dark.png",
+                  },
+                  {
+                    key: "secondary_blower",
+                    imgLight: "/src/assets/secondary_blower.png",
+                    imgDark: "/src/assets/secondary_blower-dark.png",
+                  },
+                  {
+                    key: "strobe_light",
+                    imgLight: "/src/assets/strobe_lights.png",
+                    imgDark: "/src/assets/strobe_light-dark.png",
+                  },
+                  {
+                    key: "payload_power",
+                    imgLight: "/src/assets/payload_power.png",
+                    imgDark: "/src/assets/payload_power-dark.png",
+                  },
+                ].map(({ key, imgLight, imgDark }) => (
+                  <div key={key} className="fan-box">
+                    <div
+                      className={`button-container ${
+                        pressedButtons[key] ? "pressed" : ""
+                      }`}
+                      onClick={() => toggleButton(key)}
+                    >
+                      <img
+                        src={theme === "light" ? imgLight : imgDark}
+                        alt={key}
+                        className="button-img"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <Modal
         theme={theme}
         open={openModal}
