@@ -179,41 +179,6 @@ const Home = ({
     }
   };
 
-  const formatNumber = (num) => {
-    if (!num || isNaN(num)) return "N/A"; // Handle invalid values
-
-    const absNum = Math.abs(num); // Work with positive values
-
-    if (absNum >= 1.0e9) {
-      return (num / 1.0e9).toFixed(2) + "B"; // Billion
-    }
-    if (absNum >= 1.0e6) {
-      return (num / 1.0e6).toFixed(2) + "M"; // Million
-    }
-    if (absNum >= 1.0e3) {
-      return (num / 1.0e3).toFixed(2) + "K"; // Thousand
-    }
-    return num.toString(); // Small numbers remain unchanged
-  };
-
-  // const [pressedButtons, setPressedButtons] = useState({
-  //   primary_blower: false,
-  //   secondary_blower: false,
-  //   strobe_light: false,
-  //   payload_power: false,
-  // });
-
-  // const toggleButton = (buttonName) => {
-  //   setPressedButtons((prev) => ({
-  //     ...prev,
-  //     [buttonName]: !prev[buttonName],
-  //   }));
-
-  //   handleChange(buttonName, pressedButtons[buttonName] ? "Off" : "On");
-  // };
-
-  console.log("Humidity Data:", response?.weather?.humidity);
-
   useEffect(() => {
     let relayControls = {};
     if (phase === 1) {
@@ -264,44 +229,34 @@ const Home = ({
   useEffect(() => {
     if (lastMessage?.data) {
       const data = JSON.parse(lastMessage.data);
-      const status = data.status;
-      if (status === "success") {
-        if (phase === 1) {
-          setFan1(
-            data?.settings_set?.tcp?.fan?.fan_one === "OFF"
-              ? "Pressured"
-              : "Continuous"
-          );
-          setFan2(
-            data?.settings_set?.tcp?.fan?.fan_two === "OFF"
-              ? "Off"
-              : "Continuous"
-          );
-          setLight(
-            data?.settings_set?.tcp?.strobe_light === "OFF" ? "Off" : "On"
-          );
-          console.log(
-            `${data?.settings_set?.tcp?.fan?.fan_one} ${data?.settings_set?.tcp?.fan?.fan_two} ${data?.settings_set?.tcp?.strobe_light}`
-          );
-        }
-        if (phase === 2) {
+      if (data.status === "success") {
+        if (data.settings_get) {
+          // Ensure response is from initial fetch
           setPrimaryBlower(
-            data?.settings_set?.modbus?.relay[0] === 1 ? "On" : "Off"
+            data?.settings_get?.modbus?.relay[0] === 1 ? "On" : "Off"
           );
           setSecondaryBlower(
-            data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off"
+            data?.settings_get?.modbus?.relay[1] === 1 ? "On" : "Off"
           );
           setStrobeLight(
-            data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off"
+            data?.settings_get?.modbus?.relay[2] === 1 ? "On" : "Off"
           );
           setPayloadPower(
-            data?.settings_set?.modbus?.relay[3] === 1 ? "On" : "Off"
+            data?.settings_get?.modbus?.relay[3] === 1 ? "On" : "Off"
           );
-          console.log(data?.settings_set?.modbus?.relay);
+
+          // Ensure the UI buttons also reflect this state
+          setPressedButtons({
+            primary_blower: data?.settings_get?.modbus?.relay[0] === 1,
+            secondary_blower: data?.settings_get?.modbus?.relay[1] === 1,
+            strobe_light: data?.settings_get?.modbus?.relay[2] === 1,
+            payload_power: data?.settings_get?.modbus?.relay[3] === 1,
+          });
         }
       }
     }
   }, [lastMessage]);
+
   const [pressedButtons, setPressedButtons] = useState({});
 
   const toggleButton = (key) => {
@@ -310,21 +265,40 @@ const Home = ({
     handleChange(key, newState);
   };
 
+  const formatNumber = (num) => {
+    if (!num || isNaN(num)) return "N/A"; // Handle invalid values
 
-  useEffect(() => {
-    if (phase === 2 && data?.data?.modbus?.modbus1?.[4196]) {
-      const modbusData = data.data.modbus.modbus1[4196];
+    const absNum = Math.abs(num); // Work with positive values
 
-      setRelay({
-        primary_blower: modbusData.primary_blower_value === "1" ? "On" : "Off",
-        secondary_blower:
-          modbusData.secondary_blower_value === "1" ? "On" : "Off",
-        payload_power: modbusData.payload_power_value === "1" ? "On" : "Off",
-        strobe_lights: modbusData.strobe_lights_value === "1" ? "On" : "Off",
-      });
+    if (absNum >= 1.0e9) {
+      return (num / 1.0e9).toFixed(2) + "B"; // Billion
     }
-  }, [data, phase]);
-  
+    if (absNum >= 1.0e6) {
+      return (num / 1.0e6).toFixed(2) + "M"; // Million
+    }
+    if (absNum >= 1.0e3) {
+      return (num / 1.0e3).toFixed(2) + "K"; // Thousand
+    }
+    return num.toString(); // Small numbers remain unchanged
+  };
+
+  // const [pressedButtons, setPressedButtons] = useState({
+  //   primary_blower: false,
+  //   secondary_blower: false,
+  //   strobe_light: false,
+  //   payload_power: false,
+  // });
+
+  // const toggleButton = (buttonName) => {
+  //   setPressedButtons((prev) => ({
+  //     ...prev,
+  //     [buttonName]: !prev[buttonName],
+  //   }));
+
+  //   handleChange(buttonName, pressedButtons[buttonName] ? "Off" : "On");
+  // };
+
+  console.log("Humidity Data:", response?.weather?.humidity);
 
   const [pressureGaugeOpts, setPressureGaugeOpts] = useState(
     pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
@@ -510,7 +484,7 @@ const Home = ({
                           <ChartChip
                             name={t("humidity")}
                             value={response?.weather?.humidity}
-                        unit={"%"}
+                            unit={"%"}
                           />
                         )}
 
@@ -521,91 +495,93 @@ const Home = ({
                       ).toFixed(2)}
                       unit={"°"}
                     /> */}
-                  </div>
+                      </div>
+                    </div>
+                  </ChildCard>
                 </div>
-              </ChildCard>
+              </MainCard>
+              <MainCard title={t("windSpeed")}>
+                <div className="wind-speed-card">
+                  <HighchartsReact
+                    highcharts={Highcharts}
+                    options={windGaugeOpts}
+                  />
+                  <ChartsData
+                    position={"between"}
+                    description1={t("airTemp")}
+                    value1={
+                      <select
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          color: "#4260ff",
+                          fontWeight: "800",
+                          fontSize: "16px",
+                        }}
+                        value={tempUnit}
+                        onChange={(e) => setTempUnit(e.target.value)}
+                      >
+                        <option value="C">{airTempC.toFixed(2)} °C</option>
+                        <option value="F">{airTempF.toFixed(2)} °F</option>
+                      </select>
+                    }
+                    graphName={t("windSpeed")}
+                    description2={t("baroPress")}
+                    value2={`${parseFloat(
+                      response?.weather?.baro_presssure || 0
+                    ).toFixed(2)} hPa`}
+                    graphValue={
+                      <select
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          color: "#4260ff",
+                          fontWeight: "800",
+                          fontSize: "16px",
+                        }}
+                        value={windUnit}
+                        onChange={(e) => setWindUnit(e.target.value)}
+                      >
+                        <option value="Knots">
+                          {windSpeedKnots.toFixed(2)} Knots
+                        </option>
+                        <option value="m/s">
+                          {windSpeedMS.toFixed(2)} m/s
+                        </option>
+                      </select>
+                    }
+                  />
+                </div>
+              </MainCard>
             </div>
-          </MainCard>
-          <MainCard title={t("windSpeed")}>
-            <div className="wind-speed-card">
-              <HighchartsReact
-                highcharts={Highcharts}
-                options={windGaugeOpts}
-              />
-              <ChartsData
-                position={"between"}
-                description1={t("airTemp")}
-                value1={
-                  <select
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: "#4260ff",
-                      fontWeight: "800",
-                      fontSize: "16px",
-                    }}
-                    value={tempUnit}
-                    onChange={(e) => setTempUnit(e.target.value)}
-                  >
-                    <option value="C">{airTempC.toFixed(2)} °C</option>
-                    <option value="F">{airTempF.toFixed(2)} °F</option>
-                  </select>
-                }
-                graphName={t("windSpeed")}
-                description2={t("baroPress")}
-                value2={`${parseFloat(
-                  response?.weather?.baro_presssure || 0
-                ).toFixed(2)} hPa`}
-                graphValue={
-                  <select
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: "#4260ff",
-                      fontWeight: "800",
-                      fontSize: "16px",
-                    }}
-                    value={windUnit}
-                    onChange={(e) => setWindUnit(e.target.value)}
-                  >
-                    <option value="Knots">
-                      {windSpeedKnots.toFixed(2)} Knots
-                    </option>
-                    <option value="m/s">{windSpeedMS.toFixed(2)} m/s</option>
-                  </select>
-                }
-              />
-            </div>
-          </MainCard>
-        </div>
-        <div className="box2">
-          <div
-            className={`preferences ${
-              theme === "light" ? "preferences-light" : "preferences-dark"
-            }`}
-          >
-            <div className="pref-data-new">
-              <h3
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: theme === "light" ? "black" : "white",
-                }}
+            <div className="box2">
+              <div
+                className={`preferences ${
+                  theme === "light" ? "preferences-light" : "preferences-dark"
+                }`}
               >
-                AlfaCOR:
-              </h3>
-              <ChartChip
-                name={t("temperature")}
-                value={
-                  phase === 1
-                    ? "N/A"
-                    : response?.digitalCompass.temperature === "NaN" ||
-                      !response?.digitalCompass.temperature
-                    ? "N/A"
-                    : response?.digitalCompass.temperature
-                }
-                unit={phase === 1 ? "" : "°"}
-              />
+                <div className="pref-data-new">
+                  <h3
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: theme === "light" ? "black" : "white",
+                    }}
+                  >
+                    AlfaCOR:
+                  </h3>
+                  <ChartChip
+                    name={t("temperature")}
+                    value={
+                      phase === 1
+                        ? "N/A"
+                        : response?.digitalCompass.temperature === "NaN" ||
+                          !response?.digitalCompass.temperature
+                        ? "N/A"
+                        : response?.digitalCompass.temperature
+                    }
+                    unit={phase === 1 ? "" : "°"}
+                  />
 
                   <ChartChip
                     name={t("humidity")}
@@ -763,15 +739,15 @@ const Home = ({
                         }
                       >
                         <div className="pitch-roll-chips">
-                      {phase === 2 && (
-                        <ChartChip
-                          name={"Pitch:"}
-                          value={parseFloat(
-                            response?.digitalCompass?.pitch
-                          ).toFixed(2)}
-                          unit={"°"}
-                        />
-                      )}
+                          {phase === 2 && (
+                            <ChartChip
+                              name={"Pitch:"}
+                              value={parseFloat(
+                                response?.digitalCompass?.pitch
+                              ).toFixed(2)}
+                              unit={"°"}
+                            />
+                          )}
                           <ChartChip
                             name={t("roll")}
                             value={parseFloat(
@@ -790,8 +766,7 @@ const Home = ({
                             />
                           )}
 
-                        
-                              {/* <ChartChip
+                          {/* <ChartChip
                             name={"Longitude:"}
                             value={
                               response?.weather?.longitude === "NaN" ||
@@ -811,23 +786,21 @@ const Home = ({
                             }
                             unit={""}
                           /> */}
-                            {phase === 2 && (
-                        
-                              <div className="phase-2-section">
-                                {/* <StatusChip color={"red"} description={"Humidity"} /> */}
-                                {/* <ChartChip
+                          {phase === 2 && (
+                            <div className="phase-2-section">
+                              {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                              {/* <ChartChip
                               name={"Humidity"}
                               value={getValueForKey("Humidity:", response)}
                             /> */}
-                                <ChartChip
-                                  name={t("heading")}
-                                  value={parseFloat(
-                                    response?.digitalCompass?.mag_heading
-                                  ).toFixed(2)}
-                                  unit={"°"}
-                                />
-                              </div>
-                          
+                              <ChartChip
+                                name={t("heading")}
+                                value={parseFloat(
+                                  response?.digitalCompass?.mag_heading
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            </div>
                           )}
                         </div>
                         <NewRollMeter
@@ -869,16 +842,16 @@ const Home = ({
                 </ChildCard>
               </div>
             </div> */}
-         
-          <div className="horizontal-box1">
-            <div className="pressure-box">
-              <MainCard title={t("pressures")}>
-                <div className="pressure-box-content">
-                  <div>
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={pressureGaugeOpts}
-                    />
+
+              <div className="horizontal-box1">
+                <div className="pressure-box">
+                  <MainCard title={t("pressures")}>
+                    <div className="pressure-box-content">
+                      <div>
+                        <HighchartsReact
+                          highcharts={Highcharts}
+                          options={pressureGaugeOpts}
+                        />
 
                         <ChartsData
                           position={"around"}
@@ -894,165 +867,167 @@ const Home = ({
                           options={ballonetGaugeOpts}
                         />
 
-                    <ChartsData
-                      position={phase === 1 ? "around" : "between"}
-                      graphValue={parseFloat(
-                        response?.ballonet?.bal_pressure
-                      ).toFixed(2)}
-                      graphName={t("ballonetPressure")}
-                      description1={phase === 2 && t("curtainHeight")}
-                      value1={
-                        phase === 2 &&
-                        (response?.ballonet?.ballonet_height === "NaN" ||
-                          !response?.ballonet?.ballonet_height)
-                          ? "N/A"
-                          : phase === 2 &&
-                            response?.ballonet?.ballonet_height && (
-                              <select
-                                style={{
-                                  background: "transparent",
-                                  border: "none",
-                                  color: "#4260ff",
-                                  fontWeight: "800",
-                                  fontSize: "16px",
-                                }}
-                                value={heightUnit}
-                                onChange={(e) => setHeightUnit(e.target.value)}
-                              >
-                                <option value="m">
-                                  {ballonetHeight.toFixed(2)} m
-                                </option>
-                                <option value="ft">
-                                  {ballonetHeightFt} ft
-                                </option>
-                              </select>
-                            )
-                      }
-                    />
-                  </div>
-                </div>
-              </MainCard>
-            </div>
-            <div className="confluence-box">
-              <MainCard title={t("lift")}>
-                <div className="confluence-box-content">
-                  <ChartChip
-                    name={t("maxTension")}
-                    value={
-                      <select
-                        style={{
-                          background: "transparent",
-                          border: "none",
-                          color: "#4260ff",
-                          fontWeight: "800",
-                          fontSize: "16px",
-                        }}
-                        value={maxTensionUnit}
-                        onChange={(e) => setMaxTensionUnit(e.target.value)}
-                      >
-                        <option value="kg">{maxTensionKg.toFixed(2)} kg</option>
-                        <option value="lbs">
-                          {maxTensionLbs.toFixed(2)} lbs
-                        </option>
-                      </select>
-                    }
-                  />
-
-                  <div className="confluence-graph">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={confluenceGaugeOpts}
-                    />
-
-                    <ChartsData
-                      position={"center"}
-                      graphName={t("currentTension")}
-                      graphValue={
-                        <select
-                          style={{
-                            background: "transparent",
-                            border: "none",
-                            color: "#4260ff",
-                            fontWeight: "800",
-                            fontSize: "16px",
-                          }}
-                          value={currentTensionUnit}
-                          onChange={(e) =>
-                            setCurrentTensionUnit(e.target.value)
+                        <ChartsData
+                          position={phase === 1 ? "around" : "between"}
+                          graphValue={parseFloat(
+                            response?.ballonet?.bal_pressure
+                          ).toFixed(2)}
+                          graphName={t("ballonetPressure")}
+                          description1={phase === 2 && t("curtainHeight")}
+                          value1={
+                            phase === 2 &&
+                            (response?.ballonet?.ballonet_height === "NaN" ||
+                              !response?.ballonet?.ballonet_height)
+                              ? "N/A"
+                              : phase === 2 &&
+                                response?.ballonet?.ballonet_height && (
+                                  <select
+                                    style={{
+                                      background: "transparent",
+                                      border: "none",
+                                      color: "#4260ff",
+                                      fontWeight: "800",
+                                      fontSize: "16px",
+                                    }}
+                                    value={heightUnit}
+                                    onChange={(e) =>
+                                      setHeightUnit(e.target.value)
+                                    }
+                                  >
+                                    <option value="m">
+                                      {ballonetHeight.toFixed(2)} m
+                                    </option>
+                                    <option value="ft">
+                                      {ballonetHeightFt} ft
+                                    </option>
+                                  </select>
+                                )
                           }
-                        >
-                          <option value="kg">
-                            {currentTensionKg.toFixed(2)} kg
-                          </option>
-                          <option value="lbs">
-                            {currentTensionLbs.toFixed(2)} lbs
-                          </option>
-                        </select>
-                      }
-                    />
-                  </div>
-                </div>
-              </MainCard>
-            </div>
-          </div>
-        </div>
-      {phase === 2 && (
-        // <div
-        //   style={{
-        //     padding: "0px 30px",
-        //   }}
-        // >
-        
-        
-       
-        <div>
-          <div className="right-sidebar-content">
-            <div className="right-section-design">
-              <div className="controls-box">
-                {[
-                  {
-                    key: "primary_blower",
-                    imgLight: "/src/assets/primary_blower.png",
-                    imgDark: "/src/assets/primary_blower-dark.png",
-                  },
-                  {
-                    key: "secondary_blower",
-                    imgLight: "/src/assets/secondary_blower.png",
-                    imgDark: "/src/assets/secondary_blower-dark.png",
-                  },
-                  {
-                    key: "strobe_light",
-                    imgLight: "/src/assets/strobe_lights.png",
-                    imgDark: "/src/assets/strobe_light-dark.png",
-                  },
-                  {
-                    key: "payload_power",
-                    imgLight: "/src/assets/payload_power.png",
-                    imgDark: "/src/assets/payload_power-dark.png",
-                  },
-                ].map(({ key, imgLight, imgDark }) => (
-                  <div key={key} className="fan-box">
-                    <div
-                      className={`button-container ${
-                        pressedButtons[key] ? "pressed" : ""
-                      }`}
-                      onClick={() => toggleButton(key)}
-                    >
-                      <img
-                        src={theme === "light" ? imgLight : imgDark}
-                        alt={key}
-                        className="button-img"
-                      />
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  </MainCard>
+                </div>
+                <div className="confluence-box">
+                  <MainCard title={t("lift")}>
+                    <div className="confluence-box-content">
+                      <ChartChip
+                        name={t("maxTension")}
+                        value={
+                          <select
+                            style={{
+                              background: "transparent",
+                              border: "none",
+                              color: "#4260ff",
+                              fontWeight: "800",
+                              fontSize: "16px",
+                            }}
+                            value={maxTensionUnit}
+                            onChange={(e) => setMaxTensionUnit(e.target.value)}
+                          >
+                            <option value="kg">
+                              {maxTensionKg.toFixed(2)} kg
+                            </option>
+                            <option value="lbs">
+                              {maxTensionLbs.toFixed(2)} lbs
+                            </option>
+                          </select>
+                        }
+                      />
+
+                      <div className="confluence-graph">
+                        <HighchartsReact
+                          highcharts={Highcharts}
+                          options={confluenceGaugeOpts}
+                        />
+
+                        <ChartsData
+                          position={"center"}
+                          graphName={t("currentTension")}
+                          graphValue={
+                            <select
+                              style={{
+                                background: "transparent",
+                                border: "none",
+                                color: "#4260ff",
+                                fontWeight: "800",
+                                fontSize: "16px",
+                              }}
+                              value={currentTensionUnit}
+                              onChange={(e) =>
+                                setCurrentTensionUnit(e.target.value)
+                              }
+                            >
+                              <option value="kg">
+                                {currentTensionKg.toFixed(2)} kg
+                              </option>
+                              <option value="lbs">
+                                {currentTensionLbs.toFixed(2)} lbs
+                              </option>
+                            </select>
+                          }
+                        />
+                      </div>
+                    </div>
+                  </MainCard>
+                </div>
               </div>
             </div>
+            {phase === 2 && (
+              // <div
+              //   style={{
+              //     padding: "0px 30px",
+              //   }}
+              // >
+
+              <div>
+                <div className="right-sidebar-content">
+                  <div className="right-section-design">
+                    <div className="controls-box">
+                      {[
+                        {
+                          key: "primary_blower",
+                          imgLight: "/src/assets/primary_blower.png",
+                          imgDark: "/src/assets/primary_blower-dark.png",
+                        },
+                        {
+                          key: "secondary_blower",
+                          imgLight: "/src/assets/secondary_blower.png",
+                          imgDark: "/src/assets/secondary_blower-dark.png",
+                        },
+                        {
+                          key: "strobe_light",
+                          imgLight: "/src/assets/strobe_lights.png",
+                          imgDark: "/src/assets/strobe_light-dark.png",
+                        },
+                        {
+                          key: "payload_power",
+                          imgLight: "/src/assets/payload_power.png",
+                          imgDark: "/src/assets/payload_power-dark.png",
+                        },
+                      ].map(({ key, imgLight, imgDark }) => (
+                        <div key={key} className="fan-box">
+                          <div
+                            className={`button-container ${
+                              pressedButtons[key] ? "pressed" : ""
+                            }`}
+                            onClick={() => toggleButton(key)}
+                          >
+                            <img
+                              src={theme === "light" ? imgLight : imgDark}
+                              alt={key}
+                              className="button-img"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
-      </div>
-      </div>
       </div>
       <Modal
         theme={theme}
