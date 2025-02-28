@@ -397,7 +397,7 @@ const Sidebar = ({
       </div>
 
       <div style={{ color: "grey", position: "absolute", bottom: "0" }}>
-        v2.1.7
+        v2.2.1
       </div>
 
       {/* Popup Modal */}
