@@ -142,9 +142,9 @@ const Home = ({
     if (newArray.length > 10) newArray.shift(); // Keep only last 10 points
     return newArray;
   };
-
   const handleChange = (name, value) => {
     console.log("Fetching Start:", fetchingStart);
+    console.log(`handleChange called - Name: ${name}, Value: ${value}`);
     if (fetchingStart) {
       console.log(`Changing ${name} to ${value}`);
       switch (name) {
@@ -173,11 +173,17 @@ const Home = ({
           break;
       }
       setSendData(true);
+      console.log("sendData set to true", true);
+      console.log("sendData state after update:", sendData);
       console.log("sendData set to true");
     } else {
       console.log("fetchingStart is FALSE, ignoring change.");
     }
   };
+  window.handleChange = handleChange;
+  useEffect(() => {
+    console.log("sendData updated:", sendData);
+  }, [sendData]);
 
   useEffect(() => {
     let relayControls = {};
@@ -225,57 +231,58 @@ const Home = ({
     strobe_light,
     payload_power,
   ]);
-  const [pressedButtons, setPressedButtons] = useState({});
-
-  useEffect(() => {
-    console.log("Requesting initial state from WebSocket...");
-    sendJsonMessage({
-      method: "alfa.actuator.settings.set",
-    });
-  }, []);
+  const [pressedButtons, setPressedButtons] = useState({
+    primary_blower_value: false,
+    secondary_blower_value: false,
+    strobe_lights_value: false,
+    payload_power_value: false,
+  });
 
   useEffect(() => {
     if (lastMessage?.data) {
-      const data = JSON.parse(lastMessage.data);
-      const status = data.status;
+      console.log("Raw WebSocket Data Received:", lastMessage.data);
 
-      if (status === "success") {
-        if (data.method === "alfa.actuator.settings.set") {
-          console.log("Received latest actuator state from WebSocket:", data);
+      try {
+        const parsedData = JSON.parse(lastMessage.data);
+        console.log("Parsed Data:", parsedData);
 
-          const newPrimaryBlower =
-            data?.settings?.modbus?.relay[0] === 1 ? "On" : "Off";
-          const newSecondaryBlower =
-            data?.settings?.modbus?.relay[1] === 1 ? "On" : "Off";
-          const newStrobeLight =
-            data?.settings?.modbus?.relay[2] === 1 ? "On" : "Off";
-          const newPayloadPower =
-            data?.settings?.modbus?.relay[3] === 1 ? "On" : "Off";
+        // Check if the data contains the actuator state
+        if (parsedData.data?.modbus?.["modbus-relay"]?.["4196"]) {
+          const relay = parsedData.data.modbus["modbus-relay"]["4196"];
+          console.log("Relay Data:", relay);
 
-          setPrimaryBlower(newPrimaryBlower);
-          setSecondaryBlower(newSecondaryBlower);
-          setStrobeLight(newStrobeLight);
-          setPayloadPower(newPayloadPower);
+          // Map backend data to UI state
+          const newStates = {
+            primary_blower_value: relay.primary_blower_value === "1",
+            secondary_blower_value: relay.secondary_blower_value === "1",
+            strobe_lights_value: relay.strobe_lights_value === "1",
+            payload_power_value: relay.payload_power_value === "1",
+          };
 
-          setPressedButtons({
-            primary_blower: newPrimaryBlower === "On",
-            secondary_blower: newSecondaryBlower === "On",
-            strobe_light: newStrobeLight === "On",
-            payload_power: newPayloadPower === "On",
-          });
+          // Update the pressedButtons state
+          setPressedButtons((prev) => ({
+            ...prev,
+            ...newStates,
+          }));
 
-          console.log("UI updated with latest actuator state.");
+          console.log("Updated button states:", newStates);
         }
+      } catch (error) {
+        console.error("Error parsing WebSocket data:", error);
       }
     }
   }, [lastMessage]);
 
   const toggleButton = (key) => {
-    const newState = !pressedButtons[key];
-    setPressedButtons((prev) => ({ ...prev, [key]: newState }));
+    setPressedButtons((prev) => {
+      const newState = !prev[key];
+      const updatedState = { ...prev, [key]: newState };
 
-    // Send new state to backend
-    handleChange(key, newState ? "On" : "Off");
+      // Call handleChange to update the WebSocket
+      handleChange(key, newState ? "On" : "Off"); // Ensure the value matches your backend's expected format
+
+      return updatedState;
+    });
   };
 
   const formatNumber = (num) => {
@@ -911,7 +918,7 @@ const Home = ({
                                       {ballonetHeight.toFixed(2)} m
                                     </option>
                                     <option value="ft">
-                                      {ballonetHeightFt} ft
+                                      {ballonetHeightFt.toFixed(2)} ft
                                     </option>
                                   </select>
                                 )
@@ -999,41 +1006,44 @@ const Home = ({
                     <div className="controls-box">
                       {[
                         {
-                          key: "primary_blower",
+                          key: "primary_blower_value",
                           imgLight: "/src/assets/primary_blower.png",
                           imgDark: "/src/assets/primary_blower-dark.png",
                         },
                         {
-                          key: "secondary_blower",
+                          key: "secondary_blower_value",
                           imgLight: "/src/assets/secondary_blower.png",
                           imgDark: "/src/assets/secondary_blower-dark.png",
                         },
                         {
-                          key: "strobe_light",
+                          key: "strobe_lights_value",
                           imgLight: "/src/assets/strobe_lights.png",
                           imgDark: "/src/assets/strobe_light-dark.png",
                         },
                         {
-                          key: "payload_power",
+                          key: "payload_power_value",
                           imgLight: "/src/assets/payload_power.png",
                           imgDark: "/src/assets/payload_power-dark.png",
                         },
-                      ].map(({ key, imgLight, imgDark }) => (
-                        <div key={key} className="fan-box">
-                          <div
-                            className={`button-container ${
-                              pressedButtons[key] ? "pressed" : ""
-                            }`}
-                            onClick={() => toggleButton(key)}
-                          >
-                            <img
-                              src={theme === "light" ? imgLight : imgDark}
-                              alt={key}
-                              className="button-img"
-                            />
+                      ].map(({ key, imgLight, imgDark }) => {
+                        console.log(`Rendering ${key}:`, pressedButtons[key]); // Debug log
+                        return (
+                          <div key={key} className="fan-box">
+                            <div
+                              className={`button-container ${
+                                pressedButtons[key] ? "pressed" : ""
+                              }`}
+                              onClick={() => toggleButton(key)}
+                            >
+                              <img
+                                src={theme === "light" ? imgLight : imgDark}
+                                alt={key}
+                                className="button-img"
+                              />
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>

@@ -285,7 +285,9 @@ const Sidebar = ({
                 theme === "light" ? "log-input-box-light" : "log-input-box-dark"
               }`}
             >
-              <h4>{t("logFile")}</h4>
+              <h4 style={{ color: theme === "light" ? "#161a25" : "#f8f8f8" }}>
+                {t("logFile")}
+              </h4>
               <div
                 className={`file-name-box ${
                   theme === "light"
@@ -381,7 +383,12 @@ const Sidebar = ({
             Config
           </button>
         </div>
-        <div style={{ width: "306px"}}>
+        <div
+          style={{ width: "306px" }}
+          className={`config-box ${
+            theme === "light" ? "config-box-light" : "config-box-dark"
+          }`}
+        >
           {/* Button to Open Popup */}
           <button onClick={() => setIsPopupOpen(true)} className="popup-btn">
             Analysis
