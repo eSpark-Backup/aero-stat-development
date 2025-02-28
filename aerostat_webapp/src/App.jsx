@@ -27,7 +27,7 @@ function App() {
     if (!pageLoads) {
       sendJsonMessage({
         "method": "alfa.phase.settings.set",
-        "phaseType": "tcp"
+        "phaseType": "modbus"
       });
       sendJsonMessage({
         "method": "alfa.braodcast.settings.set",

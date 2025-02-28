@@ -68,10 +68,10 @@ const Home = ({
   const [fan1, setFan1] = useState("Continuous");
   const [fan2, setFan2] = useState("Off");
   const [light, setLight] = useState("Off");
-  const [primary_blower, setPrimaryBlower] = useState("Off");
-  const [secondary_blower, setSecondaryBlower] = useState("Off");
-  const [strobe_light, setStrobeLight] = useState("Off");
-  const [payload_power, setPayloadPower] = useState("Off");
+  const [primary_blower, setPrimaryBlower] = useState("null");
+  const [secondary_blower, setSecondaryBlower] = useState("null");
+  const [strobe_light, setStrobeLight] = useState("null");
+  const [payload_power, setPayloadPower] = useState("null");
   const [sendData, setSendData] = useState(false);
   const { sendJsonMessage, lastMessage } = useContext(WebSocketContext);
   const { t } = useTranslation();
@@ -230,40 +230,34 @@ const Home = ({
   useEffect(() => {
     if (lastMessage?.data) {
       const data = JSON.parse(lastMessage.data);
-      const status = data.status;
 
-      if (status === "success") {
-        if (phase === 2) {
-          // Update UI states based on backend response
-          const newPrimaryBlower =
-            data?.settings_set?.modbus?.relay[0] === 1 ? "On" : "Off";
-          const newSecondaryBlower =
-            data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off";
-          const newStrobeLight =
-            data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off";
-          const newPayloadPower =
-            data?.settings_set?.modbus?.relay[3] === 1 ? "On" : "Off";
+      if (data.method === "alfa.actuator.settings.get") {
+        // Extract the state from the backend response
+        const newPrimaryBlower = data?.modbus?.relay[0] === 1 ? "On" : "Off";
+        const newSecondaryBlower = data?.modbus?.relay[1] === 1 ? "On" : "Off";
+        const newStrobeLight = data?.modbus?.relay[2] === 1 ? "On" : "Off";
+        const newPayloadPower = data?.modbus?.relay[3] === 1 ? "On" : "Off";
 
-          setPrimaryBlower(newPrimaryBlower);
-          setSecondaryBlower(newSecondaryBlower);
-          setStrobeLight(newStrobeLight);
-          setPayloadPower(newPayloadPower);
+        // Update UI state
+        setPrimaryBlower(newPrimaryBlower);
+        setSecondaryBlower(newSecondaryBlower);
+        setStrobeLight(newStrobeLight);
+        setPayloadPower(newPayloadPower);
 
-          // Also update pressedButtons state
-          setPressedButtons({
-            primary_blower: newPrimaryBlower === "On",
-            secondary_blower: newSecondaryBlower === "On",
-            strobe_light: newStrobeLight === "On",
-            payload_power: newPayloadPower === "On",
-          });
+        // Update button press states
+        setPressedButtons({
+          primary_blower: newPrimaryBlower === "On",
+          secondary_blower: newSecondaryBlower === "On",
+          strobe_light: newStrobeLight === "On",
+          payload_power: newPayloadPower === "On",
+        });
 
-          console.log("Updated button states from backend:", {
-            primary_blower: newPrimaryBlower,
-            secondary_blower: newSecondaryBlower,
-            strobe_light: newStrobeLight,
-            payload_power: newPayloadPower,
-          });
-        }
+        console.log("Updated states from backend:", {
+          primary_blower: newPrimaryBlower,
+          secondary_blower: newSecondaryBlower,
+          strobe_light: newStrobeLight,
+          payload_power: newPayloadPower,
+        });
       }
     }
   }, [lastMessage]);
