@@ -228,44 +228,52 @@ const Home = ({
   const [pressedButtons, setPressedButtons] = useState({});
 
   useEffect(() => {
+    console.log("Requesting initial state from WebSocket...");
+    sendJsonMessage({
+      method: "alfa.actuator.settings.get", // Ensure the backend supports this request
+    });
+  }, []);
+
+  useEffect(() => {
     if (lastMessage?.data) {
       const data = JSON.parse(lastMessage.data);
       const status = data.status;
 
-      if (status === "success" && phase === 2) {
-        // Extract values from backend response
-        const newPrimaryBlower =
-          data?.settings_set?.modbus?.relay[0] === 1 ? "On" : "Off";
-        const newSecondaryBlower =
-          data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off";
-        const newStrobeLight =
-          data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off";
-        const newPayloadPower =
-          data?.settings_set?.modbus?.relay[3] === 1 ? "On" : "Off";
+      if (status === "success") {
+        if (phase === 2) {
+          // Update UI states based on backend response
+          const newPrimaryBlower =
+            data?.settings_set?.modbus?.relay[0] === 1 ? "On" : "Off";
+          const newSecondaryBlower =
+            data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off";
+          const newStrobeLight =
+            data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off";
+          const newPayloadPower =
+            data?.settings_set?.modbus?.relay[3] === 1 ? "On" : "Off";
 
-        // Update individual states
-        setPrimaryBlower(newPrimaryBlower);
-        setSecondaryBlower(newSecondaryBlower);
-        setStrobeLight(newStrobeLight);
-        setPayloadPower(newPayloadPower);
+          setPrimaryBlower(newPrimaryBlower);
+          setSecondaryBlower(newSecondaryBlower);
+          setStrobeLight(newStrobeLight);
+          setPayloadPower(newPayloadPower);
 
-        // Update pressedButtons state based on backend response
-        setPressedButtons({
-          primary_blower: newPrimaryBlower === "On",
-          secondary_blower: newSecondaryBlower === "On",
-          strobe_light: newStrobeLight === "On",
-          payload_power: newPayloadPower === "On",
-        });
+          // Also update pressedButtons state
+          setPressedButtons({
+            primary_blower: newPrimaryBlower === "On",
+            secondary_blower: newSecondaryBlower === "On",
+            strobe_light: newStrobeLight === "On",
+            payload_power: newPayloadPower === "On",
+          });
 
-        console.log("Updated initial button states from backend:", {
-          primary_blower: newPrimaryBlower,
-          secondary_blower: newSecondaryBlower,
-          strobe_light: newStrobeLight,
-          payload_power: newPayloadPower,
-        });
+          console.log("Updated button states from backend:", {
+            primary_blower: newPrimaryBlower,
+            secondary_blower: newSecondaryBlower,
+            strobe_light: newStrobeLight,
+            payload_power: newPayloadPower,
+          });
+        }
       }
     }
-  }, [lastMessage]); // This ensures the effect runs when a new message arrives
+  }, [lastMessage]);
 
   const toggleButton = (key) => {
     const newState = !pressedButtons[key]; // Toggle the current state
