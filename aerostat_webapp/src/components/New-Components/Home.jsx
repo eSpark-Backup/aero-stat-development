@@ -230,7 +230,7 @@ const Home = ({
   useEffect(() => {
     console.log("Requesting initial state from WebSocket...");
     sendJsonMessage({
-      method: "alfa.actuator.settings.get", // Ensure the backend supports this request
+      method: "alfa.actuator.settings.set",
     });
   }, []);
 
@@ -240,23 +240,23 @@ const Home = ({
       const status = data.status;
 
       if (status === "success") {
-        if (phase === 2) {
-          // Update UI states based on backend response
+        if (data.method === "alfa.actuator.settings.set") {
+          console.log("Received latest actuator state from WebSocket:", data);
+
           const newPrimaryBlower =
-            data?.settings_set?.modbus?.relay[0] === 1 ? "On" : "Off";
+            data?.settings?.modbus?.relay[0] === 1 ? "On" : "Off";
           const newSecondaryBlower =
-            data?.settings_set?.modbus?.relay[1] === 1 ? "On" : "Off";
+            data?.settings?.modbus?.relay[1] === 1 ? "On" : "Off";
           const newStrobeLight =
-            data?.settings_set?.modbus?.relay[2] === 1 ? "On" : "Off";
+            data?.settings?.modbus?.relay[2] === 1 ? "On" : "Off";
           const newPayloadPower =
-            data?.settings_set?.modbus?.relay[3] === 1 ? "On" : "Off";
+            data?.settings?.modbus?.relay[3] === 1 ? "On" : "Off";
 
           setPrimaryBlower(newPrimaryBlower);
           setSecondaryBlower(newSecondaryBlower);
           setStrobeLight(newStrobeLight);
           setPayloadPower(newPayloadPower);
 
-          // Also update pressedButtons state
           setPressedButtons({
             primary_blower: newPrimaryBlower === "On",
             secondary_blower: newSecondaryBlower === "On",
@@ -264,19 +264,14 @@ const Home = ({
             payload_power: newPayloadPower === "On",
           });
 
-          console.log("Updated button states from backend:", {
-            primary_blower: newPrimaryBlower,
-            secondary_blower: newSecondaryBlower,
-            strobe_light: newStrobeLight,
-            payload_power: newPayloadPower,
-          });
+          console.log("UI updated with latest actuator state.");
         }
       }
     }
   }, [lastMessage]);
 
   const toggleButton = (key) => {
-    const newState = !pressedButtons[key]; // Toggle the current state
+    const newState = !pressedButtons[key];
     setPressedButtons((prev) => ({ ...prev, [key]: newState }));
 
     // Send new state to backend
