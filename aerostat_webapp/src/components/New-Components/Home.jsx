@@ -182,59 +182,37 @@ const Home = ({
     setSendData(true); // Set sendData after state update
   };
 
-  useEffect(() => {
-    let relayControls = {};
-    if (phase === 1) {
-      relayControls = {
-        method: "alfa.actuator.settings.set",
-        tcp: [
-          {
-            name: "tcp1",
-            fan: [fan1 === "Pressured" ? 0 : 1, fan2 === "Off" ? 0 : 1],
-            strobe_light: [light === "On" ? 1 : 0],
-          },
-        ],
-      };
-    }
-    if (phase === 2) {
-      relayControls = {
-        method: "alfa.actuator.settings.set",
-        modbus: [
-          {
-            name: "modbus-relay",
-            relay: [
-              primary_blower === "On" ? 1 : 0,
-              secondary_blower === "On" ? 1 : 0,
-              strobe_light === "On" ? 1 : 0,
-              payload_power === "On" ? 1 : 0,
-            ],
-          },
-        ],
-      };
-    }
-    if (sendData) {
-      console.log("Sending data to WebSocket:", relayControls);
-      sendJsonMessage(relayControls);
-      console.log("Controls successfully posted:", relayControls);
-      setSendData(false);
-    }
-  }, [
-    sendData,
-    fan1,
-    fan2,
-    light,
-    primary_blower,
-    secondary_blower,
-    strobe_light,
-    payload_power,
-  ]);
-
+  
   const [pressedButtons, setPressedButtons] = useState({
     primary_blower_value: false,
     secondary_blower_value: false,
     strobe_lights_value: false,
     payload_power_value: false,
   });
+
+  useEffect(() => {
+    if (sendData) {
+      const relayControls = {
+        method: "alfa.actuator.settings.set",
+        modbus: [
+          {
+            name: "modbus-relay",
+            relay: [
+              pressedButtons.primary_blower_value ? 1 : 0,
+              pressedButtons.secondary_blower_value ? 1 : 0,
+              pressedButtons.strobe_lights_value ? 1 : 0,
+              pressedButtons.payload_power_value ? 1 : 0,
+            ],
+          },
+        ],
+      };
+
+      console.log("Sending data to WebSocket:", relayControls);
+      sendJsonMessage(relayControls);
+      setSendData(false);
+    }
+  }, [sendData, pressedButtons]); // Depend on `pressedButtons` instead of separate states
+
 
   useEffect(() => {
     if (lastMessage?.data && !isUserAction) {
@@ -286,8 +264,20 @@ const Home = ({
       const newState = !prev[key];
       const updatedState = { ...prev, [key]: newState };
 
-      // Call handleChange to update the WebSocket
-      handleChange(key, newState ? "On" : "Off");
+      // Collect new states and send once
+      const newPrimaryBlower = updatedState.primary_blower_value ? "On" : "Off";
+      const newSecondaryBlower = updatedState.secondary_blower_value
+        ? "On"
+        : "Off";
+      const newStrobeLight = updatedState.strobe_lights_value ? "On" : "Off";
+      const newPayloadPower = updatedState.payload_power_value ? "On" : "Off";
+
+      setPrimaryBlower(newPrimaryBlower);
+      setSecondaryBlower(newSecondaryBlower);
+      setStrobeLight(newStrobeLight);
+      setPayloadPower(newPayloadPower);
+
+      setSendData(true); // Trigger WebSocket update after setting all states
 
       return updatedState;
     });
