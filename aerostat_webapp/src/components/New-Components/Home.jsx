@@ -183,8 +183,9 @@ const Home = ({
   };
 
   useEffect(() => {
-    if (sendData) {
-      const relayControls = {
+    let relayControls = {};
+    if (phase === 1) {
+      relayControls = {
         method: "alfa.actuator.settings.set",
         tcp: [
           {
@@ -194,11 +195,39 @@ const Home = ({
           },
         ],
       };
+    }
+    if (phase === 2) {
+      relayControls = {
+        method: "alfa.actuator.settings.set",
+        modbus: [
+          {
+            name: "modbus-relay",
+            relay: [
+              primary_blower === "On" ? 1 : 0,
+              secondary_blower === "On" ? 1 : 0,
+              strobe_light === "On" ? 1 : 0,
+              payload_power === "On" ? 1 : 0,
+            ],
+          },
+        ],
+      };
+    }
+    if (sendData) {
       console.log("Sending data to WebSocket:", relayControls);
       sendJsonMessage(relayControls);
-      setSendData(false); // Reset sendData after sending
+      console.log("Controls successfully posted:", relayControls);
+      setSendData(false);
     }
-  }, [sendData, fan1, fan2, light]);
+  }, [
+    sendData,
+    fan1,
+    fan2,
+    light,
+    primary_blower,
+    secondary_blower,
+    strobe_light,
+    payload_power,
+  ]);
 
   const [pressedButtons, setPressedButtons] = useState({
     primary_blower_value: false,
