@@ -10,7 +10,7 @@ function App() {
   const { isPhase1Starts } = useContext(ThemeContext);
   const [pageLoads, setPageLoads] = useState(false);
 
-  const socketUrl = useMemo(() => "'ws://10.85.5.31:9001", []);
+  const socketUrl = useMemo(() => "ws://10.85.5.31:9001", []);
 
   // Use the useWebSocket hook in the App component
   const { readyState, sendJsonMessage, getWebSocket, lastMessage } =

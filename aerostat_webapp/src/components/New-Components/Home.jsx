@@ -142,53 +142,49 @@ const Home = ({
     if (newArray.length > 10) newArray.shift(); // Keep only last 10 points
     return newArray;
   };
+
+  const [isUserAction, setIsUserAction] = useState(false);
+
   const handleChange = (name, value) => {
-    console.log("Fetching Start:", fetchingStart);
-    console.log(`handleChange called - Name: ${name}, Value: ${value}`);
-    if (fetchingStart) {
-      console.log(`Changing ${name} to ${value}`);
-      switch (name) {
-        case "fan1":
-          setFan1(value);
-          break;
-        case "fan2":
-          setFan2(value);
-          break;
-        case "light":
-          setLight(value);
-          break;
-        case "primary_blower":
-          setPrimaryBlower(value);
-          break;
-        case "secondary_blower":
-          setSecondaryBlower(value);
-          break;
-        case "strobe_light":
-          setStrobeLight(value);
-          break;
-        case "payload_power":
-          setPayloadPower(value);
-          break;
-        default:
-          break;
-      }
-      setSendData(true);
-      console.log("sendData set to true", true);
-      console.log("sendData state after update:", sendData);
-      console.log("sendData set to true");
-    } else {
-      console.log("fetchingStart is FALSE, ignoring change.");
+    if (!fetchingStart) {
+      console.error("fetchingStart is false. State updates ignored.");
+      return;
     }
+
+    console.log(`Changing ${name} to ${value}`);
+    setIsUserAction(true); // Mark this as a user action
+
+    switch (name) {
+      case "fan1":
+        setFan1(value);
+        break;
+      case "fan2":
+        setFan2(value);
+        break;
+      case "light":
+        setLight(value);
+        break;
+      case "primary_blower":
+        setPrimaryBlower(value);
+        break;
+      case "secondary_blower":
+        setSecondaryBlower(value);
+        break;
+      case "strobe_light":
+        setStrobeLight(value);
+        break;
+      case "payload_power":
+        setPayloadPower(value);
+        break;
+      default:
+        break;
+    }
+    setSendData(true); // Set sendData after state update
   };
-  window.handleChange = handleChange;
-  useEffect(() => {
-    console.log("sendData updated:", sendData);
-  }, [sendData]);
 
   useEffect(() => {
-    let relayControls = {};
-    if (phase === 1) {
-      relayControls = {
+    if (sendData) {
+      const relayControls = {
         method: "alfa.actuator.settings.set",
         tcp: [
           {
@@ -198,39 +194,12 @@ const Home = ({
           },
         ],
       };
-    }
-    if (phase === 2) {
-      relayControls = {
-        method: "alfa.actuator.settings.set",
-        modbus: [
-          {
-            name: "modbus-relay",
-            relay: [
-              primary_blower === "On" ? 1 : 0,
-              secondary_blower === "On" ? 1 : 0,
-              strobe_light === "On" ? 1 : 0,
-              payload_power === "On" ? 1 : 0,
-            ],
-          },
-        ],
-      };
-    }
-    if (sendData) {
       console.log("Sending data to WebSocket:", relayControls);
       sendJsonMessage(relayControls);
-      console.log("Controls successfully posted:", relayControls);
-      setSendData(false);
+      setSendData(false); // Reset sendData after sending
     }
-  }, [
-    sendData,
-    fan1,
-    fan2,
-    light,
-    primary_blower,
-    secondary_blower,
-    strobe_light,
-    payload_power,
-  ]);
+  }, [sendData, fan1, fan2, light]);
+
   const [pressedButtons, setPressedButtons] = useState({
     primary_blower_value: false,
     secondary_blower_value: false,
@@ -239,7 +208,7 @@ const Home = ({
   });
 
   useEffect(() => {
-    if (lastMessage?.data) {
+    if (lastMessage?.data && !isUserAction) {
       console.log("Raw WebSocket Data Received:", lastMessage.data);
 
       try {
@@ -271,7 +240,17 @@ const Home = ({
         console.error("Error parsing WebSocket data:", error);
       }
     }
-  }, [lastMessage]);
+  }, [lastMessage, isUserAction]);
+
+  useEffect(() => {
+    if (isUserAction) {
+      const timeout = setTimeout(() => {
+        setIsUserAction(false); // Reset after delay
+      }, 1000); // Adjust the delay as needed
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isUserAction]);
 
   const toggleButton = (key) => {
     setPressedButtons((prev) => {
@@ -279,7 +258,7 @@ const Home = ({
       const updatedState = { ...prev, [key]: newState };
 
       // Call handleChange to update the WebSocket
-      handleChange(key, newState ? "On" : "Off"); // Ensure the value matches your backend's expected format
+      handleChange(key, newState ? "On" : "Off");
 
       return updatedState;
     });
