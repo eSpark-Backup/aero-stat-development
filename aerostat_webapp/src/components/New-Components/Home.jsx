@@ -182,7 +182,6 @@ const Home = ({
     setSendData(true); // Set sendData after state update
   };
 
-  
   const [pressedButtons, setPressedButtons] = useState({
     primary_blower_value: false,
     secondary_blower_value: false,
@@ -212,7 +211,6 @@ const Home = ({
       setSendData(false);
     }
   }, [sendData, pressedButtons]); // Depend on `pressedButtons` instead of separate states
-
 
   useEffect(() => {
     if (lastMessage?.data && !isUserAction) {
@@ -334,64 +332,52 @@ const Home = ({
     pressureGaugeOptions(theme, 0, 6, [0], getChartSize())
   );
 
+  const pressureChartRef = useRef(null);
+  const confluenceChartRef = useRef(null);
+  const windChartRef = useRef(null);
+  const ballonetChartRef = useRef(null);
+
   useEffect(() => {
     if (response) {
-      setPressureGaugeOpts(
-        pressureGaugeOptions(
-          theme,
-          0,
+      // Function to update the gauge without resetting
+      const updateGauge = (chartRef, newValue) => {
+        if (chartRef.current && chartRef.current.chart) {
+          chartRef.current.chart.series[0].setData([newValue], true);
+        }
+      };
+
+      // Updating all gauges dynamically
+      updateGauge(
+        pressureChartRef,
+        Math.min(
           6,
-          [
-            Math.min(
-              6,
-              Math.max(0, parseFloat(response?.helium?.hel_pressure))
-            ),
-          ],
-          getChartSize()
+          Math.max(0, parseFloat(response?.helium?.hel_pressure) || 0)
         )
       );
 
-      setConfluenceGaugeOpts(
-        confluenceGaugeOptions(
-          theme,
-          0,
-          350,
-          [Math.min(350, Math.max(0, parseFloat(response?.adams?.tension)))],
-          getChartSize()
-        )
+      updateGauge(
+        confluenceChartRef,
+        Math.min(350, Math.max(0, parseFloat(response?.adams?.tension) || 0))
       );
 
-      setWindGaugeOpts(
-        windGaugeOptions(
-          theme,
-          0,
+      updateGauge(
+        windChartRef,
+        Math.min(
           50,
-          [
-            Math.min(
-              50,
-              Math.max(0, parseFloat(response?.weather?.wind_speed))
-            ),
-          ],
-          getChartSize()
+          Math.max(0, parseFloat(response?.weather?.wind_speed) || 0)
         )
       );
 
-      setBallonetGaugeOpts(
-        pressureGaugeOptions(
-          theme,
-          0,
+      updateGauge(
+        ballonetChartRef,
+        Math.min(
           6,
-          [
-            Math.min(
-              6,
-              Math.max(0, parseFloat(response?.ballonet?.bal_pressure))
-            ),
-          ],
-          getChartSize()
+          Math.max(0, parseFloat(response?.ballonet?.bal_pressure) || 0)
         )
       );
     }
-  }, [response, theme]);
+  }, [response]);
+
   return (
     <>
       <div className="container">
@@ -523,6 +509,7 @@ const Home = ({
                   <HighchartsReact
                     highcharts={Highcharts}
                     options={windGaugeOpts}
+                    ref={windChartRef}
                   />
                   <ChartsData
                     position={"between"}
@@ -869,6 +856,7 @@ const Home = ({
                         <HighchartsReact
                           highcharts={Highcharts}
                           options={pressureGaugeOpts}
+                          ref={pressureChartRef}
                         />
 
                         <ChartsData
@@ -883,6 +871,7 @@ const Home = ({
                         <HighchartsReact
                           highcharts={Highcharts}
                           options={ballonetGaugeOpts}
+                          ref={ballonetChartRef}
                         />
 
                         <ChartsData
@@ -957,8 +946,8 @@ const Home = ({
                         <HighchartsReact
                           highcharts={Highcharts}
                           options={confluenceGaugeOpts}
+                          ref={confluenceChartRef}
                         />
-
                         <ChartsData
                           position={"center"}
                           graphName={t("currentTension")}
