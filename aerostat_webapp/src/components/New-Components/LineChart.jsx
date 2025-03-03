@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import HighchartsReact from "highcharts-react-official";
 import Highcharts from "highcharts";
 import MainCard from "../../common/MainCard";
+import { useTranslation } from "react-i18next";
 
 const availableOptions = [
   "Hull Pressure",
@@ -19,17 +20,10 @@ const colorMap = {
   "Ballonet Curtain": "#ffcc33",
 };
 
-const yAxisRanges = {
-  "Hull Pressure": { min: 0, max: 6 },
-  "Barometric Pressure": { min: 0, max: 1500 },
-  "Outside Temperature": { min: 0, max: 50 },
-  "Ballonet Pressure": { min: 0, max: 6 },
-  "Ballonet Curtain": { min: 0, max: 12 },
-};
-
 const LineChartWithDropdown = ({ theme, data }) => {
   const [selectedValues, setSelectedValues] = useState(availableOptions);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { t } = useTranslation();
 
   console.log("Received data in Chart Component:", data);
 
@@ -93,7 +87,6 @@ const LineChartWithDropdown = ({ theme, data }) => {
     legend: { enabled: true },
     accessibility: { enabled: false },
   };
-  
 
   return (
     <div className="chart-container">
@@ -102,7 +95,7 @@ const LineChartWithDropdown = ({ theme, data }) => {
           className="dropdown-button"
           onClick={() => setDropdownOpen(!dropdownOpen)}
         >
-          Select Data Points ⏷
+          {t("select")}
         </button>
         {dropdownOpen && (
           <div className="dropdown-menu">
@@ -119,7 +112,7 @@ const LineChartWithDropdown = ({ theme, data }) => {
           </div>
         )}
       </div>
-      <MainCard title={"Line Chart"}>
+      <MainCard title={t("lineChart")}>
         <HighchartsReact highcharts={Highcharts} options={lineChartOptions} />
       </MainCard>
       <style>
@@ -127,6 +120,9 @@ const LineChartWithDropdown = ({ theme, data }) => {
         .chart-container {
           position: relative;
           margin-bottom: 20px;
+          width: 80%;
+          background: #eff2f7;
+          border-radius: 12px;
         }
         .dropdown-wrapper {
           position: absolute;

@@ -61,8 +61,8 @@ const Phase1 = React.memo(() => {
       humidity: parseFloat(0).toFixed(2),
       wind_angle: parseFloat(158.4).toFixed(2),
       wind_speed: parseFloat(70).toFixed(2),
-      longitude: parseFloat(0).toFixed(2),
-      latitude: parseFloat(0).toFixed(2),
+      longitude: parseFloat(54.3773).toFixed(2),
+      latitude: parseFloat(24.4539).toFixed(2),
       altitude: parseFloat(0).toFixed(2),
       ground_speed: parseFloat(0).toFixed(2),
     },
@@ -91,7 +91,7 @@ const Phase1 = React.memo(() => {
   const [isThemeLoaded, setIsThemeLoaded] = useState(false);
   const [responses, setResponses] = useState(lastPerfectResponses.current);
   const [openModal, setOpenModal] = useState(false);
-  const [startFetchData, setStartFetchData] = useState(false);
+  const [startFetchData, setStartFetchData] = useState(true);
   const [startFetchingFromFile, setStartFetchingFromFile] = useState(false);
   const [logFile, setLogFile] = useState("");
   const [fileContent, setFileContent] = useState("");
@@ -811,8 +811,9 @@ const Phase1 = React.memo(() => {
           playBtn={playBtn}
           fwdBtn={fwdBtn}
           StopBtn={stopBtn}
+          response={responses}
         />
-        <RightSidebar
+        {/* <RightSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
           phase={1}
@@ -820,7 +821,7 @@ const Phase1 = React.memo(() => {
           fetchingStart={
             (startFetchData || phase1Start || phase2Start) && activateWebSocket
           }
-        />
+        /> */}
 
         <Home
           response={responses}
