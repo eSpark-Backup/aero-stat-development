@@ -81,14 +81,13 @@ const NewCompass = ({ size, needle1, needle2 }) => {
               </span>
             )}
           </div>
-          {phase === 1 && (
-            <div
-              className="needle"
-              style={{
-                transform: `rotate(${needleRotation}deg) translate(-50%, -50%)`,
-              }}
-            ></div>
-          )}
+          <div
+            className="needle"
+            style={{
+              transform: `rotate(${needleRotation}deg) translate(-50%, -50%)`,
+            }}
+          ></div>
+
           {needle2 && (
             <div
               className="needle2"

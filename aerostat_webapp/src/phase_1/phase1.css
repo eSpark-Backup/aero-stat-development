@@ -2560,3 +2560,27 @@ img.sidebar-close.dark {
     justify-content: center;
   }
 }
+
+.gauge-container {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping */
+  justify-content: space-between; /* Distributes space evenly */
+  align-items: center;
+  width: 100%;
+ 
+}
+
+/* Ensure first two gauges take equal space */
+.gauge-block {
+  width: 101%; /* Two gauges in one row */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px; /* Space between rows */
+  margin-left: -20px;
+
+}
+
+/* Make third gauge take full width to wrap onto next line */
+
+

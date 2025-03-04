@@ -338,6 +338,162 @@ const Home = ({
       );
     }
   }, [response, theme]);
+
+  const [humidityGaugeOpts, setHumidityGaugeOpts] = useState({});
+  const [baroGaugeOpts, setBaroGaugeOpts] = useState({});
+  const [tempGaugeOpts, setTempGaugeOpts] = useState({});
+
+  useEffect(() => {
+    if (response?.weather) {
+        const theme = 'light'; // You can dynamically set this based on your app's theme
+        const commonGaugeSettings = {
+            chart: {
+                type: "gauge",
+                backgroundColor: "transparent",
+                height: 230,
+                width: 230,
+                animation: false,
+            },
+            title: {
+                text: "",
+                style: { fontSize: "12px", fontWeight: "bold", marginBottom: 5 },
+            },
+            pane: {
+                startAngle: -150,
+                endAngle: 150,
+                background: [{
+                    backgroundColor: 'transparent',
+                    borderWidth: 0,
+                    outerRadius: '100%',
+                }],
+            },
+            yAxis: {
+                tickPixelInterval: 20,
+                lineWidth: 0.5,
+                minorTickInterval: null,
+                tickAmount: 5,
+                tickWidth: 2,
+                tickPosition: 'inside',
+                tickLength: 4,
+                tickColor: theme === 'light' ? '#666666' : '#AAAD9C',
+                labels: {
+                    distance: -15,
+                    rotation: 'auto',
+                    style: {
+                        fontSize: "10px",
+                        color: theme === 'light' ? '#1B1A1A' : '#4260FF',
+                    },
+                },
+            },
+            plotOptions: {
+                gauge: {
+                    dataLabels: {
+                        enabled: false,
+                    },
+                    dial: {
+                        radius: "75%",
+                        baseWidth: 6,
+                        rearLength: "5%",
+                        backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF',
+                    },
+                    pivot: {
+                        radius: 4,
+                        backgroundColor: theme === 'light' ? '#666666' : '#FFFFFF',
+                    },
+                },
+            },
+        };
+
+        // Helper function to generate dynamic plot bands
+        const getDynamicPlotBands = (value, ranges) => {
+            return ranges.map((range, index) => ({
+                from: range.from,
+                to: value < range.to ? value : range.to,
+                color: value >= range.from ? range.color : "transparent",
+                thickness: '20%',
+            }));
+        };
+
+        // Humidity Gauge
+        const humidityValue = parseFloat(response.weather.humidity);
+        setHumidityGaugeOpts({
+            ...commonGaugeSettings,
+            title: { text: "Humidity" },
+            yAxis: {
+                ...commonGaugeSettings.yAxis,
+                min: 0,
+                max: 100,
+                plotBands: getDynamicPlotBands(humidityValue, [
+                    { from: 0, to: 30, color: '#5fd400' }, // Green
+                    { from: 30, to: 60, color: '#eef02c' }, // Yellow
+                    { from: 60, to: 100, color: '#e0403b' }, // Red
+                ]),
+            },
+            series: [
+                {
+                    name: "Humidity",
+                    data: [humidityValue],
+                    tooltip: {
+                        valueSuffix: " %",
+                    },
+                },
+            ],
+        });
+
+        // Barometric Pressure Gauge
+        const baroValue = parseFloat(response.weather.baro_presssure);
+        setBaroGaugeOpts({
+            ...commonGaugeSettings,
+            title: { text: "Baro Pressure" },
+            yAxis: {
+                ...commonGaugeSettings.yAxis,
+                min: 900,
+                max: 1100,
+                plotBands: getDynamicPlotBands(baroValue, [
+                    { from: 900, to: 970, color: '#5fd400' }, // Green
+                    { from: 970, to: 1030, color: '#eef02c' }, // Yellow
+                    { from: 1030, to: 1100, color: '#e0403b' }, // Red
+                ]),
+            },
+            series: [
+                {
+                    name: "Baro Pressure",
+                    data: [baroValue],
+                    tooltip: {
+                        valueSuffix: " hPa",
+                    },
+                },
+            ],
+        });
+
+        // Temperature Gauge
+        const tempValue = parseFloat(response.weather.air_temp);
+        setTempGaugeOpts({
+            ...commonGaugeSettings,
+            title: { text: "Air Temp" },
+            yAxis: {
+                ...commonGaugeSettings.yAxis,
+                min: -10,
+                max: 50,
+                plotBands: getDynamicPlotBands(tempValue, [
+                    { from: -10, to: 10, color: '#5fd400' }, // Green
+                    { from: 10, to: 30, color: '#eef02c' }, // Yellow
+                    { from: 30, to: 50, color: '#e0403b' }, // Red
+                ]),
+            },
+            series: [
+                {
+                    name: "Air Temp",
+                    data: [tempValue],
+                    tooltip: {
+                        valueSuffix: " °C",
+                    },
+                },
+            ],
+        });
+    }
+}, [response]);
+
   return (
     <>
       <div className="main">
@@ -403,187 +559,400 @@ const Home = ({
             </div>
           </div>
         </div>
-        <div className="box1">
-          {/* Weather Station - Compass + Wind Speed */}
-          <MainCard style={{ width: "120%" }} title={"Weather Station"}>
-            <div className="weather-station-card">
-              <ChildCard style={{ width: "100%" }}>
-                <div
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "column",
-                    rowGap: "40px",
-                    paddingTop: "10px",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent:"center", alignItems:"center",marginRight:"-50px" }}>
-                    {/* Compass for Wind Angle & Heading */}
+        {phase === 1 && (
+          <div className="box1">
+            <MainCard title={"Weather Station"}>
+              <div className="weather-station-card">
+                <ChildCard>
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "column",
+                      rowGap: "40px",
+                      paddingTop: "10px",
+                    }}
+                  >
                     <NewCompass
                       size={getCompassSize()}
                       needle1={response?.weather?.heading}
                       needle2={response?.weather?.wind_angle}
                     />
-                    <div style={{marginLeft:"15px"}}>
-                    {/* Wind Speed Gauge */}
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={windGaugeOpts}
-                    />
+                    <div className="weather-station-chips">
+                      <StatusChip color={"blue"} description={"Wind Angle"} />
+                      {/* Section for Phase 1 */}
+                      {phase === 1 && (
+                        <div className="phase-1-section">
+                          <StatusChip
+                            color={"red"}
+                            description={"Aerostat Heading"}
+                          />
+                        </div>
+                      )}
+
+                      {/* {phase === 2 && (
+                      <ChartChip
+                        name={"Humidity"}
+                        value={response?.weather?.humidity}
+                      />
+                    )} */}
+
+                      {/* <ChartChip
+                      name={"Heading"}
+                      value={parseFloat(
+                        response?.digitalCompass?.mag_heading
+                      ).toFixed(2)}
+                      unit={"°"}
+                    /> */}
                     </div>
                   </div>
-
-                  {/* Wind Angle & Air Temperature */}
-                  <div className="weather-station-chips">
-                    <StatusChip color={"blue"} description={"Wind Angle"} />
-                    <ChartsData
-                      position={"between"}
-                      graphValue={parseFloat(
-                        response?.weather?.wind_speed || 0
-                      ).toFixed(2)}
-                      graphName={"Wind Speed"}
-                      unit={"Knots"}
-                    />
-                  </div>
-                </div>
-              </ChildCard>
-            </div>
-          </MainCard>
-
-          {/* Wind Data - Wind Speed + Humidity + Baro Pressure */}
-          <MainCard title={"Wind Data"}>
-            <div className="wind-speed-card">
-              <HighchartsReact
-                highcharts={Highcharts}
-                options={windGaugeOpts}
-              />
-
-              <ChartsData
-                position={"between"}
-                description1={"Humidity:"}
-                value1={`${parseFloat(response?.weather?.humidity || 0).toFixed(
-                  2
-                )} %`}
-                description2={"Baro Press:"}
-                value2={`${parseFloat(
-                  response?.weather?.baro_presssure || 0
-                ).toFixed(2)} hPa`}
-                description3={"Air Temp:"}
-                value3={`${parseFloat(response?.weather?.air_temp || 0).toFixed(
-                  2
-                )} °C`}
-              />
-            </div>
-          </MainCard>
-        </div>
-
-        <div className="box2">
-          <div
-            className={`preferences ${
-              theme === "light" ? "preferences-light" : "preferences-dark"
-            }`}
-            style={{ marginLeft: "85px", width: "95%" }}
-          >
-            <div className="pref-data-new">
-              <h3
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  color: theme === "light" ? "black" : "white",
-                }}
-              >
-                AlfaCOR:
-              </h3>
-              <ChartChip
-                name={"Temperature:"}
-                value={
-                  phase === 1
-                    ? "N/A"
-                    : response?.digitalCompass.temperature === "NaN" ||
-                      !response?.digitalCompass.temperature
-                    ? "N/A"
-                    : response?.digitalCompass.temperature
-                }
-                unit={phase === 1 ? "" : "°"}
-              />
-
-              <ChartChip
-                name={"Humidity:"}
-                value={
-                  phase === 1
-                    ? "N/A"
-                    : response?.digitalCompass.humidity === "NaN" ||
-                      !response?.digitalCompass.humidity
-                    ? "N/A"
-                    : `${response?.digitalCompass.humidity}%`
-                }
-                unit={""}
-              />
-              <StatusChip
-                color={"green"}
-                description={
-                  fetchingStart
-                    ? isLoading
-                      ? "Loading..."
-                      : "Connected"
-                    : "Disconnected"
-                }
-              />
-            </div>
-            <div className="prefrence-box-new">
-              <p
-                style={{
-                  fontSize: "20px",
-                  color: theme === "light" ? "black" : "white",
-                }}
-              >
-                Preferences
-              </p>
-
-              <div
-                className={`choice ${
-                  theme === "light" ? "choice-light" : "choice-dark"
-                }`}
-                onClick={toggleTheme}
-              >
-                {theme === "light" ? (
-                  <>
-                    <div className="theme-light"></div>
-                    <p className="theme-text-light">Light</p>
-                  </>
-                ) : (
-                  <>
-                    <p className="theme-text-dark">Dark</p>
-                    <div className="theme-dark"></div>
-                  </>
-                )}
+                </ChildCard>
               </div>
-            </div>
+            </MainCard>
+            <MainCard title={"Wind Speed"}>
+              <div className="wind-speed-card">
+                {/* <HighchartsReact
+                  highcharts={Highcharts}
+                  options={windGaugeOpts}
+                /> */}
+                <HighchartsReact
+                  highcharts={Highcharts}
+                  options={windGaugeOpts}
+                />
+                <ChartsData
+                  position={"between"}
+                  description1={"Air Temp:"}
+                  value1={`${parseFloat(
+                    response?.weather?.air_temp || 0
+                  ).toFixed(2)} °C`}
+                  description2={"Baro Press:"}
+                  value2={`${parseFloat(
+                    response?.weather?.baro_presssure || 0
+                  ).toFixed(2)} hPa`}
+                  graphValue={parseFloat(
+                    response?.weather?.wind_speed || 0
+                  ).toFixed(2)}
+                  graphName={"Wind Speed"}
+                  unit={"Knots"}
+                />
+              </div>
+            </MainCard>
           </div>
-          <MainCard
-            style={{ marginLeft: "85px", width: "95%" }}
-            title={"Aerostat Position and Orientation"}
-          >
-            <div className="magnetometer-box">
-              <div className="heading-box2">
-                <ChildCard>
+        )}
+        {phase === 2 && (
+          <div className="box1">
+            {/* Weather Station - Compass + Wind Speed */}
+            <MainCard style={{ width: "120%" }} title={"Wind Data"}>
+              <div className="weather-station-card">
+                <ChildCard style={{ width: "100%" }}>
                   <div
-                    className={
-                      phase === 1
-                        ? `heading-box-content`
-                        : `heading-box-content-phase2`
-                    }
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexDirection: "column",
+                      rowGap: "20px",
+                      paddingTop: "10px",
+                    }}
                   >
                     <div
                       style={{
                         display: "flex",
-                        flexDirection: "column",
-                        rowGap: "10px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginRight: "-50px",
                       }}
                     >
-                      {/* {phase === 2 && (
+                      {/* Compass for Wind Angle & Heading */}
+                      <NewCompass
+                        size={getCompassSize()}
+                        needle1={response?.weather?.heading}
+                        needle2={response?.weather?.wind_angle}
+                      />
+                      <div style={{ marginLeft: "15px" }}>
+                        {/* Wind Speed Gauge */}
+                        <HighchartsReact
+                          highcharts={Highcharts}
+                          options={windGaugeOpts}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Wind Angle & Air Temperature */}
+                    <div
+                      style={{ width: "100%", padding: "10px 20px" }}
+                      className="weather-station-chips"
+                    >
+                      <div style={{ gap: "10px", display: "grid" }}>
+                        <StatusChip color={"blue"} description={"Wind Angle"} />
+                        <StatusChip
+                          color={"red"}
+                          description={"Aerostat Heading"}
+                        />
+                      </div>
+                      <ChartsData
+                        position={"between"}
+                        graphValue={parseFloat(
+                          response?.weather?.wind_speed || 0
+                        ).toFixed(2)}
+                        graphName={"Wind Speed"}
+                        unit={"Knots"}
+                        graphBgStyle={{
+                          padding: "15px 10px",
+                          justifyContent: "center",
+                        }}
+                        chartsDataBg={{
+                          bottom: "10px",
+                          width: "50%",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </ChildCard>
+              </div>
+            </MainCard>
+
+            {/* Wind Data - Wind Speed + Humidity + Baro Pressure */}
+            <MainCard style={{ width: "120%" }} title={"Weather Data"}>
+              <div className="wind-speed-card">
+                <div className="gauge-container">
+                  <div className="gauge-block">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={humidityGaugeOpts}
+                    />
+
+                    {/* Baro Pressure Gauge */}
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={baroGaugeOpts}
+                    />
+
+                    {/* Air Temperature Gauge */}
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={tempGaugeOpts}
+                    />
+                  </div>
+                </div>
+                <ChartsData
+                  position={"between"}
+                  description1={"Humidity:"}
+                  value1={`${parseFloat(
+                    response?.weather?.humidity || 0
+                  ).toFixed(2)} %`}
+                  description2={"Baro Press:"}
+                  value2={`${parseFloat(
+                    response?.weather?.baro_presssure || 0
+                  ).toFixed(2)} hPa`}
+                  description3={"Air Temp:"}
+                  value3={`${parseFloat(
+                    response?.weather?.air_temp || 0
+                  ).toFixed(2)} °C`}
+                  chartsDataBg={{
+                    width: "64%",
+                    bottom: "5px",
+                  }}
+                />
+              </div>
+            </MainCard>
+          </div>
+        )}
+
+        <div className="box2">
+          {phase === 2 && (
+            <div
+              className={`preferences ${
+                theme === "light" ? "preferences-light" : "preferences-dark"
+              }`}
+              style={{ marginLeft: "85px", width: "95%" }}
+            >
+              <div className="pref-data-new">
+                <h3
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: theme === "light" ? "black" : "white",
+                  }}
+                >
+                  AlfaCOR:
+                </h3>
+                <ChartChip
+                  name={"Temperature:"}
+                  value={
+                    phase === 1
+                      ? "N/A"
+                      : response?.digitalCompass.temperature === "NaN" ||
+                        !response?.digitalCompass.temperature
+                      ? "N/A"
+                      : response?.digitalCompass.temperature
+                  }
+                  unit={phase === 1 ? "" : "°"}
+                />
+
+                <ChartChip
+                  name={"Humidity:"}
+                  value={
+                    phase === 1
+                      ? "N/A"
+                      : response?.digitalCompass.humidity === "NaN" ||
+                        !response?.digitalCompass.humidity
+                      ? "N/A"
+                      : `${response?.digitalCompass.humidity}%`
+                  }
+                  unit={""}
+                />
+                <StatusChip
+                  color={"green"}
+                  description={
+                    fetchingStart
+                      ? isLoading
+                        ? "Loading..."
+                        : "Connected"
+                      : "Disconnected"
+                  }
+                />
+              </div>
+              <div className="prefrence-box-new">
+                <p
+                  style={{
+                    fontSize: "20px",
+                    color: theme === "light" ? "black" : "white",
+                  }}
+                >
+                  Preferences
+                </p>
+
+                <div
+                  className={`choice ${
+                    theme === "light" ? "choice-light" : "choice-dark"
+                  }`}
+                  onClick={toggleTheme}
+                >
+                  {theme === "light" ? (
+                    <>
+                      <div className="theme-light"></div>
+                      <p className="theme-text-light">Light</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="theme-text-dark">Dark</p>
+                      <div className="theme-dark"></div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {phase === 1 && (
+            <div
+              className={`preferences ${
+                theme === "light" ? "preferences-light" : "preferences-dark"
+              }`}
+            >
+              <div className="pref-data-new">
+                <h3
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    color: theme === "light" ? "black" : "white",
+                  }}
+                >
+                  AlfaCOR:
+                </h3>
+                <ChartChip
+                  name={"Temperature:"}
+                  value={
+                    phase === 1
+                      ? "N/A"
+                      : response?.digitalCompass.temperature === "NaN" ||
+                        !response?.digitalCompass.temperature
+                      ? "N/A"
+                      : response?.digitalCompass.temperature
+                  }
+                  unit={phase === 1 ? "" : "°"}
+                />
+
+                <ChartChip
+                  name={"Humidity:"}
+                  value={
+                    phase === 1
+                      ? "N/A"
+                      : response?.digitalCompass.humidity === "NaN" ||
+                        !response?.digitalCompass.humidity
+                      ? "N/A"
+                      : `${response?.digitalCompass.humidity}%`
+                  }
+                  unit={""}
+                />
+                <StatusChip
+                  color={"green"}
+                  description={
+                    fetchingStart
+                      ? isLoading
+                        ? "Loading..."
+                        : "Connected"
+                      : "Disconnected"
+                  }
+                />
+              </div>
+              <div className="prefrence-box-new">
+                <p
+                  style={{
+                    fontSize: "20px",
+                    color: theme === "light" ? "black" : "white",
+                  }}
+                >
+                  Preferences
+                </p>
+
+                <div
+                  className={`choice ${
+                    theme === "light" ? "choice-light" : "choice-dark"
+                  }`}
+                  onClick={toggleTheme}
+                >
+                  {theme === "light" ? (
+                    <>
+                      <div className="theme-light"></div>
+                      <p className="theme-text-light">Light</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="theme-text-dark">Dark</p>
+                      <div className="theme-dark"></div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {phase === 2 && (
+            <MainCard
+              style={{ marginLeft: "85px", width: "95%" }}
+              title={"Aerostat Position and Orientation"}
+            >
+              <div className="magnetometer-box">
+                <div className="heading-box2">
+                  <ChildCard>
+                    <div
+                      className={
+                        phase === 1
+                          ? `heading-box-content`
+                          : `heading-box-content-phase2`
+                      }
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          rowGap: "10px",
+                        }}
+                      >
+                        {/* {phase === 2 && (
                         <div className="phase-2-section">
                           <StatusChip color={"red"} description={"Humidity"} />
                           <ChartChip
@@ -592,100 +961,91 @@ const Home = ({
                           />
                         </div>
                       )} */}
+                        {phase === 1 && (
+                          <ChartChip
+                            name={"Heading"}
+                            value={parseFloat(
+                              response?.digitalCompass?.mag_heading
+                            ).toFixed(2)}
+                            unit={"°"}
+                          />
+                        )}
+                        {phase === 2 && (
+                          <>
+                            <ChartChip
+                              name={"Longitude:"}
+                              value={
+                                response?.weather?.longitude === "NaN" ||
+                                !response?.weather?.longitude
+                                  ? "N/A"
+                                  : `${response?.weather?.longitude}°`
+                              }
+                              unit={""}
+                            />
+                            <ChartChip
+                              name={"Latitude:"}
+                              value={
+                                response?.weather?.latitude === "NaN" ||
+                                !response?.weather?.latitude
+                                  ? "N/A"
+                                  : `${response?.weather?.latitude}°`
+                              }
+                              unit={""}
+                            />
+                            <ChartChip
+                              name={"Altitude:"}
+                              value={
+                                response?.weather?.altitude === "NaN" ||
+                                !response?.weather?.altitude
+                                  ? "N/A"
+                                  : `${formatNumber(
+                                      response.weather.altitude
+                                    )}m`
+                              }
+                              unit={""}
+                            />
+                          </>
+                        )}
+                      </div>
+                      {/* Show NewCompass only in phase 1 */}
                       {phase === 1 && (
-                        <ChartChip
-                          name={"Heading"}
-                          value={parseFloat(
-                            response?.digitalCompass?.mag_heading
-                          ).toFixed(2)}
-                          unit={"°"}
+                        <NewCompass
+                          size={getCompassSize()}
+                          needle1={response?.digitalCompass?.mag_heading}
                         />
                       )}
-                      {phase === 2 && (
-                        <>
-                          <ChartChip
-                            name={"Longitude:"}
-                            value={
-                              response?.weather?.longitude === "NaN" ||
-                              !response?.weather?.longitude
-                                ? "N/A"
-                                : `${response?.weather?.longitude}°`
-                            }
-                            unit={""}
+
+                      {/* Show LeafletMap only in phase 2 */}
+                      {phase === 2 &&
+                        response?.weather?.latitude &&
+                        response?.weather?.longitude && (
+                          <LeafletMap
+                            lat={response.weather.latitude}
+                            lng={response.weather.longitude}
                           />
-                          <ChartChip
-                            name={"Latitude:"}
-                            value={
-                              response?.weather?.latitude === "NaN" ||
-                              !response?.weather?.latitude
-                                ? "N/A"
-                                : `${response?.weather?.latitude}°`
-                            }
-                            unit={""}
-                          />
-                          <ChartChip
-                            name={"Altitude:"}
-                            value={
-                              response?.weather?.altitude === "NaN" ||
-                              !response?.weather?.altitude
-                                ? "N/A"
-                                : `${formatNumber(response.weather.altitude)}m`
-                            }
-                            unit={""}
-                          />
-                        </>
-                      )}
+                        )}
                     </div>
-                    {/* Show NewCompass only in phase 1 */}
-                    {phase === 1 && (
-                      <NewCompass
-                        size={getCompassSize()}
-                        needle1={response?.digitalCompass?.mag_heading}
-                      />
-                    )}
-
-                    {/* Show LeafletMap only in phase 2 */}
-                    {phase === 2 &&
-                      response?.weather?.latitude &&
-                      response?.weather?.longitude && (
-                        <LeafletMap
-                          lat={response.weather.latitude}
-                          lng={response.weather.longitude}
-                        />
-                      )}
-                  </div>
-                </ChildCard>
-              </div>
-              <div className="heading-box2">
-                <ChildCard>
-                  <div
-                    className={
-                      phase === 1
-                        ? `pitch-box-content`
-                        : `pitch-box-content-phase2`
-                    }
-                  >
-                    <div className="pitch-roll-chips">
-                      <ChartChip
-                        name={"Roll:"}
-                        value={parseFloat(
-                          response?.digitalCompass?.roll
-                        ).toFixed(2)}
-                        unit={"°"}
-                      />
-
-                      {phase === 1 && (
+                  </ChildCard>
+                </div>
+                <div className="heading-box2">
+                  <ChildCard>
+                    <div
+                      className={
+                        phase === 1
+                          ? `pitch-box-content`
+                          : `pitch-box-content-phase2`
+                      }
+                    >
+                      <div className="pitch-roll-chips">
                         <ChartChip
-                          name={"Pitch:"}
+                          name={"Roll:"}
                           value={parseFloat(
-                            response?.digitalCompass?.pitch
+                            response?.digitalCompass?.roll
                           ).toFixed(2)}
                           unit={"°"}
                         />
-                      )}
 
-                      {phase === 2 && (
-                        <>
+                        {phase === 1 && (
                           <ChartChip
                             name={"Pitch:"}
                             value={parseFloat(
@@ -693,7 +1053,18 @@ const Home = ({
                             ).toFixed(2)}
                             unit={"°"}
                           />
-                          {/* <ChartChip
+                        )}
+
+                        {phase === 2 && (
+                          <>
+                            <ChartChip
+                              name={"Pitch:"}
+                              value={parseFloat(
+                                response?.digitalCompass?.pitch
+                              ).toFixed(2)}
+                              unit={"°"}
+                            />
+                            {/* <ChartChip
                             name={"Longitude:"}
                             value={
                               response?.weather?.longitude === "NaN" ||
@@ -713,106 +1084,367 @@ const Home = ({
                             }
                             unit={""}
                           /> */}
-                          <div className="phase-2-section">
-                            {/* <StatusChip color={"red"} description={"Humidity"} /> */}
-                            {/* <ChartChip
+                            <div className="phase-2-section">
+                              {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                              {/* <ChartChip
                               name={"Humidity"}
                               value={getValueForKey("Humidity:", response)}
                             /> */}
+                              <ChartChip
+                                name={"Heading"}
+                                value={parseFloat(
+                                  response?.digitalCompass?.mag_heading
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <NewRollMeter
+                        roll={response?.digitalCompass?.roll}
+                        pitch={response?.digitalCompass?.pitch}
+                      />
+                    </div>
+                  </ChildCard>
+                </div>
+              </div>
+            </MainCard>
+          )}
+          {phase === 1 && (
+            <MainCard title={"Aerostat Position and Orientation"}>
+              <div className="magnetometer-box">
+                <div className="heading-box2">
+                  <ChildCard>
+                    <div
+                      className={
+                        phase === 1
+                          ? `heading-box-content`
+                          : `heading-box-content-phase2`
+                      }
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          rowGap: "10px",
+                        }}
+                      >
+                        {/* {phase === 2 && (
+                        <div className="phase-2-section">
+                          <StatusChip color={"red"} description={"Humidity"} />
+                          <ChartChip
+                            name={"Humidity"}
+                            value={getValueForKey("Humidity:", response)}
+                          />
+                        </div>
+                      )} */}
+                        {phase === 1 && (
+                          <ChartChip
+                            name={"Heading"}
+                            value={parseFloat(
+                              response?.digitalCompass?.mag_heading
+                            ).toFixed(2)}
+                            unit={"°"}
+                          />
+                        )}
+                        {phase === 2 && (
+                          <>
                             <ChartChip
-                              name={"Heading"}
+                              name={"Longitude:"}
+                              value={
+                                response?.weather?.longitude === "NaN" ||
+                                !response?.weather?.longitude
+                                  ? "N/A"
+                                  : `${response?.weather?.longitude}°`
+                              }
+                              unit={""}
+                            />
+                            <ChartChip
+                              name={"Latitude:"}
+                              value={
+                                response?.weather?.latitude === "NaN" ||
+                                !response?.weather?.latitude
+                                  ? "N/A"
+                                  : `${response?.weather?.latitude}°`
+                              }
+                              unit={""}
+                            />
+                            <ChartChip
+                              name={"Altitude:"}
+                              value={
+                                response?.weather?.altitude === "NaN" ||
+                                !response?.weather?.altitude
+                                  ? "N/A"
+                                  : `${formatNumber(
+                                      response.weather.altitude
+                                    )}m`
+                              }
+                              unit={""}
+                            />
+                          </>
+                        )}
+                      </div>
+                      {/* Show NewCompass only in phase 1 */}
+                      {phase === 1 && (
+                        <NewCompass
+                          size={getCompassSize()}
+                          needle1={response?.digitalCompass?.mag_heading}
+                        />
+                      )}
+
+                      {/* Show LeafletMap only in phase 2 */}
+                      {phase === 2 &&
+                        response?.weather?.latitude &&
+                        response?.weather?.longitude && (
+                          <LeafletMap
+                            lat={response.weather.latitude}
+                            lng={response.weather.longitude}
+                          />
+                        )}
+                    </div>
+                  </ChildCard>
+                </div>
+                <div className="heading-box2">
+                  <ChildCard>
+                    <div
+                      className={
+                        phase === 1
+                          ? `pitch-box-content`
+                          : `pitch-box-content-phase2`
+                      }
+                    >
+                      <div className="pitch-roll-chips">
+                        <ChartChip
+                          name={"Roll:"}
+                          value={parseFloat(
+                            response?.digitalCompass?.roll
+                          ).toFixed(2)}
+                          unit={"°"}
+                        />
+
+                        {phase === 1 && (
+                          <ChartChip
+                            name={"Pitch:"}
+                            value={parseFloat(
+                              response?.digitalCompass?.pitch
+                            ).toFixed(2)}
+                            unit={"°"}
+                          />
+                        )}
+
+                        {phase === 2 && (
+                          <>
+                            <ChartChip
+                              name={"Pitch:"}
                               value={parseFloat(
-                                response?.digitalCompass?.mag_heading
+                                response?.digitalCompass?.pitch
                               ).toFixed(2)}
                               unit={"°"}
                             />
-                          </div>
-                        </>
-                      )}
+                            {/* <ChartChip
+                            name={"Longitude:"}
+                            value={
+                              response?.weather?.longitude === "NaN" ||
+                              !response?.weather?.longitude
+                                ? "N/A"
+                                : `${response?.weather?.longitude}°`
+                            }
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Latitude:"}
+                            value={
+                              response?.weather?.latitude === "NaN" ||
+                              !response?.weather?.latitude
+                                ? "N/A"
+                                : `${response?.weather?.latitude}°`
+                            }
+                            unit={""}
+                          /> */}
+                            <div className="phase-2-section">
+                              {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                              {/* <ChartChip
+                              name={"Humidity"}
+                              value={getValueForKey("Humidity:", response)}
+                            /> */}
+                              <ChartChip
+                                name={"Heading"}
+                                value={parseFloat(
+                                  response?.digitalCompass?.mag_heading
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      <NewRollMeter
+                        roll={response?.digitalCompass?.roll}
+                        pitch={response?.digitalCompass?.pitch}
+                      />
                     </div>
-                    <NewRollMeter
-                      roll={response?.digitalCompass?.roll}
-                      pitch={response?.digitalCompass?.pitch}
-                    />
-                  </div>
-                </ChildCard>
+                  </ChildCard>
+                </div>
               </div>
-            </div>
-          </MainCard>
+            </MainCard>
+          )}
           <div className="horizontal-box1">
             <div className="pressure-box">
-              <MainCard
-                style={{ marginLeft: "25px" }}
-                title={"Pressures (inWG)"}
-              >
-                <div className="pressure-box-content">
-                  <div>
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={pressureGaugeOpts}
-                    />
+              {phase === 2 && (
+                <MainCard
+                  style={{ marginLeft: "90px", width: "90%" }}
+                  title={"Pressures (inWG)"}
+                >
+                  <div className="pressure-box-content">
+                    <div>
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={pressureGaugeOpts}
+                      />
 
-                    <ChartsData
-                      position={"around"}
-                      graphValue={parseFloat(
-                        response?.helium?.hel_pressure
-                      ).toFixed(2)}
-                      graphName={"Hull Pressure"}
-                    />
-                  </div>
-                  <div>
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={ballonetGaugeOpts}
-                    />
+                      <ChartsData
+                        position={"around"}
+                        graphValue={parseFloat(
+                          response?.helium?.hel_pressure
+                        ).toFixed(2)}
+                        graphName={"Hull Pressure"}
+                      />
+                    </div>
+                    <div>
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={ballonetGaugeOpts}
+                      />
 
-                    <ChartsData
-                      position={phase === 1 ? "around" : "between"}
-                      graphValue={parseFloat(
-                        response?.ballonet?.bal_pressure
-                      ).toFixed(2)}
-                      graphName={"Ballonet Air"}
-                      description1={phase === 2 && "Curtain Height"}
-                      // value1={response?.ballonet?.ballonet_height === "NaN" ? "N/A" : `${parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}m`}
-                      value1={
-                        phase === 2 &&
-                        (response?.ballonet?.ballonet_height === "NaN" ||
-                          !response?.ballonet?.ballonet_height)
-                          ? "N/A"
-                          : phase === 2 && response?.ballonet?.ballonet_height
-                          ? `${response?.ballonet?.ballonet_height}m`
-                          : ""
-                      }
-                    />
+                      <ChartsData
+                        position={phase === 1 ? "around" : "between"}
+                        graphValue={parseFloat(
+                          response?.ballonet?.bal_pressure
+                        ).toFixed(2)}
+                        graphName={"Ballonet Air"}
+                        description1={phase === 2 && "Curtain Height"}
+                        // value1={response?.ballonet?.ballonet_height === "NaN" ? "N/A" : `${parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}m`}
+                        value1={
+                          phase === 2 &&
+                          (response?.ballonet?.ballonet_height === "NaN" ||
+                            !response?.ballonet?.ballonet_height)
+                            ? "N/A"
+                            : phase === 2 && response?.ballonet?.ballonet_height
+                            ? `${response?.ballonet?.ballonet_height}m`
+                            : ""
+                        }
+                      />
+                    </div>
                   </div>
-                </div>
-              </MainCard>
+                </MainCard>
+              )}
+              {phase === 1 && (
+                <MainCard title={"Pressures (inWG)"}>
+                  <div className="pressure-box-content">
+                    <div>
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={pressureGaugeOpts}
+                      />
+
+                      <ChartsData
+                        position={"around"}
+                        graphValue={parseFloat(
+                          response?.helium?.hel_pressure
+                        ).toFixed(2)}
+                        graphName={"Hull Pressure"}
+                      />
+                    </div>
+                    <div>
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={ballonetGaugeOpts}
+                      />
+
+                      <ChartsData
+                        position={phase === 1 ? "around" : "between"}
+                        graphValue={parseFloat(
+                          response?.ballonet?.bal_pressure
+                        ).toFixed(2)}
+                        graphName={"Ballonet Air"}
+                        description1={phase === 2 && "Curtain Height"}
+                        // value1={response?.ballonet?.ballonet_height === "NaN" ? "N/A" : `${parseFloat(response?.ballonet?.ballonet_height).toFixed(2)}m`}
+                        value1={
+                          phase === 2 &&
+                          (response?.ballonet?.ballonet_height === "NaN" ||
+                            !response?.ballonet?.ballonet_height)
+                            ? "N/A"
+                            : phase === 2 && response?.ballonet?.ballonet_height
+                            ? `${response?.ballonet?.ballonet_height}m`
+                            : ""
+                        }
+                      />
+                    </div>
+                  </div>
+                </MainCard>
+              )}
             </div>
             <div className="confluence-box">
-              <MainCard style={{ marginLeft: "25px" }} title={"Lift Force"}>
-                <div className="confluence-box-content">
-                  <ChartChip
-                    name={"Max Tension"}
-                    value={parseFloat(response?.adams?.max_tension).toFixed(2)}
-                    unit={"kg"}
-                  />
-                  <div className="confluence-graph">
-                    <HighchartsReact
-                      highcharts={Highcharts}
-                      options={confluenceGaugeOpts}
-                    />
-
-                    <ChartsData
-                      position={"center"}
-                      graphName={"Current Tension"}
-                      graphValue={parseFloat(response?.adams?.tension).toFixed(
+              {phase === 2 && (
+                <MainCard
+                  style={{ marginLeft: "20px", width: "100%" }}
+                  title={"Lift Force"}
+                >
+                  <div className="confluence-box-content">
+                    <ChartChip
+                      name={"Max Tension"}
+                      value={parseFloat(response?.adams?.max_tension).toFixed(
                         2
                       )}
-                      unit={"Kg"}
+                      unit={"kg"}
                     />
+                    <div className="confluence-graph">
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={confluenceGaugeOpts}
+                      />
+
+                      <ChartsData
+                        position={"center"}
+                        graphName={"Current Tension"}
+                        graphValue={parseFloat(
+                          response?.adams?.tension
+                        ).toFixed(2)}
+                        unit={"Kg"}
+                      />
+                    </div>
                   </div>
-                </div>
-              </MainCard>
+                </MainCard>
+              )}
+              {phase === 1 && (
+                <MainCard title={"Lift Force"}>
+                  <div className="confluence-box-content">
+                    <ChartChip
+                      name={"Max Tension"}
+                      value={parseFloat(response?.adams?.max_tension).toFixed(
+                        2
+                      )}
+                      unit={"kg"}
+                    />
+                    <div className="confluence-graph">
+                      <HighchartsReact
+                        highcharts={Highcharts}
+                        options={confluenceGaugeOpts}
+                      />
+
+                      <ChartsData
+                        position={"center"}
+                        graphName={"Current Tension"}
+                        graphValue={parseFloat(
+                          response?.adams?.tension
+                        ).toFixed(2)}
+                        unit={"Kg"}
+                      />
+                    </div>
+                  </div>
+                </MainCard>
+              )}
             </div>
           </div>
         </div>
