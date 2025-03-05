@@ -683,17 +683,19 @@ const Home = ({
 
                     {/* Wind Angle & Air Temperature */}
                     <div
-                      style={{ width: "100%", padding: "10px 20px" }}
+                      style={{ width: "100%", padding: "10px 20px", }}
                       className="weather-station-chips"
                     >
-                      <div style={{ gap: "10px", display: "grid" }}>
+                      <div style={{ gap: "10px", display: "flex" }}>
                         <StatusChip color={"blue"} description={"Wind Angle"} />
                         <StatusChip
                           color={"red"}
-                          description={"Aerostat Heading"}
+                          description={"Heading"}
                         />
                       </div>
-                      <ChartsData
+                      
+                    </div>
+                    <ChartsData
                         position={"between"}
                         graphValue={parseFloat(
                           response?.weather?.wind_speed || 0
@@ -709,7 +711,6 @@ const Home = ({
                           width: "50%",
                         }}
                       />
-                    </div>
                   </div>
                 </ChildCard>
               </div>
