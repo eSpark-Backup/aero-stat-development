@@ -80,6 +80,18 @@ const Home = ({
   const [heightUnit, setHeightUnit] = useState("m"); // Default: Meters
   const [maxTensionUnit, setMaxTensionUnit] = useState("kg");
   const [currentTensionUnit, setCurrentTensionUnit] = useState("");
+  const [gearActive, setGearActive] = useState(false);
+  const [highValue, setHighValue] = useState(100);
+  const [lowValue, setLowValue] = useState(0);
+  const [adjustedValue, setAdjustedValue] = useState(
+    (highValue + lowValue) / 2
+  );
+
+  // Ensure adjustedValue is always within range
+  useEffect(() => {
+    console.log("Updated High Value:", highValue);
+    console.log("Updated Low Value:", lowValue);
+  }, [highValue, lowValue]);
 
   // Extract values
   const airTempC = parseFloat(response?.weather?.air_temp || 0);
@@ -258,6 +270,10 @@ const Home = ({
   }, [isUserAction]);
 
   const toggleButton = (key) => {
+    if (key === "Gear") {
+      setGearActive(true); // Open the slider panel
+      return;
+    }
     setPressedButtons((prev) => {
       const newState = !prev[key];
       const updatedState = { ...prev, [key]: newState };
@@ -515,20 +531,21 @@ const Home = ({
                     position={"between"}
                     description1={t("airTemp")}
                     value1={
-                      <select
+                      <span
                         style={{
-                          background: "transparent",
-                          border: "none",
+                          cursor: "pointer",
                           color: "#4260ff",
                           fontWeight: "800",
                           fontSize: "16px",
                         }}
-                        value={tempUnit}
-                        onChange={(e) => setTempUnit(e.target.value)}
+                        onClick={() =>
+                          setTempUnit((prev) => (prev === "C" ? "F" : "C"))
+                        }
                       >
-                        <option value="C">{airTempC.toFixed(2)} °C</option>
-                        <option value="F">{airTempF.toFixed(2)} °F</option>
-                      </select>
+                        {tempUnit === "C"
+                          ? `${airTempC.toFixed(2)} °C`
+                          : `${airTempF.toFixed(2)} °F`}
+                      </span>
                     }
                     graphName={t("windSpeed")}
                     description2={t("baroPress")}
@@ -536,24 +553,23 @@ const Home = ({
                       response?.weather?.baro_presssure || 0
                     ).toFixed(2)} hPa`}
                     graphValue={
-                      <select
+                      <span
                         style={{
-                          background: "transparent",
-                          border: "none",
+                          cursor: "pointer",
                           color: "#4260ff",
                           fontWeight: "800",
                           fontSize: "16px",
                         }}
-                        value={windUnit}
-                        onChange={(e) => setWindUnit(e.target.value)}
+                        onClick={() =>
+                          setWindUnit((prev) =>
+                            prev === "Knots" ? "m/s" : "Knots"
+                          )
+                        }
                       >
-                        <option value="Knots">
-                          {windSpeedKnots.toFixed(2)} Knots
-                        </option>
-                        <option value="m/s">
-                          {windSpeedMS.toFixed(2)} m/s
-                        </option>
-                      </select>
+                        {windUnit === "Knots"
+                          ? `${windSpeedKnots.toFixed(2)} Knots`
+                          : `${windSpeedMS.toFixed(2)} m/s`}
+                      </span>
                     }
                   />
                 </div>
@@ -888,26 +904,23 @@ const Home = ({
                               ? "N/A"
                               : phase === 2 &&
                                 response?.ballonet?.ballonet_height && (
-                                  <select
+                                  <span
                                     style={{
-                                      background: "transparent",
-                                      border: "none",
+                                      cursor: "pointer",
                                       color: "#4260ff",
                                       fontWeight: "800",
                                       fontSize: "16px",
                                     }}
-                                    value={heightUnit}
-                                    onChange={(e) =>
-                                      setHeightUnit(e.target.value)
+                                    onClick={() =>
+                                      setHeightUnit((prev) =>
+                                        prev === "m" ? "ft" : "m"
+                                      )
                                     }
                                   >
-                                    <option value="m">
-                                      {ballonetHeight.toFixed(2)} m
-                                    </option>
-                                    <option value="ft">
-                                      {ballonetHeightFt.toFixed(2)} ft
-                                    </option>
-                                  </select>
+                                    {heightUnit === "m"
+                                      ? `${ballonetHeight.toFixed(2)} m`
+                                      : `${ballonetHeightFt.toFixed(2)} ft`}
+                                  </span>
                                 )
                           }
                         />
@@ -921,24 +934,23 @@ const Home = ({
                       <ChartChip
                         name={t("maxTension")}
                         value={
-                          <select
+                          <span
                             style={{
-                              background: "transparent",
-                              border: "none",
+                              cursor: "pointer",
                               color: "#4260ff",
                               fontWeight: "800",
                               fontSize: "16px",
                             }}
-                            value={maxTensionUnit}
-                            onChange={(e) => setMaxTensionUnit(e.target.value)}
+                            onClick={() =>
+                              setMaxTensionUnit((prev) =>
+                                prev === "kg" ? "lbs" : "kg"
+                              )
+                            }
                           >
-                            <option value="kg">
-                              {maxTensionKg.toFixed(2)} kg
-                            </option>
-                            <option value="lbs">
-                              {maxTensionLbs.toFixed(2)} lbs
-                            </option>
-                          </select>
+                            {maxTensionUnit === "kg"
+                              ? `${maxTensionKg.toFixed(2)} kg`
+                              : `${maxTensionLbs.toFixed(2)} lbs`}
+                          </span>
                         }
                       />
 
@@ -952,26 +964,23 @@ const Home = ({
                           position={"center"}
                           graphName={t("currentTension")}
                           graphValue={
-                            <select
+                            <span
                               style={{
-                                background: "transparent",
-                                border: "none",
+                                cursor: "pointer",
                                 color: "#4260ff",
                                 fontWeight: "800",
                                 fontSize: "16px",
                               }}
-                              value={currentTensionUnit}
-                              onChange={(e) =>
-                                setCurrentTensionUnit(e.target.value)
+                              onClick={() =>
+                                setCurrentTensionUnit((prev) =>
+                                  prev === "kg" ? "lbs" : "kg"
+                                )
                               }
                             >
-                              <option value="kg">
-                                {currentTensionKg.toFixed(2)} kg
-                              </option>
-                              <option value="lbs">
-                                {currentTensionLbs.toFixed(2)} lbs
-                              </option>
-                            </select>
+                              {currentTensionUnit === "kg"
+                                ? `${currentTensionKg.toFixed(2)} kg`
+                                : `${currentTensionLbs.toFixed(2)} lbs`}
+                            </span>
                           }
                         />
                       </div>
@@ -987,11 +996,64 @@ const Home = ({
               //   }}
               // >
 
-              <div>
-                <div className="right-sidebar-content">
-                  <div className="right-section-design">
-                    <div className="controls-box">
-                      {[
+              <div className="right-sidebar-content">
+                <div className="right-section-design">
+                  <div className="controls-box">
+                    {gearActive ? (
+                      <div className="slider-wrapper">
+                        <label>High:</label>
+                        <input
+                          className="input-style"
+                          type="number"
+                          value={highValue}
+                          onChange={(e) => {
+                            let newHigh = parseInt(e.target.value) || 0;
+                            setHighValue(newHigh);
+                            if (adjustedValue > newHigh)
+                              setAdjustedValue(newHigh);
+                          }}
+                        />
+
+                        <input
+                          type="range"
+                          min={lowValue}
+                          max={highValue}
+                          value={adjustedValue}
+                          onChange={(e) => {
+                            const newValue = parseInt(e.target.value);
+                            console.log("Slider moved:", newValue);
+                            setAdjustedValue(newValue);
+
+                            // Adjust high and low values dynamically
+                            if (newValue > highValue) {
+                              setHighValue(newValue);
+                            }
+                            if (newValue < lowValue) {
+                              setLowValue(newValue);
+                            }
+                          }}
+                          className="vertical-slider"
+                        />
+
+                        <label>Low:</label>
+                        <input
+                          className="input-style"
+                          type="number"
+                          value={lowValue}
+                          onChange={(e) => {
+                            let newLow = parseInt(e.target.value) || 0;
+                            setLowValue(newLow);
+                            if (adjustedValue < newLow)
+                              setAdjustedValue(newLow);
+                          }}
+                        />
+
+                        <button className="close-button" onClick={() => setGearActive(false)}>
+                          Close
+                        </button>
+                      </div>
+                    ) : (
+                      [
                         {
                           key: "primary_blower_value",
                           imgLight: "/src/assets/primary_blower.png",
@@ -1012,26 +1074,28 @@ const Home = ({
                           imgLight: "/src/assets/payload_power.png",
                           imgDark: "/src/assets/payload_power-dark.png",
                         },
-                      ].map(({ key, imgLight, imgDark }) => {
-                        console.log(`Rendering ${key}:`, pressedButtons[key]); // Debug log
-                        return (
-                          <div key={key} className="fan-box">
-                            <div
-                              className={`button-container ${
-                                pressedButtons[key] ? "pressed" : ""
-                              }`}
-                              onClick={() => toggleButton(key)}
-                            >
-                              <img
-                                src={theme === "light" ? imgLight : imgDark}
-                                alt={key}
-                                className="button-img"
-                              />
-                            </div>
+                        {
+                          key: "Gear",
+                          imgLight: "/src/assets/Gear-light.png",
+                          imgDark: "/src/assets/Gear-dark.png",
+                        },
+                      ].map(({ key, imgLight, imgDark }) => (
+                        <div key={key} className="fan-box">
+                          <div
+                            className={`button-container ${
+                              pressedButtons[key] ? "pressed" : ""
+                            }`}
+                            onClick={() => toggleButton(key)}
+                          >
+                            <img
+                              src={theme === "light" ? imgLight : imgDark}
+                              alt={key}
+                              className="button-img"
+                            />
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
