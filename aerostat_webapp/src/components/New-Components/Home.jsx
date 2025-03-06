@@ -83,11 +83,7 @@ const Home = ({
   const [gearActive, setGearActive] = useState(false);
   const [highValue, setHighValue] = useState(100);
   const [lowValue, setLowValue] = useState(0);
-  const [adjustedValue, setAdjustedValue] = useState(
-    (highValue + lowValue) / 2
-  );
 
-  // Ensure adjustedValue is always within range
   useEffect(() => {
     console.log("Updated High Value:", highValue);
     console.log("Updated Low Value:", lowValue);
@@ -997,108 +993,107 @@ const Home = ({
               // >
 
               <div className="right-sidebar-content">
-                <div className="right-section-design">
-                  <div className="controls-box">
-                    {gearActive ? (
-                      <div className="slider-wrapper">
-                        <label>High:</label>
-                        <input
-                          className="input-style"
-                          type="number"
-                          value={highValue}
-                          onChange={(e) => {
-                            let newHigh = parseInt(e.target.value) || 0;
-                            setHighValue(newHigh);
-                            if (adjustedValue > newHigh)
-                              setAdjustedValue(newHigh);
-                          }}
-                        />
-
+              <div className="right-section-design">
+                <div className="controls-box">
+                  {gearActive ? (
+                    <div className="slider-wrapper">
+                      <label>High:</label>
+                      <input
+                        className="input-style"
+                        type="number"
+                        value={highValue}
+                        onChange={(e) => {
+                          let newHigh = parseInt(e.target.value) || 0;
+                          if (newHigh > lowValue) setHighValue(newHigh);
+                        }}
+                      />
+        
+                      {/* Multi-Range Slider */}
+                      <div className="multi-range-slider">
                         <input
                           type="range"
-                          min={lowValue}
-                          max={highValue}
-                          value={adjustedValue}
-                          onChange={(e) => {
-                            const newValue = parseInt(e.target.value);
-                            console.log("Slider moved:", newValue);
-                            setAdjustedValue(newValue);
-
-                            // Adjust high and low values dynamically
-                            if (newValue > highValue) {
-                              setHighValue(newValue);
-                            }
-                            if (newValue < lowValue) {
-                              setLowValue(newValue);
-                            }
-                          }}
-                          className="vertical-slider"
-                        />
-
-                        <label>Low:</label>
-                        <input
-                          className="input-style"
-                          type="number"
+                          min="0"
+                          max="100"
                           value={lowValue}
                           onChange={(e) => {
-                            let newLow = parseInt(e.target.value) || 0;
-                            setLowValue(newLow);
-                            if (adjustedValue < newLow)
-                              setAdjustedValue(newLow);
+                            let newLow = parseInt(e.target.value);
+                            if (newLow < highValue) setLowValue(newLow);
                           }}
+                          className="slider thumb-left"
                         />
-
-                        <button className="close-button" onClick={() => setGearActive(false)}>
-                          Close
-                        </button>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={highValue}
+                          onChange={(e) => {
+                            let newHigh = parseInt(e.target.value);
+                            if (newHigh > lowValue) setHighValue(newHigh);
+                          }}
+                          className="slider thumb-right"
+                        />
+                        <div
+                          className="slider-track"
+                          style={{
+                            left: `${(lowValue / 100) * 100}%`,
+                            right: `${100 - (highValue / 100) * 100}%`,
+                          }}
+                        ></div>
                       </div>
-                    ) : (
-                      [
-                        {
-                          key: "primary_blower_value",
-                          imgLight: "/src/assets/primary_blower.png",
-                          imgDark: "/src/assets/primary_blower-dark.png",
-                        },
-                        {
-                          key: "secondary_blower_value",
-                          imgLight: "/src/assets/secondary_blower.png",
-                          imgDark: "/src/assets/secondary_blower-dark.png",
-                        },
-                        {
-                          key: "strobe_lights_value",
-                          imgLight: "/src/assets/strobe_lights.png",
-                          imgDark: "/src/assets/strobe_light-dark.png",
-                        },
-                        {
-                          key: "payload_power_value",
-                          imgLight: "/src/assets/payload_power.png",
-                          imgDark: "/src/assets/payload_power-dark.png",
-                        },
-                        {
-                          key: "Gear",
-                          imgLight: "/src/assets/Gear-light.png",
-                          imgDark: "/src/assets/Gear-dark.png",
-                        },
-                      ].map(({ key, imgLight, imgDark }) => (
-                        <div key={key} className="fan-box">
-                          <div
-                            className={`button-container ${
-                              pressedButtons[key] ? "pressed" : ""
-                            }`}
-                            onClick={() => toggleButton(key)}
-                          >
-                            <img
-                              src={theme === "light" ? imgLight : imgDark}
-                              alt={key}
-                              className="button-img"
-                            />
-                          </div>
+        
+                      <label>Low:</label>
+                      <input
+                        className="input-style"
+                        type="number"
+                        value={lowValue}
+                        onChange={(e) => {
+                          let newLow = parseInt(e.target.value) || 0;
+                          if (newLow < highValue) setLowValue(newLow);
+                        }}
+                      />
+        
+                      <button className="close-button" onClick={() => setGearActive(false)}>
+                        Close
+                      </button>
+                    </div>
+                  ) : (
+                    [
+                      {
+                        key: "primary_blower_value",
+                        imgLight: "/src/assets/primary_blower.png",
+                        imgDark: "/src/assets/primary_blower-dark.png",
+                      },
+                      {
+                        key: "secondary_blower_value",
+                        imgLight: "/src/assets/secondary_blower.png",
+                        imgDark: "/src/assets/secondary_blower-dark.png",
+                      },
+                      {
+                        key: "strobe_lights_value",
+                        imgLight: "/src/assets/strobe_lights.png",
+                        imgDark: "/src/assets/strobe_light-dark.png",
+                      },
+                      {
+                        key: "payload_power_value",
+                        imgLight: "/src/assets/payload_power.png",
+                        imgDark: "/src/assets/payload_power-dark.png",
+                      },
+                      {
+                        key: "Gear",
+                        imgLight: "/src/assets/Gear-light.png",
+                        imgDark: "/src/assets/Gear-dark.png",
+                      },
+                    ].map(({ key, imgLight, imgDark }) => (
+                      <div key={key} className="fan-box">
+                        <div className={`button-container ${pressedButtons[key] ? "pressed" : ""}`} onClick={() => toggleButton(key)}>
+                          <img src={theme === "light" ? imgLight : imgDark} alt={key} className="button-img" />
                         </div>
-                      ))
-                    )}
-                  </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
+            </div>
             )}
           </div>
         </div>
