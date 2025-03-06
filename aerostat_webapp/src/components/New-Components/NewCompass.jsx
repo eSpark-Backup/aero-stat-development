@@ -48,8 +48,23 @@ const NewCompass = ({ size, needle1, needle2 }) => {
               theme === "light" ? "center-circle-light" : "center-circle-dark"
             }`}
           >
-            {phase === 1 && (
+              
+            
+            {!needle2 && (
               <span
+                className={`direction ${
+                  theme === "light" ? "direction-light" : "direction-dark"
+                }`}
+              >
+                <p>{direction1}</p>
+              </span>
+            )}
+            {needle2 && (
+              <span className="degree2" style={{ color: "#4260FF" }}>
+                <p>{Number(needleRotation2)?.toFixed(2)}°</p>
+              </span>
+            )}
+            <span
                 style={{
                   color:
                     theme === "light" && needle2
@@ -65,21 +80,6 @@ const NewCompass = ({ size, needle1, needle2 }) => {
                   {Number(needleRotation)?.toFixed(2)}°
                 </p>
               </span>
-            )}
-            {!needle2 && (
-              <span
-                className={`direction ${
-                  theme === "light" ? "direction-light" : "direction-dark"
-                }`}
-              >
-                <p>{direction1}</p>
-              </span>
-            )}
-            {needle2 && (
-              <span className="degree2" style={{ color: "#4260FF" }}>
-                <p>{Number(needleRotation2)?.toFixed(2)}°</p>
-              </span>
-            )}
           </div>
           <div
             className="needle"
