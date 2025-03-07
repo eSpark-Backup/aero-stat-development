@@ -80,6 +80,94 @@ const Home = ({
   const [heightUnit, setHeightUnit] = useState("m"); // Default: Meters
   const [maxTensionUnit, setMaxTensionUnit] = useState("kg");
   const [currentTensionUnit, setCurrentTensionUnit] = useState("");
+  const [gearActive, setGearActive] = useState(false);
+  const [highValue, setHighValue] = useState(100);
+  const [lowValue, setLowValue] = useState(0);
+
+  const pressureLimits = {
+    blower: { on: 1.8, off: 2.5 }, // in iwg
+    hull: { min: 1.8, max: 2.5 }, // in iwg
+    ballonet: { min: 1.8, max: 2.5 }, // in iwg
+  };
+
+  // Convert pressure value (e.g., 1.8 iwg) to slider value (0–100)
+  const pressureToSlider = (pressureValue, minPressure, maxPressure) => {
+    return ((pressureValue - minPressure) / (maxPressure - minPressure)) * 100;
+  };
+
+  // Convert slider value (0–100) to pressure value (e.g., 1.8 iwg)
+  const sliderToPressure = (sliderValue, minPressure, maxPressure) => {
+    return (sliderValue / 100) * (maxPressure - minPressure) + minPressure;
+  };
+
+  const [lowPressure, setLowPressure] = useState(1.8); // Default low pressure (1.8 iwg)
+  const [highPressure, setHighPressure] = useState(2.5); // Default high pressure (2.5 iwg)
+
+  const minPressure = 0; // Minimum pressure value (0 iwg)
+  const maxPressure = 100; // Maximum pressure value (5 iwg)
+
+  const [lowSliderValue, setLowSliderValue] = useState(
+    pressureToSlider(1.8, minPressure, maxPressure) // Initial low slider value (0–100)
+  );
+  const [highSliderValue, setHighSliderValue] = useState(
+    pressureToSlider(2.5, minPressure, maxPressure) // Initial high slider value (0–100)
+  );
+
+  // Handle low slider change
+  const handleLowSliderChange = (e) => {
+    const newLow = parseInt(e.target.value);
+    if (newLow < highSliderValue) {
+      setLowSliderValue(newLow);
+    }
+  };
+
+  // Handle high slider change
+  const handleHighSliderChange = (e) => {
+    const newHigh = parseInt(e.target.value);
+    if (newHigh > lowSliderValue) {
+      setHighSliderValue(newHigh);
+    }
+  };
+
+  // Save the user-defined thresholds
+  const saveValues = () => {
+    const newLowPressure = sliderToPressure(
+      lowSliderValue,
+      minPressure,
+      maxPressure
+    );
+    const newHighPressure = sliderToPressure(
+      highSliderValue,
+      minPressure,
+      maxPressure
+    );
+
+    setLowPressure(newLowPressure); // Update low pressure threshold
+    setHighPressure(newHighPressure); // Update high pressure threshold
+
+    console.log("Saved Values:", {
+      lowPressure: newLowPressure,
+      highPressure: newHighPressure,
+    });
+    // Add logic to save values (e.g., to backend or local storage)
+  };
+
+  useEffect(() => {
+    console.log("Updated High Value:", highValue);
+    console.log("Updated Low Value:", lowValue);
+  }, [highValue, lowValue]);
+
+  const hullPressure = parseFloat(response?.helium?.hel_pressure).toFixed(2);
+  const ballonetPressure = parseFloat(response?.ballonet?.bal_pressure).toFixed(
+    2
+  );
+
+  // Check if blower should be on or off based on saved thresholds
+  if (hullPressure <= lowPressure || ballonetPressure <= lowPressure) {
+    console.log("Blower ON"); // Turn blower on
+  } else if (hullPressure >= highPressure || ballonetPressure >= highPressure) {
+    console.log("Blower OFF"); // Turn blower off
+  }
 
   // Extract values
   const airTempC = parseFloat(response?.weather?.air_temp || 0);
@@ -258,6 +346,10 @@ const Home = ({
   }, [isUserAction]);
 
   const toggleButton = (key) => {
+    if (key === "Gear") {
+      setGearActive(true); // Open the slider panel
+      return;
+    }
     setPressedButtons((prev) => {
       const newState = !prev[key];
       const updatedState = { ...prev, [key]: newState };
@@ -280,6 +372,22 @@ const Home = ({
       return updatedState;
     });
   };
+
+  // Control logic for blowers
+  useEffect(() => {
+    if (hullPressure <= lowPressure || ballonetPressure <= lowPressure) {
+      // Turn blower ON
+      setPressedButtons((prev) => ({ ...prev, primary_blower_value: true }));
+      console.log("Blower turned ON");
+    } else if (
+      hullPressure >= highPressure ||
+      ballonetPressure >= highPressure
+    ) {
+      // Turn blower OFF
+      setPressedButtons((prev) => ({ ...prev, primary_blower_value: false }));
+      console.log("Blower turned OFF");
+    }
+  }, [hullPressure, ballonetPressure, lowPressure, highPressure]);
 
   const formatNumber = (num) => {
     if (!num || isNaN(num)) return "N/A"; // Handle invalid values
@@ -515,20 +623,21 @@ const Home = ({
                     position={"between"}
                     description1={t("airTemp")}
                     value1={
-                      <select
+                      <span
                         style={{
-                          background: "transparent",
-                          border: "none",
+                          cursor: "pointer",
                           color: "#4260ff",
                           fontWeight: "800",
                           fontSize: "16px",
                         }}
-                        value={tempUnit}
-                        onChange={(e) => setTempUnit(e.target.value)}
+                        onClick={() =>
+                          setTempUnit((prev) => (prev === "C" ? "F" : "C"))
+                        }
                       >
-                        <option value="C">{airTempC.toFixed(2)} °C</option>
-                        <option value="F">{airTempF.toFixed(2)} °F</option>
-                      </select>
+                        {tempUnit === "C"
+                          ? `${airTempC.toFixed(2)} °C`
+                          : `${airTempF.toFixed(2)} °F`}
+                      </span>
                     }
                     graphName={t("windSpeed")}
                     description2={t("baroPress")}
@@ -536,24 +645,23 @@ const Home = ({
                       response?.weather?.baro_presssure || 0
                     ).toFixed(2)} hPa`}
                     graphValue={
-                      <select
+                      <span
                         style={{
-                          background: "transparent",
-                          border: "none",
+                          cursor: "pointer",
                           color: "#4260ff",
                           fontWeight: "800",
                           fontSize: "16px",
                         }}
-                        value={windUnit}
-                        onChange={(e) => setWindUnit(e.target.value)}
+                        onClick={() =>
+                          setWindUnit((prev) =>
+                            prev === "Knots" ? "m/s" : "Knots"
+                          )
+                        }
                       >
-                        <option value="Knots">
-                          {windSpeedKnots.toFixed(2)} Knots
-                        </option>
-                        <option value="m/s">
-                          {windSpeedMS.toFixed(2)} m/s
-                        </option>
-                      </select>
+                        {windUnit === "Knots"
+                          ? `${windSpeedKnots.toFixed(2)} Knots`
+                          : `${windSpeedMS.toFixed(2)} m/s`}
+                      </span>
                     }
                   />
                 </div>
@@ -888,26 +996,23 @@ const Home = ({
                               ? "N/A"
                               : phase === 2 &&
                                 response?.ballonet?.ballonet_height && (
-                                  <select
+                                  <span
                                     style={{
-                                      background: "transparent",
-                                      border: "none",
+                                      cursor: "pointer",
                                       color: "#4260ff",
                                       fontWeight: "800",
                                       fontSize: "16px",
                                     }}
-                                    value={heightUnit}
-                                    onChange={(e) =>
-                                      setHeightUnit(e.target.value)
+                                    onClick={() =>
+                                      setHeightUnit((prev) =>
+                                        prev === "m" ? "ft" : "m"
+                                      )
                                     }
                                   >
-                                    <option value="m">
-                                      {ballonetHeight.toFixed(2)} m
-                                    </option>
-                                    <option value="ft">
-                                      {ballonetHeightFt.toFixed(2)} ft
-                                    </option>
-                                  </select>
+                                    {heightUnit === "m"
+                                      ? `${ballonetHeight.toFixed(2)} m`
+                                      : `${ballonetHeightFt.toFixed(2)} ft`}
+                                  </span>
                                 )
                           }
                         />
@@ -921,24 +1026,23 @@ const Home = ({
                       <ChartChip
                         name={t("maxTension")}
                         value={
-                          <select
+                          <span
                             style={{
-                              background: "transparent",
-                              border: "none",
+                              cursor: "pointer",
                               color: "#4260ff",
                               fontWeight: "800",
                               fontSize: "16px",
                             }}
-                            value={maxTensionUnit}
-                            onChange={(e) => setMaxTensionUnit(e.target.value)}
+                            onClick={() =>
+                              setMaxTensionUnit((prev) =>
+                                prev === "kg" ? "lbs" : "kg"
+                              )
+                            }
                           >
-                            <option value="kg">
-                              {maxTensionKg.toFixed(2)} kg
-                            </option>
-                            <option value="lbs">
-                              {maxTensionLbs.toFixed(2)} lbs
-                            </option>
-                          </select>
+                            {maxTensionUnit === "kg"
+                              ? `${maxTensionKg.toFixed(2)} kg`
+                              : `${maxTensionLbs.toFixed(2)} lbs`}
+                          </span>
                         }
                       />
 
@@ -952,26 +1056,23 @@ const Home = ({
                           position={"center"}
                           graphName={t("currentTension")}
                           graphValue={
-                            <select
+                            <span
                               style={{
-                                background: "transparent",
-                                border: "none",
+                                cursor: "pointer",
                                 color: "#4260ff",
                                 fontWeight: "800",
                                 fontSize: "16px",
                               }}
-                              value={currentTensionUnit}
-                              onChange={(e) =>
-                                setCurrentTensionUnit(e.target.value)
+                              onClick={() =>
+                                setCurrentTensionUnit((prev) =>
+                                  prev === "kg" ? "lbs" : "kg"
+                                )
                               }
                             >
-                              <option value="kg">
-                                {currentTensionKg.toFixed(2)} kg
-                              </option>
-                              <option value="lbs">
-                                {currentTensionLbs.toFixed(2)} lbs
-                              </option>
-                            </select>
+                              {currentTensionUnit === "kg"
+                                ? `${currentTensionKg.toFixed(2)} kg`
+                                : `${currentTensionLbs.toFixed(2)} lbs`}
+                            </span>
                           }
                         />
                       </div>
@@ -987,51 +1088,153 @@ const Home = ({
               //   }}
               // >
 
-              <div>
-                <div className="right-sidebar-content">
-                  <div className="right-section-design">
-                    <div className="controls-box">
-                      {[
+              <div className="right-sidebar-content">
+                <div className="right-section-design">
+                  <div className="controls-box">
+                    {gearActive ? (
+                      <div className="slider-wrapper">
+                        <label>High:</label>
+                        <input
+                          className="input-style"
+                          type="number"
+                          value={sliderToPressure(
+                            highSliderValue,
+                            minPressure,
+                            maxPressure
+                          ).toFixed(2)}
+                          onChange={(e) => {
+                            const newPressure = parseFloat(e.target.value);
+                            if (
+                              newPressure >
+                              sliderToPressure(
+                                lowSliderValue,
+                                minPressure,
+                                maxPressure
+                              )
+                            ) {
+                              setHighSliderValue(
+                                pressureToSlider(
+                                  newPressure,
+                                  minPressure,
+                                  maxPressure
+                                )
+                              );
+                            }
+                          }}
+                        />
+
+                        <div className="multi-range-slider">
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={lowSliderValue}
+                            onChange={handleLowSliderChange}
+                            className="slider thumb-left"
+                          />
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={highSliderValue}
+                            onChange={handleHighSliderChange}
+                            className="slider thumb-right"
+                          />
+                          <div
+                            className="slider-track"
+                            style={{
+                              left: `${lowSliderValue}%`,
+                              right: `${100 - highSliderValue}%`,
+                            }}
+                          ></div>
+                        </div>
+
+                        <label>Low:</label>
+                        <input
+                          className="input-style"
+                          type="number"
+                          value={sliderToPressure(
+                            lowSliderValue,
+                            minPressure,
+                            maxPressure
+                          ).toFixed(2)}
+                          onChange={(e) => {
+                            const newPressure = parseFloat(e.target.value);
+                            if (
+                              newPressure <
+                              sliderToPressure(
+                                highSliderValue,
+                                minPressure,
+                                maxPressure
+                              )
+                            ) {
+                              setLowSliderValue(
+                                pressureToSlider(
+                                  newPressure,
+                                  minPressure,
+                                  maxPressure
+                                )
+                              );
+                            }
+                          }}
+                        />
+                        <div className="grid-container" >
+                        <button className="save-button" onClick={saveValues}>
+                          Save
+                        </button>
+
+                        <button
+                          className="close-button"
+                          onClick={() => setGearActive(false)}
+                        >
+                          Close
+                        </button>
+                        </div>
+                      </div>
+                    ) : (
+                      [
                         {
                           key: "primary_blower_value",
-                          imgLight: "/src/assets/primary_blower.png",
-                          imgDark: "/src/assets/primary_blower-dark.png",
+                          imgLight: "/src/assets/primary_white.png",
+                          imgDark: "/src/assets/primary_black.png",
                         },
                         {
                           key: "secondary_blower_value",
-                          imgLight: "/src/assets/secondary_blower.png",
-                          imgDark: "/src/assets/secondary_blower-dark.png",
+                          imgLight: "/src/assets/secondary_white.png",
+                          imgDark: "/src/assets/secondary_black.png",
                         },
                         {
                           key: "strobe_lights_value",
-                          imgLight: "/src/assets/strobe_lights.png",
-                          imgDark: "/src/assets/strobe_light-dark.png",
+                          imgLight: "/src/assets/strobe_white.png",
+                          imgDark: "/src/assets/strobe_black.png",
                         },
                         {
                           key: "payload_power_value",
-                          imgLight: "/src/assets/payload_power.png",
-                          imgDark: "/src/assets/payload_power-dark.png",
+                          imgLight: "/src/assets/payload_white.png",
+                          imgDark: "/src/assets/payload_black.png",
                         },
-                      ].map(({ key, imgLight, imgDark }) => {
-                        console.log(`Rendering ${key}:`, pressedButtons[key]); // Debug log
-                        return (
-                          <div key={key} className="fan-box">
-                            <div
-                              className={`button-container ${
-                                pressedButtons[key] ? "pressed" : ""
-                              }`}
-                              onClick={() => toggleButton(key)}
-                            >
-                              <img
-                                src={theme === "light" ? imgLight : imgDark}
-                                alt={key}
-                                className="button-img"
-                              />
-                            </div>
+                        {
+                          key: "Gear",
+                          imgLight: "/src/assets/Gear-light.png",
+                          imgDark: "/src/assets/Gear-dark.png",
+                        },
+                      ].map(({ key, imgLight, imgDark }) => (
+                        <div key={key} className="fan-box">
+                          <div
+                            className={`button-container ${
+                              pressedButtons[key] ? "pressed" : ""
+                            }`}
+                            onClick={() => toggleButton(key)}
+                          >
+                            <img
+                              src={theme === "light" ? imgLight : imgDark}
+                              alt={key}
+                              className="button-img"
+                            />
                           </div>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
