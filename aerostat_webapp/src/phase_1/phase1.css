@@ -2757,7 +2757,7 @@ img.sidebar-close.dark {
   right: -1%;
   transform: translateY(-50%);
   width: 100px; /* Increased width */
-  height: 440px; /* Adjusted height */
+  height: 460px; /* Adjusted height */
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.15),
@@ -2970,8 +2970,32 @@ img.sidebar-close.dark {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Soft shadow */
   width: 80px; /* Adjust width if necessary */
   text-align: center;
-  margin-top: -25px;
+  /* margin-top: -25px; */
 }
+
+.save-button{
+  background: linear-gradient(to bottom, #1a73e8, #1669c1); /* Blue gradient */
+  color: white;
+  border: none;
+  border-radius: 12px; /* Soft rounded corners */
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  width: 80px; /* Adjust width if necessary */
+  text-align: center;
+  margin-top: -25px; 
+}
+
+.grid-container {
+  display: grid;
+  grid-template-rows: auto auto; /* Creates two rows */
+  row-gap: 10px; /* Adjust vertical spacing */
+  justify-content: start; /* Aligns buttons to the left (change to center if needed) */
+}
+
 
 .multi-range-slider {
   position: relative;

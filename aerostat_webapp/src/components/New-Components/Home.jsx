@@ -84,10 +84,90 @@ const Home = ({
   const [highValue, setHighValue] = useState(100);
   const [lowValue, setLowValue] = useState(0);
 
+  const pressureLimits = {
+    blower: { on: 1.8, off: 2.5 }, // in iwg
+    hull: { min: 1.8, max: 2.5 }, // in iwg
+    ballonet: { min: 1.8, max: 2.5 }, // in iwg
+  };
+
+  // Convert pressure value (e.g., 1.8 iwg) to slider value (0–100)
+  const pressureToSlider = (pressureValue, minPressure, maxPressure) => {
+    return ((pressureValue - minPressure) / (maxPressure - minPressure)) * 100;
+  };
+
+  // Convert slider value (0–100) to pressure value (e.g., 1.8 iwg)
+  const sliderToPressure = (sliderValue, minPressure, maxPressure) => {
+    return (sliderValue / 100) * (maxPressure - minPressure) + minPressure;
+  };
+
+  const [lowPressure, setLowPressure] = useState(1.8); // Default low pressure (1.8 iwg)
+  const [highPressure, setHighPressure] = useState(2.5); // Default high pressure (2.5 iwg)
+
+  const minPressure = 0; // Minimum pressure value (0 iwg)
+  const maxPressure = 100; // Maximum pressure value (5 iwg)
+
+  const [lowSliderValue, setLowSliderValue] = useState(
+    pressureToSlider(1.8, minPressure, maxPressure) // Initial low slider value (0–100)
+  );
+  const [highSliderValue, setHighSliderValue] = useState(
+    pressureToSlider(2.5, minPressure, maxPressure) // Initial high slider value (0–100)
+  );
+
+  // Handle low slider change
+  const handleLowSliderChange = (e) => {
+    const newLow = parseInt(e.target.value);
+    if (newLow < highSliderValue) {
+      setLowSliderValue(newLow);
+    }
+  };
+
+  // Handle high slider change
+  const handleHighSliderChange = (e) => {
+    const newHigh = parseInt(e.target.value);
+    if (newHigh > lowSliderValue) {
+      setHighSliderValue(newHigh);
+    }
+  };
+
+  // Save the user-defined thresholds
+  const saveValues = () => {
+    const newLowPressure = sliderToPressure(
+      lowSliderValue,
+      minPressure,
+      maxPressure
+    );
+    const newHighPressure = sliderToPressure(
+      highSliderValue,
+      minPressure,
+      maxPressure
+    );
+
+    setLowPressure(newLowPressure); // Update low pressure threshold
+    setHighPressure(newHighPressure); // Update high pressure threshold
+
+    console.log("Saved Values:", {
+      lowPressure: newLowPressure,
+      highPressure: newHighPressure,
+    });
+    // Add logic to save values (e.g., to backend or local storage)
+  };
+
   useEffect(() => {
     console.log("Updated High Value:", highValue);
     console.log("Updated Low Value:", lowValue);
   }, [highValue, lowValue]);
+
+  const hullPressure = parseFloat(response?.helium?.hel_pressure).toFixed(2);
+  const ballonetPressure = parseFloat(response?.ballonet?.bal_pressure).toFixed(
+    2
+  );
+
+  // Check if blower should be on or off based on saved thresholds
+  if (hullPressure <= lowPressure || ballonetPressure <= lowPressure) {
+    console.log("Blower ON"); // Turn blower on
+  } else if (hullPressure >= highPressure || ballonetPressure >= highPressure) {
+    console.log("Blower OFF"); // Turn blower off
+  }
 
   // Extract values
   const airTempC = parseFloat(response?.weather?.air_temp || 0);
@@ -292,6 +372,22 @@ const Home = ({
       return updatedState;
     });
   };
+
+  // Control logic for blowers
+  useEffect(() => {
+    if (hullPressure <= lowPressure || ballonetPressure <= lowPressure) {
+      // Turn blower ON
+      setPressedButtons((prev) => ({ ...prev, primary_blower_value: true }));
+      console.log("Blower turned ON");
+    } else if (
+      hullPressure >= highPressure ||
+      ballonetPressure >= highPressure
+    ) {
+      // Turn blower OFF
+      setPressedButtons((prev) => ({ ...prev, primary_blower_value: false }));
+      console.log("Blower turned OFF");
+    }
+  }, [hullPressure, ballonetPressure, lowPressure, highPressure]);
 
   const formatNumber = (num) => {
     if (!num || isNaN(num)) return "N/A"; // Handle invalid values
@@ -993,107 +1089,155 @@ const Home = ({
               // >
 
               <div className="right-sidebar-content">
-              <div className="right-section-design">
-                <div className="controls-box">
-                  {gearActive ? (
-                    <div className="slider-wrapper">
-                      <label>High:</label>
-                      <input
-                        className="input-style"
-                        type="number"
-                        value={highValue}
-                        onChange={(e) => {
-                          let newHigh = parseInt(e.target.value) || 0;
-                          if (newHigh > lowValue) setHighValue(newHigh);
-                        }}
-                      />
-        
-                      {/* Multi-Range Slider */}
-                      <div className="multi-range-slider">
+                <div className="right-section-design">
+                  <div className="controls-box">
+                    {gearActive ? (
+                      <div className="slider-wrapper">
+                        <label>High:</label>
                         <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={lowValue}
+                          className="input-style"
+                          type="number"
+                          value={sliderToPressure(
+                            highSliderValue,
+                            minPressure,
+                            maxPressure
+                          ).toFixed(2)}
                           onChange={(e) => {
-                            let newLow = parseInt(e.target.value);
-                            if (newLow < highValue) setLowValue(newLow);
+                            const newPressure = parseFloat(e.target.value);
+                            if (
+                              newPressure >
+                              sliderToPressure(
+                                lowSliderValue,
+                                minPressure,
+                                maxPressure
+                              )
+                            ) {
+                              setHighSliderValue(
+                                pressureToSlider(
+                                  newPressure,
+                                  minPressure,
+                                  maxPressure
+                                )
+                              );
+                            }
                           }}
-                          className="slider thumb-left"
                         />
+
+                        <div className="multi-range-slider">
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={lowSliderValue}
+                            onChange={handleLowSliderChange}
+                            className="slider thumb-left"
+                          />
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={highSliderValue}
+                            onChange={handleHighSliderChange}
+                            className="slider thumb-right"
+                          />
+                          <div
+                            className="slider-track"
+                            style={{
+                              left: `${lowSliderValue}%`,
+                              right: `${100 - highSliderValue}%`,
+                            }}
+                          ></div>
+                        </div>
+
+                        <label>Low:</label>
                         <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={highValue}
+                          className="input-style"
+                          type="number"
+                          value={sliderToPressure(
+                            lowSliderValue,
+                            minPressure,
+                            maxPressure
+                          ).toFixed(2)}
                           onChange={(e) => {
-                            let newHigh = parseInt(e.target.value);
-                            if (newHigh > lowValue) setHighValue(newHigh);
+                            const newPressure = parseFloat(e.target.value);
+                            if (
+                              newPressure <
+                              sliderToPressure(
+                                highSliderValue,
+                                minPressure,
+                                maxPressure
+                              )
+                            ) {
+                              setLowSliderValue(
+                                pressureToSlider(
+                                  newPressure,
+                                  minPressure,
+                                  maxPressure
+                                )
+                              );
+                            }
                           }}
-                          className="slider thumb-right"
                         />
-                        <div
-                          className="slider-track"
-                          style={{
-                            left: `${(lowValue / 100) * 100}%`,
-                            right: `${100 - (highValue / 100) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-        
-                      <label>Low:</label>
-                      <input
-                        className="input-style"
-                        type="number"
-                        value={lowValue}
-                        onChange={(e) => {
-                          let newLow = parseInt(e.target.value) || 0;
-                          if (newLow < highValue) setLowValue(newLow);
-                        }}
-                      />
-        
-                      <button className="close-button" onClick={() => setGearActive(false)}>
-                        Close
-                      </button>
-                    </div>
-                  ) : (
-                    [
-                      {
-                        key: "primary_blower_value",
-                        imgLight: "/src/assets/primary_blower.png",
-                        imgDark: "/src/assets/primary_blower-dark.png",
-                      },
-                      {
-                        key: "secondary_blower_value",
-                        imgLight: "/src/assets/secondary_blower.png",
-                        imgDark: "/src/assets/secondary_blower-dark.png",
-                      },
-                      {
-                        key: "strobe_lights_value",
-                        imgLight: "/src/assets/strobe_lights.png",
-                        imgDark: "/src/assets/strobe_light-dark.png",
-                      },
-                      {
-                        key: "payload_power_value",
-                        imgLight: "/src/assets/payload_power.png",
-                        imgDark: "/src/assets/payload_power-dark.png",
-                      },
-                      {
-                        key: "Gear",
-                        imgLight: "/src/assets/Gear-light.png",
-                        imgDark: "/src/assets/Gear-dark.png",
-                      },
-                    ].map(({ key, imgLight, imgDark }) => (
-                      <div key={key} className="fan-box">
-                        <div className={`button-container ${pressedButtons[key] ? "pressed" : ""}`} onClick={() => toggleButton(key)}>
-                          <img src={theme === "light" ? imgLight : imgDark} alt={key} className="button-img" />
+                        <div className="grid-container" >
+                        <button className="save-button" onClick={saveValues}>
+                          Save
+                        </button>
+
+                        <button
+                          className="close-button"
+                          onClick={() => setGearActive(false)}
+                        >
+                          Close
+                        </button>
                         </div>
                       </div>
-                    ))
-                  )}
+                    ) : (
+                      [
+                        {
+                          key: "primary_blower_value",
+                          imgLight: "/src/assets/primary_white.png",
+                          imgDark: "/src/assets/primary_black.png",
+                        },
+                        {
+                          key: "secondary_blower_value",
+                          imgLight: "/src/assets/secondary_white.png",
+                          imgDark: "/src/assets/secondary_black.png",
+                        },
+                        {
+                          key: "strobe_lights_value",
+                          imgLight: "/src/assets/strobe_white.png",
+                          imgDark: "/src/assets/strobe_black.png",
+                        },
+                        {
+                          key: "payload_power_value",
+                          imgLight: "/src/assets/payload_white.png",
+                          imgDark: "/src/assets/payload_black.png",
+                        },
+                        {
+                          key: "Gear",
+                          imgLight: "/src/assets/Gear-light.png",
+                          imgDark: "/src/assets/Gear-dark.png",
+                        },
+                      ].map(({ key, imgLight, imgDark }) => (
+                        <div key={key} className="fan-box">
+                          <div
+                            className={`button-container ${
+                              pressedButtons[key] ? "pressed" : ""
+                            }`}
+                            onClick={() => toggleButton(key)}
+                          >
+                            <img
+                              src={theme === "light" ? imgLight : imgDark}
+                              alt={key}
+                              className="button-img"
+                            />
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
             )}
           </div>
         </div>
