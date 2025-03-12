@@ -557,169 +557,284 @@ const Home = ({
                 </div>
               </div>
             </div>
-            <div className="box1">
-              <MainCard title={t("weatherStation")}>
-                <div className="weather-station-card">
-                  <ChildCard>
-                    <div
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        flexDirection: "column",
-                        rowGap: "40px",
-                        paddingTop: "10px",
-                      }}
-                    >
-                      <NewCompass
-                        size={getCompassSize()}
-                        needle1={response?.weather?.heading}
-                        needle2={response?.weather?.wind_angle}
-                      />
-                      <div className="weather-station-chips">
-                        <StatusChip
-                          color={"blue"}
-                          description={t("windAngle")}
+            {phase === 1 && (
+              <div className="box1">
+                <MainCard title={t("weatherStation")}>
+                  <div className="weather-station-card">
+                    <ChildCard>
+                      <div
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "column",
+                          rowGap: "40px",
+                          paddingTop: "10px",
+                        }}
+                      >
+                        <NewCompass
+                          size={getCompassSize()}
+                          needle1={response?.weather?.heading}
+                          needle2={response?.weather?.wind_angle}
                         />
-                        {/* Section for Phase 1 */}
-                        {phase === 1 && (
-                          <div className="phase-1-section">
-                            <StatusChip
-                              color={"red"}
-                              description={"Aerostat Heading"}
-                            />
-                          </div>
-                        )}
-
-                        {phase === 2 && (
-                          <ChartChip
-                            name={t("humidity")}
-                            value={response?.weather?.humidity}
-                            unit={"%"}
+                        <div className="weather-station-chips">
+                          <StatusChip
+                            color={"blue"}
+                            description={t("windAngle")}
                           />
-                        )}
+                          {/* Section for Phase 1 */}
+                          {phase === 1 && (
+                            <div className="phase-1-section">
+                              <StatusChip
+                                color={"red"}
+                                description={"Aerostat Heading"}
+                              />
+                            </div>
+                          )}
 
-                        {/* <ChartChip
+                          {phase === 2 && (
+                            <ChartChip
+                              name={t("humidity")}
+                              value={response?.weather?.humidity}
+                              unit={"%"}
+                            />
+                          )}
+
+                          {/* <ChartChip
+          name={"Heading"}
+          value={parseFloat(
+            response?.digitalCompass?.mag_heading
+          ).toFixed(2)}
+          unit={"°"}
+        /> */}
+                        </div>
+                      </div>
+                    </ChildCard>
+                  </div>
+                </MainCard>
+                <MainCard title={t("windSpeed")}>
+                  <div className="wind-speed-card">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={windGaugeOpts}
+                      ref={windChartRef}
+                    />
+                    <ChartsData
+                      position={"between"}
+                      description1={t("airTemp")}
+                      value1={
+                        <span
+                          style={{
+                            cursor: "pointer",
+                            color: "#4260ff",
+                            fontWeight: "800",
+                            fontSize: "16px",
+                          }}
+                          onClick={() =>
+                            setTempUnit((prev) => (prev === "C" ? "F" : "C"))
+                          }
+                        >
+                          {tempUnit === "C"
+                            ? `${airTempC.toFixed(2)} °C`
+                            : `${airTempF.toFixed(2)} °F`}
+                        </span>
+                      }
+                      graphName={t("windSpeed")}
+                      description2={t("baroPress")}
+                      value2={`${parseFloat(
+                        response?.weather?.baro_presssure || 0
+                      ).toFixed(2)} hPa`}
+                      graphValue={
+                        <span
+                          style={{
+                            cursor: "pointer",
+                            color: "#4260ff",
+                            fontWeight: "800",
+                            fontSize: "16px",
+                          }}
+                          onClick={() =>
+                            setWindUnit((prev) =>
+                              prev === "Knots" ? "m/s" : "Knots"
+                            )
+                          }
+                        >
+                          {windUnit === "Knots"
+                            ? `${windSpeedKnots.toFixed(2)} Knots`
+                            : `${windSpeedMS.toFixed(2)} m/s`}
+                        </span>
+                      }
+                    />
+                  </div>
+                </MainCard>
+              </div>
+            )}
+            {phase === 2 && (
+              <div className="box1">
+                <MainCard title={t("weatherStation")}>
+                  <div className="weather-station-card">
+                    <ChildCard>
+                      <div
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          flexDirection: "column",
+                          rowGap: "40px",
+                          paddingTop: "10px",
+                        }}
+                      >
+                        <NewCompass
+                          size={getCompassSize()}
+                          needle1={response?.weather?.heading}
+                          needle2={response?.weather?.wind_angle}
+                        />
+                        <div className="weather-station-chips">
+                          <StatusChip
+                            color={"blue"}
+                            description={t("windAngle")}
+                          />
+                          {/* Section for Phase 1 */}
+                          {phase === 1 && (
+                            <div className="phase-1-section">
+                              <StatusChip
+                                color={"red"}
+                                description={"Aerostat Heading"}
+                              />
+                            </div>
+                          )}
+
+                          {phase === 2 && (
+                            <ChartChip
+                              name={t("humidity")}
+                              value={response?.weather?.humidity}
+                              unit={"%"}
+                            />
+                          )}
+
+                          {/* <ChartChip
                       name={"Heading"}
                       value={parseFloat(
                         response?.digitalCompass?.mag_heading
                       ).toFixed(2)}
                       unit={"°"}
                     /> */}
+                        </div>
                       </div>
-                    </div>
-                  </ChildCard>
-                </div>
-              </MainCard>
-              <MainCard title={t("windSpeed")}>
-                <div className="wind-speed-card">
-                  <HighchartsReact
-                    highcharts={Highcharts}
-                    options={windGaugeOpts}
-                    ref={windChartRef}
-                  />
-                  <ChartsData
-                    position={"between"}
-                    description1={t("airTemp")}
-                    value1={
-                      <span
-                        style={{
-                          cursor: "pointer",
-                          color: "#4260ff",
-                          fontWeight: "800",
-                          fontSize: "16px",
-                        }}
-                        onClick={() =>
-                          setTempUnit((prev) => (prev === "C" ? "F" : "C"))
-                        }
-                      >
-                        {tempUnit === "C"
-                          ? `${airTempC.toFixed(2)} °C`
-                          : `${airTempF.toFixed(2)} °F`}
-                      </span>
-                    }
-                    graphName={t("windSpeed")}
-                    description2={t("baroPress")}
-                    value2={`${parseFloat(
-                      response?.weather?.baro_presssure || 0
-                    ).toFixed(2)} hPa`}
-                    graphValue={
-                      <span
-                        style={{
-                          cursor: "pointer",
-                          color: "#4260ff",
-                          fontWeight: "800",
-                          fontSize: "16px",
-                        }}
-                        onClick={() =>
-                          setWindUnit((prev) =>
-                            prev === "Knots" ? "m/s" : "Knots"
-                          )
-                        }
-                      >
-                        {windUnit === "Knots"
-                          ? `${windSpeedKnots.toFixed(2)} Knots`
-                          : `${windSpeedMS.toFixed(2)} m/s`}
-                      </span>
-                    }
-                  />
-                </div>
-              </MainCard>
-            </div>
+                    </ChildCard>
+                  </div>
+                </MainCard>
+                <MainCard title={t("windSpeed")}>
+                  <div className="wind-speed-card">
+                    <HighchartsReact
+                      highcharts={Highcharts}
+                      options={windGaugeOpts}
+                      ref={windChartRef}
+                    />
+                    <ChartsData
+                      position={"between"}
+                      description1={t("airTemp")}
+                      value1={
+                        <span
+                          style={{
+                            cursor: "pointer",
+                            color: "#4260ff",
+                            fontWeight: "800",
+                            fontSize: "16px",
+                          }}
+                          onClick={() =>
+                            setTempUnit((prev) => (prev === "C" ? "F" : "C"))
+                          }
+                        >
+                          {tempUnit === "C"
+                            ? `${airTempC.toFixed(2)} °C`
+                            : `${airTempF.toFixed(2)} °F`}
+                        </span>
+                      }
+                      graphName={t("windSpeed")}
+                      description2={t("baroPress")}
+                      value2={`${parseFloat(
+                        response?.weather?.baro_presssure || 0
+                      ).toFixed(2)} hPa`}
+                      graphValue={
+                        <span
+                          style={{
+                            cursor: "pointer",
+                            color: "#4260ff",
+                            fontWeight: "800",
+                            fontSize: "16px",
+                          }}
+                          onClick={() =>
+                            setWindUnit((prev) =>
+                              prev === "Knots" ? "m/s" : "Knots"
+                            )
+                          }
+                        >
+                          {windUnit === "Knots"
+                            ? `${windSpeedKnots.toFixed(2)} Knots`
+                            : `${windSpeedMS.toFixed(2)} m/s`}
+                        </span>
+                      }
+                    />
+                  </div>
+                </MainCard>
+              </div>
+            )}
             <div className="box2">
-              <div
-                className={`preferences ${
-                  theme === "light" ? "preferences-light" : "preferences-dark"
-                }`}
-              >
-                <div className="pref-data-new">
-                  <h3
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      color: theme === "light" ? "black" : "white",
-                    }}
-                  >
-                    AlfaCOR:
-                  </h3>
-                  <ChartChip
-                    name={t("temperature")}
-                    value={
-                      phase === 1
-                        ? "N/A"
-                        : response?.digitalCompass.temperature === "NaN" ||
-                          !response?.digitalCompass.temperature
-                        ? "N/A"
-                        : response?.digitalCompass.temperature
-                    }
-                    unit={phase === 1 ? "" : "°"}
-                  />
+              {phase === 1 && (
+                <div
+                  className={`preferences ${
+                    theme === "light" ? "preferences-light" : "preferences-dark"
+                  }`}
+                >
+                  <div className="pref-data-new">
+                    <h3
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        color: theme === "light" ? "black" : "white",
+                      }}
+                    >
+                      AlfaCOR:
+                    </h3>
+                    <ChartChip
+                      name={t("temperature")}
+                      value={
+                        phase === 1
+                          ? "N/A"
+                          : response?.digitalCompass.temperature === "NaN" ||
+                            !response?.digitalCompass.temperature
+                          ? "N/A"
+                          : response?.digitalCompass.temperature
+                      }
+                      unit={phase === 1 ? "" : "°"}
+                    />
 
-                  <ChartChip
-                    name={t("humidity")}
-                    value={
-                      phase === 1
-                        ? "N/A"
-                        : response?.digitalCompass.humidity === "NaN" ||
-                          !response?.digitalCompass.humidity
-                        ? "N/A"
-                        : `${response?.digitalCompass.humidity}%`
-                    }
-                    unit={""}
-                  />
-                  <StatusChip
-                    color={"green"}
-                    description={
-                      fetchingStart
-                        ? isLoading
-                          ? "Loading..."
-                          : t("connected")
-                        : t("disconnected")
-                    }
-                  />
-                </div>
-                {/* <div className="prefrence-box-new">
+                    <ChartChip
+                      name={t("humidity")}
+                      value={
+                        phase === 1
+                          ? "N/A"
+                          : response?.digitalCompass.humidity === "NaN" ||
+                            !response?.digitalCompass.humidity
+                          ? "N/A"
+                          : `${response?.digitalCompass.humidity}%`
+                      }
+                      unit={""}
+                    />
+                    <StatusChip
+                      color={"green"}
+                      description={
+                        fetchingStart
+                          ? isLoading
+                            ? "Loading..."
+                            : t("connected")
+                          : t("disconnected")
+                      }
+                    />
+                  </div>
+                  {/* <div className="prefrence-box-new">
                   <p
                     style={{
                       fontSize: "20px",
@@ -748,26 +863,111 @@ const Home = ({
                     )}
                   </div>
                 </div> */}
-              </div>
-              <MainCard title={t("aerostatPosition")}>
-                <div className="magnetometer-box">
-                  <div className="heading-box2">
-                    <ChildCard>
-                      <div
-                        className={
-                          phase === 1
-                            ? `heading-box-content`
-                            : `heading-box-content-phase2`
-                        }
-                      >
+                </div>
+              )}
+              {phase === 2 && (
+                <div
+                  className={`preferences ${
+                    theme === "light" ? "preferences-light" : "preferences-dark"
+                  }`}
+                >
+                  <div className="pref-data-new">
+                    <h3
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        color: theme === "light" ? "black" : "white",
+                      }}
+                    >
+                      AlfaCOR:
+                    </h3>
+                    <ChartChip
+                      name={t("temperature")}
+                      value={
+                        phase === 1
+                          ? "N/A"
+                          : response?.digitalCompass.temperature === "NaN" ||
+                            !response?.digitalCompass.temperature
+                          ? "N/A"
+                          : response?.digitalCompass.temperature
+                      }
+                      unit={phase === 1 ? "" : "°"}
+                    />
+
+                    <ChartChip
+                      name={t("humidity")}
+                      value={
+                        phase === 1
+                          ? "N/A"
+                          : response?.digitalCompass.humidity === "NaN" ||
+                            !response?.digitalCompass.humidity
+                          ? "N/A"
+                          : `${response?.digitalCompass.humidity}%`
+                      }
+                      unit={""}
+                    />
+                    <StatusChip
+                      color={"green"}
+                      description={
+                        fetchingStart
+                          ? isLoading
+                            ? "Loading..."
+                            : t("connected")
+                          : t("disconnected")
+                      }
+                    />
+                  </div>
+                  {/* <div className="prefrence-box-new">
+                  <p
+                    style={{
+                      fontSize: "20px",
+                      color: theme === "light" ? "black" : "white",
+                    }}
+                  >
+                    {t("preferences")}
+                  </p>
+
+                  <div
+                    className={`choice ${
+                      theme === "light" ? "choice-light" : "choice-dark"
+                    }`}
+                    onClick={toggleTheme}
+                  >
+                    {theme === "light" ? (
+                      <>
+                        <div className="theme-light"></div>
+                        <p className="theme-text-light">{t("light")}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="theme-text-dark">{t("dark")}</p>
+                        <div className="theme-dark"></div>
+                      </>
+                    )}
+                  </div>
+                </div> */}
+                </div>
+              )}
+              {phase === 1 && (
+                <MainCard title={t("aerostatPosition")}>
+                  <div className="magnetometer-box">
+                    <div className="heading-box2">
+                      <ChildCard>
                         <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            rowGap: "10px",
-                          }}
+                          className={
+                            phase === 1
+                              ? `heading-box-content`
+                              : `heading-box-content-phase2`
+                          }
                         >
-                          {/* {phase === 2 && (
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              rowGap: "10px",
+                            }}
+                          >
+                            {/* {phase === 2 && (
                         <div className="phase-2-section">
                           <StatusChip color={"red"} description={"Humidity"} />
                           <ChartChip
@@ -776,110 +976,110 @@ const Home = ({
                           />
                         </div>
                       )} */}
+                            {phase === 1 && (
+                              <ChartChip
+                                name={"Heading"}
+                                value={parseFloat(
+                                  response?.digitalCompass?.mag_heading
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            )}
+                            {phase === 2 && (
+                              <>
+                                <ChartChip
+                                  name={t("longitude")}
+                                  value={
+                                    response?.weather?.longitude === "NaN" ||
+                                    !response?.weather?.longitude
+                                      ? "N/A"
+                                      : `${response?.weather?.longitude}°`
+                                  }
+                                  unit={""}
+                                />
+                                <ChartChip
+                                  name={t("latitude")}
+                                  value={
+                                    response?.weather?.latitude === "NaN" ||
+                                    !response?.weather?.latitude
+                                      ? "N/A"
+                                      : `${response?.weather?.latitude}°`
+                                  }
+                                  unit={""}
+                                />
+                                <ChartChip
+                                  name={t("altitude")}
+                                  value={
+                                    response?.weather?.altitude === "NaN" ||
+                                    !response?.weather?.altitude
+                                      ? "N/A"
+                                      : `${formatNumber(
+                                          response.weather.altitude
+                                        )}m`
+                                  }
+                                  unit={""}
+                                />
+                              </>
+                            )}
+                          </div>
+                          {/* Show NewCompass only in phase 1 */}
                           {phase === 1 && (
-                            <ChartChip
-                              name={"Heading"}
-                              value={parseFloat(
-                                response?.digitalCompass?.mag_heading
-                              ).toFixed(2)}
-                              unit={"°"}
+                            <NewCompass
+                              size={getCompassSize()}
+                              needle1={response?.digitalCompass?.mag_heading}
                             />
                           )}
-                          {phase === 2 && (
-                            <>
-                              <ChartChip
-                                name={t("longitude")}
-                                value={
-                                  response?.weather?.longitude === "NaN" ||
-                                  !response?.weather?.longitude
-                                    ? "N/A"
-                                    : `${response?.weather?.longitude}°`
-                                }
-                                unit={""}
+
+                          {/* Show LeafletMap only in phase 2 */}
+                          {phase === 2 &&
+                            response?.weather?.latitude &&
+                            response?.weather?.longitude && (
+                              <LeafletMap
+                                lat={response.weather.latitude}
+                                lng={response.weather.longitude}
                               />
-                              <ChartChip
-                                name={t("latitude")}
-                                value={
-                                  response?.weather?.latitude === "NaN" ||
-                                  !response?.weather?.latitude
-                                    ? "N/A"
-                                    : `${response?.weather?.latitude}°`
-                                }
-                                unit={""}
-                              />
-                              <ChartChip
-                                name={t("altitude")}
-                                value={
-                                  response?.weather?.altitude === "NaN" ||
-                                  !response?.weather?.altitude
-                                    ? "N/A"
-                                    : `${formatNumber(
-                                        response.weather.altitude
-                                      )}m`
-                                }
-                                unit={""}
-                              />
-                            </>
-                          )}
+                            )}
                         </div>
-                        {/* Show NewCompass only in phase 1 */}
-                        {phase === 1 && (
-                          <NewCompass
-                            size={getCompassSize()}
-                            needle1={response?.digitalCompass?.mag_heading}
-                          />
-                        )}
-
-                        {/* Show LeafletMap only in phase 2 */}
-                        {phase === 2 &&
-                          response?.weather?.latitude &&
-                          response?.weather?.longitude && (
-                            <LeafletMap
-                              lat={response.weather.latitude}
-                              lng={response.weather.longitude}
-                            />
-                          )}
-                      </div>
-                    </ChildCard>
-                  </div>
-                  <div className="heading-box2">
-                    <ChildCard>
-                      <div
-                        className={
-                          phase === 1
-                            ? `pitch-box-content`
-                            : `pitch-box-content-phase2`
-                        }
-                      >
-                        <div className="pitch-roll-chips">
-                          {phase === 2 && (
+                      </ChildCard>
+                    </div>
+                    <div className="heading-box2">
+                      <ChildCard>
+                        <div
+                          className={
+                            phase === 1
+                              ? `pitch-box-content`
+                              : `pitch-box-content-phase2`
+                          }
+                        >
+                          <div className="pitch-roll-chips">
+                            {phase === 2 && (
+                              <ChartChip
+                                name={"Pitch:"}
+                                value={parseFloat(
+                                  response?.digitalCompass?.pitch
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            )}
                             <ChartChip
-                              name={"Pitch:"}
+                              name={t("roll")}
                               value={parseFloat(
-                                response?.digitalCompass?.pitch
+                                response?.digitalCompass?.roll
                               ).toFixed(2)}
                               unit={"°"}
                             />
-                          )}
-                          <ChartChip
-                            name={t("roll")}
-                            value={parseFloat(
-                              response?.digitalCompass?.roll
-                            ).toFixed(2)}
-                            unit={"°"}
-                          />
 
-                          {phase === 1 && (
-                            <ChartChip
-                              name={"Pitch"}
-                              value={parseFloat(
-                                response?.digitalCompass?.pitch
-                              ).toFixed(2)}
-                              unit={"°"}
-                            />
-                          )}
+                            {phase === 1 && (
+                              <ChartChip
+                                name={"Pitch"}
+                                value={parseFloat(
+                                  response?.digitalCompass?.pitch
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            )}
 
-                          {/* <ChartChip
+                            {/* <ChartChip
                             name={"Longitude:"}
                             value={
                               response?.weather?.longitude === "NaN" ||
@@ -899,32 +1099,211 @@ const Home = ({
                             }
                             unit={""}
                           /> */}
-                          {phase === 2 && (
-                            <div className="phase-2-section">
-                              {/* <StatusChip color={"red"} description={"Humidity"} /> */}
-                              {/* <ChartChip
+                            {phase === 2 && (
+                              <div className="phase-2-section">
+                                {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                                {/* <ChartChip
                               name={"Humidity"}
                               value={getValueForKey("Humidity:", response)}
                             /> */}
+                                <ChartChip
+                                  name={t("heading")}
+                                  value={parseFloat(
+                                    response?.digitalCompass?.mag_heading
+                                  ).toFixed(2)}
+                                  unit={"°"}
+                                />
+                              </div>
+                            )}
+                          </div>
+                          <NewRollMeter
+                            roll={response?.digitalCompass?.roll}
+                            pitch={response?.digitalCompass?.pitch}
+                          />
+                        </div>
+                      </ChildCard>
+                    </div>
+                  </div>
+                </MainCard>
+              )}
+              {phase === 2 && (
+                <MainCard title={t("aerostatPosition")}>
+                  <div className="magnetometer-box">
+                    <div className="heading-box2">
+                      <ChildCard>
+                        <div
+                          className={
+                            phase === 1
+                              ? `heading-box-content`
+                              : `heading-box-content-phase2`
+                          }
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              rowGap: "10px",
+                            }}
+                          >
+                            {/* {phase === 2 && (
+                        <div className="phase-2-section">
+                          <StatusChip color={"red"} description={"Humidity"} />
+                          <ChartChip
+                            name={"Humidity"}
+                            value={getValueForKey("Humidity:", response)}
+                          />
+                        </div>
+                      )} */}
+                            {phase === 1 && (
                               <ChartChip
-                                name={t("heading")}
+                                name={"Heading"}
                                 value={parseFloat(
                                   response?.digitalCompass?.mag_heading
                                 ).toFixed(2)}
                                 unit={"°"}
                               />
-                            </div>
+                            )}
+                            {phase === 2 && (
+                              <>
+                                <ChartChip
+                                  name={t("longitude")}
+                                  value={
+                                    response?.weather?.longitude === "NaN" ||
+                                    !response?.weather?.longitude
+                                      ? "N/A"
+                                      : `${response?.weather?.longitude}°`
+                                  }
+                                  unit={""}
+                                />
+                                <ChartChip
+                                  name={t("latitude")}
+                                  value={
+                                    response?.weather?.latitude === "NaN" ||
+                                    !response?.weather?.latitude
+                                      ? "N/A"
+                                      : `${response?.weather?.latitude}°`
+                                  }
+                                  unit={""}
+                                />
+                                <ChartChip
+                                  name={t("altitude")}
+                                  value={
+                                    response?.weather?.altitude === "NaN" ||
+                                    !response?.weather?.altitude
+                                      ? "N/A"
+                                      : `${formatNumber(
+                                          response.weather.altitude
+                                        )}m`
+                                  }
+                                  unit={""}
+                                />
+                              </>
+                            )}
+                          </div>
+                          {/* Show NewCompass only in phase 1 */}
+                          {phase === 1 && (
+                            <NewCompass
+                              size={getCompassSize()}
+                              needle1={response?.digitalCompass?.mag_heading}
+                            />
                           )}
+
+                          {/* Show LeafletMap only in phase 2 */}
+                          {phase === 2 &&
+                            response?.weather?.latitude &&
+                            response?.weather?.longitude && (
+                              <LeafletMap
+                                lat={response.weather.latitude}
+                                lng={response.weather.longitude}
+                              />
+                            )}
                         </div>
-                        <NewRollMeter
-                          roll={response?.digitalCompass?.roll}
-                          pitch={response?.digitalCompass?.pitch}
-                        />
-                      </div>
-                    </ChildCard>
+                      </ChildCard>
+                    </div>
+                    <div className="heading-box2">
+                      <ChildCard>
+                        <div
+                          className={
+                            phase === 1
+                              ? `pitch-box-content`
+                              : `pitch-box-content-phase2`
+                          }
+                        >
+                          <div className="pitch-roll-chips">
+                            {phase === 2 && (
+                              <ChartChip
+                                name={"Pitch:"}
+                                value={parseFloat(
+                                  response?.digitalCompass?.pitch
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            )}
+                            <ChartChip
+                              name={t("roll")}
+                              value={parseFloat(
+                                response?.digitalCompass?.roll
+                              ).toFixed(2)}
+                              unit={"°"}
+                            />
+
+                            {phase === 1 && (
+                              <ChartChip
+                                name={"Pitch"}
+                                value={parseFloat(
+                                  response?.digitalCompass?.pitch
+                                ).toFixed(2)}
+                                unit={"°"}
+                              />
+                            )}
+
+                            {/* <ChartChip
+                            name={"Longitude:"}
+                            value={
+                              response?.weather?.longitude === "NaN" ||
+                              !response?.weather?.longitude
+                                ? "N/A"
+                                : `${response?.weather?.longitude}°`
+                            }
+                            unit={""}
+                          />
+                          <ChartChip
+                            name={"Latitude:"}
+                            value={
+                              response?.weather?.latitude === "NaN" ||
+                              !response?.weather?.latitude
+                                ? "N/A"
+                                : `${response?.weather?.latitude}°`
+                            }
+                            unit={""}
+                          /> */}
+                            {phase === 2 && (
+                              <div className="phase-2-section">
+                                {/* <StatusChip color={"red"} description={"Humidity"} /> */}
+                                {/* <ChartChip
+                              name={"Humidity"}
+                              value={getValueForKey("Humidity:", response)}
+                            /> */}
+                                <ChartChip
+                                  name={t("heading")}
+                                  value={parseFloat(
+                                    response?.digitalCompass?.mag_heading
+                                  ).toFixed(2)}
+                                  unit={"°"}
+                                />
+                              </div>
+                            )}
+                          </div>
+                          <NewRollMeter
+                            roll={response?.digitalCompass?.roll}
+                            pitch={response?.digitalCompass?.pitch}
+                          />
+                        </div>
+                      </ChildCard>
+                    </div>
                   </div>
-                </div>
-              </MainCard>
+                </MainCard>
+              )}
               {/* <div className="horizontal-box1">
                 <div className="pressure-box">
                   <MainCard title={t("pressures")}>
@@ -957,105 +1336,143 @@ const Home = ({
             </div> */}
 
               <div className="horizontal-box1">
-                <div className="pressure-box">
-                  <MainCard title={t("pressures")}>
-                    <div className="pressure-box-content">
-                      <div>
-                        <HighchartsReact
-                          highcharts={Highcharts}
-                          options={pressureGaugeOpts}
-                          ref={pressureChartRef}
-                        />
+                {phase === 1 && (
+                  <div className="pressure-box">
+                    <MainCard title={t("pressures")}>
+                      <div className="pressure-box-content">
+                        <div>
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={pressureGaugeOpts}
+                            ref={pressureChartRef}
+                          />
 
-                        <ChartsData
-                          position={"around"}
-                          graphValue={parseFloat(
-                            response?.helium?.hel_pressure
-                          ).toFixed(2)}
-                          graphName={t("hullPressure")}
-                        />
-                      </div>
-                      <div>
-                        <HighchartsReact
-                          highcharts={Highcharts}
-                          options={ballonetGaugeOpts}
-                          ref={ballonetChartRef}
-                        />
+                          <ChartsData
+                            position={"around"}
+                            graphValue={parseFloat(
+                              response?.helium?.hel_pressure
+                            ).toFixed(2)}
+                            graphName={t("hullPressure")}
+                          />
+                        </div>
+                        <div>
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={ballonetGaugeOpts}
+                            ref={ballonetChartRef}
+                          />
 
-                        <ChartsData
-                          position={phase === 1 ? "around" : "between"}
-                          graphValue={parseFloat(
-                            response?.ballonet?.bal_pressure
-                          ).toFixed(2)}
-                          graphName={t("ballonetPressure")}
-                          description1={phase === 2 && t("curtainHeight")}
-                          value1={
-                            phase === 2 &&
-                            (response?.ballonet?.ballonet_height === "NaN" ||
-                              !response?.ballonet?.ballonet_height)
-                              ? "N/A"
-                              : phase === 2 &&
-                                response?.ballonet?.ballonet_height && (
-                                  <span
-                                    style={{
-                                      cursor: "pointer",
-                                      color: "#4260ff",
-                                      fontWeight: "800",
-                                      fontSize: "16px",
-                                    }}
-                                    onClick={() =>
-                                      setHeightUnit((prev) =>
-                                        prev === "m" ? "ft" : "m"
-                                      )
-                                    }
-                                  >
-                                    {heightUnit === "m"
-                                      ? `${ballonetHeight.toFixed(2)} m`
-                                      : `${ballonetHeightFt.toFixed(2)} ft`}
-                                  </span>
-                                )
-                          }
-                        />
-                      </div>
-                    </div>
-                  </MainCard>
-                </div>
-                <div className="confluence-box">
-                  <MainCard title={t("lift")}>
-                    <div className="confluence-box-content">
-                      <ChartChip
-                        name={t("maxTension")}
-                        value={
-                          <span
-                            style={{
-                              cursor: "pointer",
-                              color: "#4260ff",
-                              fontWeight: "800",
-                              fontSize: "16px",
-                            }}
-                            onClick={() =>
-                              setMaxTensionUnit((prev) =>
-                                prev === "kg" ? "lbs" : "kg"
-                              )
+                          <ChartsData
+                            position={phase === 1 ? "around" : "between"}
+                            graphValue={parseFloat(
+                              response?.ballonet?.bal_pressure
+                            ).toFixed(2)}
+                            graphName={t("ballonetPressure")}
+                            description1={phase === 2 && t("curtainHeight")}
+                            value1={
+                              phase === 2 &&
+                              (response?.ballonet?.ballonet_height === "NaN" ||
+                                !response?.ballonet?.ballonet_height)
+                                ? "N/A"
+                                : phase === 2 &&
+                                  response?.ballonet?.ballonet_height && (
+                                    <span
+                                      style={{
+                                        cursor: "pointer",
+                                        color: "#4260ff",
+                                        fontWeight: "800",
+                                        fontSize: "16px",
+                                      }}
+                                      onClick={() =>
+                                        setHeightUnit((prev) =>
+                                          prev === "m" ? "ft" : "m"
+                                        )
+                                      }
+                                    >
+                                      {heightUnit === "m"
+                                        ? `${ballonetHeight.toFixed(2)} m`
+                                        : `${ballonetHeightFt.toFixed(2)} ft`}
+                                    </span>
+                                  )
                             }
-                          >
-                            {maxTensionUnit === "kg"
-                              ? `${maxTensionKg.toFixed(2)} kg`
-                              : `${maxTensionLbs.toFixed(2)} lbs`}
-                          </span>
-                        }
-                      />
+                          />
+                        </div>
+                      </div>
+                    </MainCard>
+                  </div>
+                )}
+                {phase === 2 && (
+                  <div className="pressure-box">
+                    <MainCard title={t("pressures")}>
+                      <div className="pressure-box-content">
+                        <div>
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={pressureGaugeOpts}
+                            ref={pressureChartRef}
+                          />
 
-                      <div className="confluence-graph">
-                        <HighchartsReact
-                          highcharts={Highcharts}
-                          options={confluenceGaugeOpts}
-                          ref={confluenceChartRef}
-                        />
-                        <ChartsData
-                          position={"center"}
-                          graphName={t("currentTension")}
-                          graphValue={
+                          <ChartsData
+                            position={"around"}
+                            graphValue={parseFloat(
+                              response?.helium?.hel_pressure
+                            ).toFixed(2)}
+                            graphName={t("hullPressure")}
+                          />
+                        </div>
+                        <div>
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={ballonetGaugeOpts}
+                            ref={ballonetChartRef}
+                          />
+
+                          <ChartsData
+                            position={phase === 1 ? "around" : "between"}
+                            graphValue={parseFloat(
+                              response?.ballonet?.bal_pressure
+                            ).toFixed(2)}
+                            graphName={t("ballonetPressure")}
+                            description1={phase === 2 && t("curtainHeight")}
+                            value1={
+                              phase === 2 &&
+                              (response?.ballonet?.ballonet_height === "NaN" ||
+                                !response?.ballonet?.ballonet_height)
+                                ? "N/A"
+                                : phase === 2 &&
+                                  response?.ballonet?.ballonet_height && (
+                                    <span
+                                      style={{
+                                        cursor: "pointer",
+                                        color: "#4260ff",
+                                        fontWeight: "800",
+                                        fontSize: "16px",
+                                      }}
+                                      onClick={() =>
+                                        setHeightUnit((prev) =>
+                                          prev === "m" ? "ft" : "m"
+                                        )
+                                      }
+                                    >
+                                      {heightUnit === "m"
+                                        ? `${ballonetHeight.toFixed(2)} m`
+                                        : `${ballonetHeightFt.toFixed(2)} ft`}
+                                    </span>
+                                  )
+                            }
+                          />
+                        </div>
+                      </div>
+                    </MainCard>
+                  </div>
+                )}
+                {phase === 1 && (
+                  <div className="confluence-box">
+                    <MainCard title={t("lift")}>
+                      <div className="confluence-box-content">
+                        <ChartChip
+                          name={t("maxTension")}
+                          value={
                             <span
                               style={{
                                 cursor: "pointer",
@@ -1064,21 +1481,113 @@ const Home = ({
                                 fontSize: "16px",
                               }}
                               onClick={() =>
-                                setCurrentTensionUnit((prev) =>
+                                setMaxTensionUnit((prev) =>
                                   prev === "kg" ? "lbs" : "kg"
                                 )
                               }
                             >
-                              {currentTensionUnit === "kg"
-                                ? `${currentTensionKg.toFixed(2)} kg`
-                                : `${currentTensionLbs.toFixed(2)} lbs`}
+                              {maxTensionUnit === "kg"
+                                ? `${maxTensionKg.toFixed(2)} kg`
+                                : `${maxTensionLbs.toFixed(2)} lbs`}
                             </span>
                           }
                         />
+
+                        <div className="confluence-graph">
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={confluenceGaugeOpts}
+                            ref={confluenceChartRef}
+                          />
+                          <ChartsData
+                            position={"center"}
+                            graphName={t("currentTension")}
+                            graphValue={
+                              <span
+                                style={{
+                                  cursor: "pointer",
+                                  color: "#4260ff",
+                                  fontWeight: "800",
+                                  fontSize: "16px",
+                                }}
+                                onClick={() =>
+                                  setCurrentTensionUnit((prev) =>
+                                    prev === "kg" ? "lbs" : "kg"
+                                  )
+                                }
+                              >
+                                {currentTensionUnit === "kg"
+                                  ? `${currentTensionKg.toFixed(2)} kg`
+                                  : `${currentTensionLbs.toFixed(2)} lbs`}
+                              </span>
+                            }
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </MainCard>
-                </div>
+                    </MainCard>
+                  </div>
+                )}
+                {phase === 2 && (
+                  <div className="confluence-box">
+                    <MainCard title={t("lift")}>
+                      <div className="confluence-box-content">
+                        <ChartChip
+                          name={t("maxTension")}
+                          value={
+                            <span
+                              style={{
+                                cursor: "pointer",
+                                color: "#4260ff",
+                                fontWeight: "800",
+                                fontSize: "16px",
+                              }}
+                              onClick={() =>
+                                setMaxTensionUnit((prev) =>
+                                  prev === "kg" ? "lbs" : "kg"
+                                )
+                              }
+                            >
+                              {maxTensionUnit === "kg"
+                                ? `${maxTensionKg.toFixed(2)} kg`
+                                : `${maxTensionLbs.toFixed(2)} lbs`}
+                            </span>
+                          }
+                        />
+
+                        <div className="confluence-graph">
+                          <HighchartsReact
+                            highcharts={Highcharts}
+                            options={confluenceGaugeOpts}
+                            ref={confluenceChartRef}
+                          />
+                          <ChartsData
+                            position={"center"}
+                            graphName={t("currentTension")}
+                            graphValue={
+                              <span
+                                style={{
+                                  cursor: "pointer",
+                                  color: "#4260ff",
+                                  fontWeight: "800",
+                                  fontSize: "16px",
+                                }}
+                                onClick={() =>
+                                  setCurrentTensionUnit((prev) =>
+                                    prev === "kg" ? "lbs" : "kg"
+                                  )
+                                }
+                              >
+                                {currentTensionUnit === "kg"
+                                  ? `${currentTensionKg.toFixed(2)} kg`
+                                  : `${currentTensionLbs.toFixed(2)} lbs`}
+                              </span>
+                            }
+                          />
+                        </div>
+                      </div>
+                    </MainCard>
+                  </div>
+                )}
               </div>
             </div>
             {phase === 2 && (
@@ -1178,17 +1687,17 @@ const Home = ({
                             }
                           }}
                         />
-                        <div className="grid-container" >
-                        <button className="save-button" onClick={saveValues}>
-                          Save
-                        </button>
+                        <div className="grid-container">
+                          <button className="save-button" onClick={saveValues}>
+                            Save
+                          </button>
 
-                        <button
-                          className="close-button"
-                          onClick={() => setGearActive(false)}
-                        >
-                          Close
-                        </button>
+                          <button
+                            className="close-button"
+                            onClick={() => setGearActive(false)}
+                          >
+                            Close
+                          </button>
                         </div>
                       </div>
                     ) : (
@@ -1215,8 +1724,8 @@ const Home = ({
                         },
                         {
                           key: "Gear",
-                          imgLight: "/src/assets/Gear-light.png",
-                          imgDark: "/src/assets/Gear-dark.png",
+                          imgLight: "/src/assets/Setting-white.png",
+                          imgDark: "/src/assets/Setting-black.png",
                         },
                       ].map(({ key, imgLight, imgDark }) => (
                         <div key={key} className="fan-box">
