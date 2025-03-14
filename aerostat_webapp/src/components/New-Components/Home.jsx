@@ -318,9 +318,9 @@ const Home = ({
 
       console.log("Sending data to WebSocket:", relayControls);
       sendJsonMessage(relayControls);
-      setSendData(false);
+      setSendData(false); // Reset sendData after sending
     }
-  }, [sendData, pressedButtons]); // Depend on `pressedButtons` instead of separate states
+  }, [sendData, pressedButtons]);
 
   useEffect(() => {
     if (lastMessage?.data && !isUserAction) {
@@ -395,21 +395,47 @@ const Home = ({
     });
   };
 
+  const hysteresis = 0.1; // Example hysteresis value
+
   useEffect(() => {
-    // Check if blower should be on or off based on saved thresholds
-    if (
-      (hullPressure >= lowPressure && hullPressure <= highPressure) ||
-      (ballonetPressure >= lowPressure && ballonetPressure <= highPressure)
-    ) {
-      // Turn blower ON
-      setPressedButtons((prev) => ({ ...prev, primary_blower_value: true }));
-      console.log("Blower turned ON");
-    } else {
-      // Turn blower OFF
-      setPressedButtons((prev) => ({ ...prev, primary_blower_value: false }));
-      console.log("Blower turned OFF");
-    }
-  }, [hullPressure, ballonetPressure, lowPressure, highPressure]);
+    const timeout = setTimeout(() => {
+      if (
+        (hullPressure >= lowPressure && hullPressure <= highPressure) ||
+        (ballonetPressure >= lowPressure && ballonetPressure <= highPressure)
+      ) {
+        if (!pressedButtons.primary_blower_value) {
+          setPressedButtons((prev) => ({
+            ...prev,
+            primary_blower_value: true,
+          }));
+          setSendData(true);
+          console.log("Blower turned ON (pressure within range)");
+        }
+      } else {
+        if (pressedButtons.primary_blower_value) {
+          setPressedButtons((prev) => ({
+            ...prev,
+            primary_blower_value: false,
+          }));
+          setSendData(true);
+          console.log("Blower turned OFF (pressure outside range)");
+        }
+      }
+    }, 500); // Delay of 500ms
+
+    return () => clearTimeout(timeout); // Cleanup timeout
+  }, [
+    hullPressure,
+    ballonetPressure,
+    lowPressure,
+    highPressure,
+    pressedButtons.primary_blower_value,
+  ]);
+
+  console.log("Current Hull Pressure:", hullPressure);
+  console.log("Current Ballonet Pressure:", ballonetPressure);
+  console.log("Low Pressure Threshold:", lowPressure);
+  console.log("High Pressure Threshold:", highPressure);
 
   const formatNumber = (num) => {
     if (!num || isNaN(num)) return "N/A"; // Handle invalid values
