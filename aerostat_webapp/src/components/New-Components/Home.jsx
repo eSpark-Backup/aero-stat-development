@@ -104,7 +104,7 @@ const Home = ({
   const [highPressure, setHighPressure] = useState(2.5); // Default high pressure (2.5 iwg)
 
   const minPressure = 0; // Minimum pressure value (0 iwg)
-  const maxPressure = 100; // Maximum pressure value (5 iwg)
+  const maxPressure = 10; // Maximum pressure value (5 iwg)
 
   const [lowSliderValue, setLowSliderValue] = useState(
     pressureToSlider(1.8, minPressure, maxPressure) // Initial low slider value (0–100)
@@ -142,15 +142,37 @@ const Home = ({
       maxPressure
     );
 
-    setLowPressure(newLowPressure); // Update low pressure threshold
-    setHighPressure(newHighPressure); // Update high pressure threshold
+    // Update state
+    setLowPressure(newLowPressure);
+    setHighPressure(newHighPressure);
+
+    // Save to local storage
+    localStorage.setItem("lowPressure", newLowPressure);
+    localStorage.setItem("highPressure", newHighPressure);
 
     console.log("Saved Values:", {
       lowPressure: newLowPressure,
       highPressure: newHighPressure,
     });
-    // Add logic to save values (e.g., to backend or local storage)
   };
+
+  useEffect(() => {
+    const savedLowPressure = parseFloat(localStorage.getItem("lowPressure"));
+    const savedHighPressure = parseFloat(localStorage.getItem("highPressure"));
+
+    if (!isNaN(savedLowPressure) && !isNaN(savedHighPressure)) {
+      setLowPressure(savedLowPressure);
+      setHighPressure(savedHighPressure);
+
+      // Update slider values based on saved pressures
+      setLowSliderValue(
+        pressureToSlider(savedLowPressure, minPressure, maxPressure)
+      );
+      setHighSliderValue(
+        pressureToSlider(savedHighPressure, minPressure, maxPressure)
+      );
+    }
+  }, []);
 
   useEffect(() => {
     console.log("Updated High Value:", highValue);
@@ -373,16 +395,16 @@ const Home = ({
     });
   };
 
-  // Control logic for blowers
   useEffect(() => {
-    if (hullPressure <= lowPressure || ballonetPressure <= lowPressure) {
+    // Check if blower should be on or off based on saved thresholds
+    if (
+      (hullPressure >= lowPressure && hullPressure <= highPressure) ||
+      (ballonetPressure >= lowPressure && ballonetPressure <= highPressure)
+    ) {
       // Turn blower ON
       setPressedButtons((prev) => ({ ...prev, primary_blower_value: true }));
       console.log("Blower turned ON");
-    } else if (
-      hullPressure >= highPressure ||
-      ballonetPressure >= highPressure
-    ) {
+    } else {
       // Turn blower OFF
       setPressedButtons((prev) => ({ ...prev, primary_blower_value: false }));
       console.log("Blower turned OFF");
